@@ -52,18 +52,18 @@ struct StoreApp {
 impl StoreApp {
     fn new(cc: &eframe::CreationContext<'_>) -> Self {
         let mut visuals = egui::Visuals::dark();
-        visuals.panel_fill = Color32::from_rgb(17, 19, 18);
-        visuals.window_fill = Color32::from_rgb(22, 25, 23);
-        visuals.extreme_bg_color = Color32::from_rgb(12, 14, 13);
-        visuals.faint_bg_color = Color32::from_rgb(29, 33, 30);
-        visuals.widgets.noninteractive.bg_fill = Color32::from_rgb(23, 27, 24);
-        visuals.widgets.noninteractive.fg_stroke = Stroke::new(1.0_f32, Color32::from_rgb(210, 216, 209));
-        visuals.widgets.inactive.bg_fill = Color32::from_rgb(31, 36, 32);
-        visuals.widgets.inactive.fg_stroke = Stroke::new(1.0_f32, Color32::from_rgb(224, 229, 222));
-        visuals.widgets.hovered.bg_fill = Color32::from_rgb(48, 57, 48);
-        visuals.widgets.active.bg_fill = Color32::from_rgb(193, 238, 113);
-        visuals.selection.bg_fill = Color32::from_rgb(193, 238, 113);
-        visuals.selection.stroke = Stroke::new(1.0_f32, Color32::from_rgb(18, 22, 17));
+        visuals.panel_fill = Color32::from_rgb(19, 19, 19);
+        visuals.window_fill = Color32::from_rgb(24, 24, 24);
+        visuals.extreme_bg_color = Color32::from_rgb(14, 14, 14);
+        visuals.faint_bg_color = Color32::from_rgb(32, 32, 32);
+        visuals.widgets.noninteractive.bg_fill = Color32::from_rgb(26, 26, 26);
+        visuals.widgets.noninteractive.fg_stroke = Stroke::new(1.0_f32, Color32::from_rgb(214, 214, 214));
+        visuals.widgets.inactive.bg_fill = Color32::from_rgb(35, 35, 35);
+        visuals.widgets.inactive.fg_stroke = Stroke::new(1.0_f32, Color32::from_rgb(227, 227, 227));
+        visuals.widgets.hovered.bg_fill = Color32::from_rgb(54, 54, 54);
+        visuals.widgets.active.bg_fill = Color32::from_rgb(219, 219, 219);
+        visuals.selection.bg_fill = Color32::from_rgb(219, 219, 219);
+        visuals.selection.stroke = Stroke::new(1.0_f32, Color32::from_rgb(21, 21, 21));
         cc.egui_ctx.set_visuals(visuals);
 
         // Embed the validated catalog so the first render does not wait on a network request.
@@ -108,45 +108,45 @@ impl StoreApp {
 
     fn card(ui: &mut egui::Ui, plugin: &Plugin) {
         Frame::new()
-            .fill(Color32::from_rgb(23, 27, 24))
-            .stroke(Stroke::new(1.0_f32, Color32::from_rgb(49, 57, 50)))
+            .fill(Color32::from_rgb(26, 26, 26))
+            .stroke(Stroke::new(1.0_f32, Color32::from_rgb(55, 55, 55)))
             .inner_margin(16.0)
             .show(ui, |ui| {
                 ui.set_min_width(ui.available_width());
                 ui.horizontal(|ui| {
                     let initial = plugin.name.chars().next().unwrap_or('A').to_uppercase().to_string();
                     Frame::new()
-                        .fill(Color32::from_rgb(193, 238, 113))
+                        .fill(Color32::from_rgb(219, 219, 219))
                         .inner_margin(egui::Margin::same(9))
                         .corner_radius(egui::CornerRadius::same(8))
                         .show(ui, |ui| {
-                            ui.label(RichText::new(initial).color(Color32::from_rgb(20, 25, 18)).strong().size(20.0));
+                            ui.label(RichText::new(initial).color(Color32::from_rgb(23, 23, 23)).strong().size(20.0));
                         });
                     ui.add_space(4.0);
                     ui.vertical(|ui| {
-                        ui.label(RichText::new(Self::app_name(&plugin.app)).color(Color32::from_rgb(193, 238, 113)).size(12.0).strong());
-                        ui.label(RichText::new(if plugin.kind.is_empty() { "Extension" } else { &plugin.kind }).color(Color32::from_rgb(156, 165, 155)).size(11.0));
+                        ui.label(RichText::new(Self::app_name(&plugin.app)).color(Color32::from_rgb(219, 219, 219)).size(12.0).strong());
+                        ui.label(RichText::new(if plugin.kind.is_empty() { "Extension" } else { &plugin.kind }).color(Color32::from_rgb(162, 162, 162)).size(11.0));
                     });
                     ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                         ui.label(RichText::new(if plugin.version.is_empty() { "Community" } else { &plugin.version })
-                            .color(Color32::from_rgb(156, 165, 155)).size(11.0));
+                            .color(Color32::from_rgb(162, 162, 162)).size(11.0));
                     });
                 });
 
                 ui.add_space(13.0);
-                ui.label(RichText::new(&plugin.name).font(FontId::proportional(21.0)).strong().color(Color32::from_rgb(241, 244, 239)));
+                ui.label(RichText::new(&plugin.name).font(FontId::proportional(21.0)).strong().color(Color32::from_rgb(243, 243, 243)));
                 ui.add_space(5.0);
-                ui.label(RichText::new(&plugin.description).size(13.0).color(Color32::from_rgb(174, 183, 173)));
+                ui.label(RichText::new(&plugin.description).size(13.0).color(Color32::from_rgb(180, 180, 180)));
                 ui.add_space(10.0);
 
                 ui.horizontal_wrapped(|ui| {
                     if !plugin.compatibility.is_empty() {
-                        ui.label(RichText::new(&plugin.compatibility).size(10.5).color(Color32::from_rgb(193, 238, 113)));
+                        ui.label(RichText::new(&plugin.compatibility).size(10.5).color(Color32::from_rgb(219, 219, 219)));
                     } else if let Some(abi) = plugin.abi {
-                        ui.label(RichText::new(format!("ABI v{abi}")).size(10.5).color(Color32::from_rgb(193, 238, 113)));
+                        ui.label(RichText::new(format!("ABI v{abi}")).size(10.5).color(Color32::from_rgb(219, 219, 219)));
                     }
                     for tag in plugin.tags.iter().take(4) {
-                        ui.label(RichText::new(format!("· {tag}")).size(10.5).color(Color32::from_rgb(139, 149, 139)));
+                        ui.label(RichText::new(format!("· {tag}")).size(10.5).color(Color32::from_rgb(146, 146, 146)));
                     }
                 });
 
@@ -155,12 +155,12 @@ impl StoreApp {
                 ui.add_space(7.0);
                 ui.horizontal(|ui| {
                     ui.label(RichText::new(if plugin.author.is_empty() { "Community" } else { &plugin.author })
-                        .size(11.0).color(Color32::from_rgb(139, 149, 139)));
+                        .size(11.0).color(Color32::from_rgb(146, 146, 146)));
                     ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                         if let Some(url) = Self::download_url(plugin) {
-                            ui.hyperlink_to(RichText::new("Download ↓").strong().color(Color32::from_rgb(193, 238, 113)), url);
+                            ui.hyperlink_to(RichText::new("Download ↓").strong().color(Color32::from_rgb(219, 219, 219)), url);
                         } else {
-                            ui.label(RichText::new("No download").size(11.0).color(Color32::from_rgb(139, 149, 139)));
+                            ui.label(RichText::new("No download").size(11.0).color(Color32::from_rgb(146, 146, 146)));
                         }
                         ui.add_space(8.0);
                         ui.hyperlink_to(RichText::new("Review ↗").size(11.0), REVIEW_URL);
@@ -175,14 +175,14 @@ impl StoreApp {
 impl eframe::App for StoreApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::TopBottomPanel::top("topbar")
-            .frame(Frame::new().fill(Color32::from_rgb(14, 16, 15)).inner_margin(egui::Margin::symmetric(24, 15)))
+            .frame(Frame::new().fill(Color32::from_rgb(16, 16, 16)).inner_margin(egui::Margin::symmetric(24, 15)))
             .show(ctx, |ui| {
                 ui.horizontal(|ui| {
-                    ui.label(RichText::new("A").size(18.0).strong().color(Color32::from_rgb(193, 238, 113)));
-                    ui.label(RichText::new("ARTCRAFT").size(14.0).strong().color(Color32::from_rgb(240, 243, 237)));
-                    ui.label(RichText::new("/ STORE").size(12.0).color(Color32::from_rgb(133, 145, 133)));
+                    ui.label(RichText::new("A").size(18.0).strong().color(Color32::from_rgb(219, 219, 219)));
+                    ui.label(RichText::new("ARTCRAFT").size(14.0).strong().color(Color32::from_rgb(242, 242, 242)));
+                    ui.label(RichText::new("/ STORE").size(12.0).color(Color32::from_rgb(142, 142, 142)));
                     ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                        ui.hyperlink_to(RichText::new("GitHub ↗").size(12.0).color(Color32::from_rgb(193, 238, 113)), REPO_URL);
+                        ui.hyperlink_to(RichText::new("GitHub ↗").size(12.0).color(Color32::from_rgb(219, 219, 219)), REPO_URL);
                         ui.add_space(12.0);
                         ui.hyperlink_to(RichText::new("LUT Studio ↗").size(12.0), format!("{BASE_URL}lut-studio/"));
                         ui.add_space(12.0);
@@ -192,35 +192,35 @@ impl eframe::App for StoreApp {
             });
 
         egui::CentralPanel::default()
-            .frame(Frame::new().fill(Color32::from_rgb(17, 19, 18)).inner_margin(egui::Margin::symmetric(24, 22)))
+            .frame(Frame::new().fill(Color32::from_rgb(19, 19, 19)).inner_margin(egui::Margin::symmetric(24, 22)))
             .show(ctx, |ui| {
                 egui::ScrollArea::vertical().auto_shrink([false, false]).show(ui, |ui| {
                     ui.set_max_width(1120.0);
                     ui.label(RichText::new("● COMMUNITY BUILT   ·   OPEN SOURCE   ·   MADE FOR CREATORS")
-                        .size(10.5).strong().color(Color32::from_rgb(193, 238, 113)));
+                        .size(10.5).strong().color(Color32::from_rgb(219, 219, 219)));
                     ui.add_space(15.0);
-                    ui.label(RichText::new("Tools for your\ncreative flow.").size(48.0).strong().color(Color32::from_rgb(241, 244, 239)));
+                    ui.label(RichText::new("Tools for your\ncreative flow.").size(48.0).strong().color(Color32::from_rgb(243, 243, 243)));
                     ui.add_space(10.0);
                     ui.label(RichText::new("Small, focused extensions for PhotoCraft and Adobe After Effects, built by the community.")
-                        .size(15.0).color(Color32::from_rgb(174, 183, 173)));
+                        .size(15.0).color(Color32::from_rgb(180, 180, 180)));
                     ui.add_space(18.0);
                     ui.horizontal_wrapped(|ui| {
-                        ui.label(RichText::new(format!("{:02}", self.plugins.len())).size(20.0).strong().color(Color32::from_rgb(193, 238, 113)));
-                        ui.label(RichText::new("catalog items").size(12.0).color(Color32::from_rgb(139, 149, 139)));
+                        ui.label(RichText::new(format!("{:02}", self.plugins.len())).size(20.0).strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("catalog items").size(12.0).color(Color32::from_rgb(146, 146, 146)));
                         ui.add_space(18.0);
-                        ui.label(RichText::new("02").size(20.0).strong().color(Color32::from_rgb(193, 238, 113)));
-                        ui.label(RichText::new("creative apps").size(12.0).color(Color32::from_rgb(139, 149, 139)));
+                        ui.label(RichText::new("02").size(20.0).strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("creative apps").size(12.0).color(Color32::from_rgb(146, 146, 146)));
                         ui.add_space(18.0);
-                        ui.label(RichText::new("MIT").size(20.0).strong().color(Color32::from_rgb(193, 238, 113)));
-                        ui.label(RichText::new("open project").size(12.0).color(Color32::from_rgb(139, 149, 139)));
+                        ui.label(RichText::new("MIT").size(20.0).strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("open project").size(12.0).color(Color32::from_rgb(146, 146, 146)));
                     });
 
                     ui.add_space(28.0);
                     ui.separator();
                     ui.add_space(20.0);
-                    ui.label(RichText::new("BROWSE THE CATALOG").size(10.5).strong().color(Color32::from_rgb(193, 238, 113)));
+                    ui.label(RichText::new("BROWSE THE CATALOG").size(10.5).strong().color(Color32::from_rgb(219, 219, 219)));
                     ui.add_space(6.0);
-                    ui.label(RichText::new("Find your next tool.").size(27.0).strong().color(Color32::from_rgb(241, 244, 239)));
+                    ui.label(RichText::new("Find your next tool.").size(27.0).strong().color(Color32::from_rgb(243, 243, 243)));
                     ui.add_space(12.0);
                     ui.add_sized(
                         Vec2::new(ui.available_width().min(540.0), 36.0),
@@ -257,10 +257,10 @@ impl eframe::App for StoreApp {
                     }).cloned().collect();
 
                     if shown.is_empty() {
-                        Frame::new().fill(Color32::from_rgb(23, 27, 24))
+                        Frame::new().fill(Color32::from_rgb(26, 26, 26))
                             .inner_margin(20.0).show(ui, |ui| {
                                 ui.label(RichText::new("No matching items").strong().size(17.0));
-                                ui.label(RichText::new("Try another search or select a different app.").color(Color32::from_rgb(156, 165, 155)));
+                                ui.label(RichText::new("Try another search or select a different app.").color(Color32::from_rgb(162, 162, 162)));
                             });
                     } else {
                         let columns = if ui.available_width() >= 760.0 { 2 } else { 1 };
@@ -275,19 +275,19 @@ impl eframe::App for StoreApp {
                     }
 
                     ui.add_space(20.0);
-                    Frame::new().fill(Color32::from_rgb(23, 27, 24))
-                        .stroke(Stroke::new(1.0_f32, Color32::from_rgb(49, 57, 50)))
+                    Frame::new().fill(Color32::from_rgb(26, 26, 26))
+                        .stroke(Stroke::new(1.0_f32, Color32::from_rgb(55, 55, 55)))
                         .inner_margin(14.0).show(ui, |ui| {
-                            ui.label(RichText::new("Before you install").strong().color(Color32::from_rgb(193, 238, 113)));
+                            ui.label(RichText::new("Before you install").strong().color(Color32::from_rgb(219, 219, 219)));
                             ui.label(RichText::new("Check each listing’s source, file format, and compatibility. Downloads are served from the store or the project that maintains the item.")
-                                .size(12.0).color(Color32::from_rgb(174, 183, 173)));
+                                .size(12.0).color(Color32::from_rgb(180, 180, 180)));
                         });
 
                     ui.add_space(26.0);
                     ui.separator();
                     ui.add_space(12.0);
                     ui.horizontal_wrapped(|ui| {
-                        ui.label(RichText::new("ARTCRAFT STORE  ·  COMMUNITY PROJECT").size(10.5).color(Color32::from_rgb(139, 149, 139)));
+                        ui.label(RichText::new("ARTCRAFT STORE  ·  COMMUNITY PROJECT").size(10.5).color(Color32::from_rgb(146, 146, 146)));
                         ui.add_space(10.0);
                         ui.hyperlink_to(RichText::new("Source code ↗").size(11.0), REPO_URL);
                         ui.add_space(10.0);
