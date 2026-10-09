@@ -3,11 +3,11 @@
 A shared, searchable community catalog for apps with supported extension systems:
 
 - **PhotoCraft** — plug-ins, filters, and tools
-- **Adobe After Effects** — scripts and plug-ins
+- **EffectCraft** — plug-ins
 
 The static storefront in [`index.html`](index.html) reads [`catalog.json`](catalog.json) at runtime. Filter by app or search across names, descriptions, tags, and compatibility notes.
 
-This is a community-maintained catalog, not an official ArtCraft support channel. Submissions should be limited to plugins and scripts intended for listing in this store, with a source repository, license, download link, supported app/version, and clear description. Reviews are for existing catalog items only.
+This is a community-maintained catalog, not an official ArtCraft support channel. Submissions should be limited to plugins intended for listing in this store, with a source repository, license, download link, supported app/version, and clear description. Reviews are for existing catalog items only.
 
 ## Launcher API (v1)
 
@@ -79,7 +79,7 @@ This API is intentionally static and read-only. It does not install plugins, gua
 
 ## Adding an item
 
-Add an entry to `catalog.json` under `plugins`. Supported fields include `id`, `app`, `name`, `version`, `author`, `description`, `kind`, `tags`, `compatibility`, `sourceUrl`, `downloadUrl`, `artifact`, and `releaseAsset`. The `app` value should be `photocraft` or `after-effects`. Only list an app when the extension targets a supported plug-in or scripting interface. Use `sourceUrl` and `downloadUrl` for extensions hosted outside this repository. The storefront supports app-specific formats; it does not assume every item is a WASM file.
+Add an entry to `catalog.json` under `plugins`. Supported fields include `id`, `app`, `name`, `version`, `author`, `description`, `kind`, `tags`, `compatibility`, `sourceUrl`, `downloadUrl`, `artifact`, and `releaseAsset`. The `app` value should be `photocraft` or `effectcraft`. Only list an app when the extension targets a supported plug-in or scripting interface. Use `sourceUrl` and `downloadUrl` for extensions hosted outside this repository. The storefront supports app-specific formats; it does not assume every item is a WASM file.
 
 Do not add a listing until its source, license, download, and target-app compatibility have been checked.
 
@@ -100,7 +100,13 @@ Do not add a listing until its source, license, download, and target-app compati
 | **Geometry Fixer** | Filter (ABI v1) | Straightens rotation, adjusts horizontal/vertical perspective, and controls zoom on a fixed canvas. |
 | **Seamless Pattern Generator** | Filter (ABI v1) | Reduces texture tiling seams by blending opposing edges with a smooth falloff. |
 
-The build workflow compiles the PhotoCraft Rust/WASM plug-ins. The browser-based LUT Studio is available at `https://akkk09.github.io/artcraft-store/lut-studio/`. The catalog is limited to PhotoCraft and Adobe After Effects, the two apps identified as supporting plug-ins or scripts. There are no After Effects listings yet; entries will appear when a compatible script or plug-in is ready.
+The build workflow compiles the PhotoCraft Rust/WASM plug-ins and stages the submitted EffectCraft `chromatic-fringe.wat` extension. The browser-based LUT Studio is available at `https://akkk09.github.io/artcraft-store/lut-studio/`. The catalog supports PhotoCraft plug-ins and EffectCraft plug-ins. Chromatic Fringe is the first EffectCraft listing.
+
+## EffectCraft plug-ins
+
+**Chromatic Fringe** by `trokute` offsets the red and blue color channels in opposite directions. It targets the EffectCraft plug-in API v1 and is distributed as `chromatic-fringe.wat`.
+
+In EffectCraft, use **Effect → Load Effect Plug-in** and select `chromatic-fringe.wat`. The **Shift** parameter controls channel offset (0–32 pixels); **Blend** mixes the effect with the original image.
 
 ## Build PhotoCraft plug-ins locally
 
@@ -111,7 +117,7 @@ rustup target add wasm32-unknown-unknown
 bash build-all.sh
 ```
 
-PhotoCraft WASM modules are copied to `dist/`. Legacy asset-bundle build steps may remain, but those bundles are not listed as supported app extensions in the catalog.
+PhotoCraft WASM modules and the EffectCraft `.wat` extension are copied to `dist/`. Legacy asset-bundle build steps may remain, but those bundles are not listed as supported app extensions in the catalog.
 
 ## License
 
