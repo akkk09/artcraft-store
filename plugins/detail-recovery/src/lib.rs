@@ -202,7 +202,7 @@ mod tests {
 
     #[test]
     fn sharpening_pushes_center_away_from_local_mean() {
-        let src = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+        let src = [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0];
         let mut dst = [0.0; 9];
         filter_pixels(&src, &mut dst, 3, 3, 1, 1, false, 1.0, 0.0);
         close(dst[4], 1.0 + (1.0 - 1.0 / 9.0));
