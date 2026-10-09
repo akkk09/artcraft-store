@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#111312">
+    <meta name="description" content="Community extensions, plug-ins, scripts, and tools for the ArtCraft creative apps.">
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+    <title>ArtCraft Store — Community Extensions</title>
+    <style>
+      html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #111312; }
+      body { color: #f1f4ef; font-family: system-ui, sans-serif; }
+      canvas { display: block; width: 100%; height: 100%; outline: none; }
+      #loading { position: fixed; inset: 0; display: grid; place-items: center; background: #111312; color: #c1ee71; font: 600 13px system-ui, sans-serif; letter-spacing: .08em; }
+    </style>
+    <link data-trunk rel="rust" data-wasm-opt="z">
+  </head>
+  <body>
+    <div id="loading">LOADING ARTCRAFT STORE…</div>
+    <canvas id="the_canvas_id" oncontextmenu="event.preventDefault()"></canvas>
+    <script>
+      window.addEventListener("load", () => {
+        const loading = document.getElementById("loading");
+        const canvas = document.getElementById("the_canvas_id");
+        const observer = new MutationObserver(() => {
+          if (canvas.width > 300 || canvas.height > 150) {
+            loading.style.display = "none";
+            observer.disconnect();
+          }
+        });
+        observer.observe(canvas, { attributes: true, attributeFilter: ["width", "height"] });
+        setTimeout(() => { loading.style.display = "none"; }, 12000);
+      });
+    </script>
+  </body>
+</html>

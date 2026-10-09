@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "name": "ArtCraft Store",
-  "description": "Community extensions for PhotoCraft, FilmCraft, EffectCraft, and VectorCraft.",
+  "description": "Community extensions for PhotoCraft and Adobe After Effects.",
   "apps": [
     {
       "id": "photocraft",
@@ -13,29 +13,11 @@
       ]
     },
     {
-      "id": "filmcraft",
-      "name": "FilmCraft",
+      "id": "after-effects",
+      "name": "Adobe After Effects",
       "extensionTypes": [
         "plugin",
-        "effect",
-        "preset"
-      ]
-    },
-    {
-      "id": "effectcraft",
-      "name": "EffectCraft",
-      "extensionTypes": [
-        "script",
-        "plugin"
-      ]
-    },
-    {
-      "id": "vectorcraft",
-      "name": "VectorCraft",
-      "extensionTypes": [
-        "plugin",
-        "tool",
-        "preset"
+        "script"
       ]
     }
   ],
@@ -60,28 +42,6 @@
       ],
       "app": "photocraft",
       "compatibility": "PhotoCraft ABI v1"
-    },
-    {
-      "id": "org.filmcraft.community.film-emulation",
-      "name": "Film Emulation Toolkit — FilmCraft Pack",
-      "version": "0.1.0",
-      "author": "ArtCraft Store community",
-      "description": "Five native FilmCraft effect presets with monochrome grain plus matching 17³ .cube LUTs.",
-      "kind": "preset",
-      "source": "plugins/film-emulation",
-      "sourceUrl": "https://github.com/akkk09/artcraft-store/tree/main/plugins/film-emulation",
-      "artifact": "filmcraft-film-emulation-toolkit.zip",
-      "releaseAsset": "filmcraft-film-emulation-toolkit.zip",
-      "tags": [
-        "film",
-        "film-look",
-        "color-grading",
-        "lut",
-        "grain",
-        "cinematic"
-      ],
-      "app": "filmcraft",
-      "compatibility": "FilmCraft effect-presets v1 and .cube LUTs"
     },
     {
       "id": "org.photocraft.community.detail-recovery",
@@ -184,27 +144,6 @@
       "interactiveBrush": false,
       "app": "photocraft",
       "compatibility": "PhotoCraft ABI v1"
-    },
-    {
-      "id": "org.effectcraft.trokute.chromatic-fringe",
-      "name": "Chromatic Fringe",
-      "version": "1.0.0",
-      "author": "trokute",
-      "description": "Offsets red and blue color channels in opposite directions.",
-      "kind": "plugin",
-      "abi": 1,
-      "source": "plugins/chromatic-fringe",
-      "sourceUrl": "https://github.com/trokute/artcraft-store/tree/main/plugins/chromatic-fringe",
-      "artifact": "chromatic-fringe.wat",
-      "releaseAsset": "chromatic-fringe.wat",
-      "tags": [
-        "chromatic",
-        "fringe",
-        "color",
-        "rgb"
-      ],
-      "app": "effectcraft",
-      "compatibility": "EffectCraft plug-in API v1"
     },
     {
       "id": "org.photocraft.community.mosaic-pixelate",
@@ -334,31 +273,6 @@
       ],
       "app": "photocraft",
       "compatibility": "PhotoCraft ABI v1"
-    },
-    {
-      "id": "org.vectorcraft.community.creator-graphics-pack",
-      "name": "Creator Graphics Pack",
-      "version": "1.0.0",
-      "author": "ArtCraft Store community",
-      "description": "Editable SVG templates for video thumbnails, channel banners, end screens, lower thirds, social posts, and creator avatars.",
-      "kind": "preset",
-      "source": "assets/creator-graphics-pack",
-      "sourceUrl": "https://github.com/akkk09/artcraft-store/tree/main/assets/creator-graphics-pack",
-      "artifact": "creator-graphics-pack.zip",
-      "releaseAsset": "creator-graphics-pack.zip",
-      "tags": [
-        "creator",
-        "youtube",
-        "thumbnail",
-        "banner",
-        "social",
-        "lower-third",
-        "svg",
-        "vector",
-        "template"
-      ],
-      "app": "vectorcraft",
-      "compatibility": "Editable SVG; import/open in SVG-compatible vector editors"
     }
   ]
 }

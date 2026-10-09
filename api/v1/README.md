@@ -36,7 +36,7 @@ Common plugin fields:
 | Field | Meaning | Consumer guidance |
 |---|---|---|
 | `id` | Listing identifier | Use for lookup; treat as an opaque string. |
-| `app` | Target ArtCraft app ID | Known IDs: `photocraft`, `filmcraft`, `effectcraft`, `vectorcraft`. |
+| `app` | Target ArtCraft app ID | Known IDs: `photocraft`, `after-effects`. |
 | `name` | Display name | Treat as untrusted display text. |
 | `version` | Listing/plugin version | Do not assume it follows a particular versioning scheme unless your installer defines one. |
 | `author` | Author/maintainer label | Informational metadata, not identity verification. |
@@ -85,11 +85,11 @@ It supports modern browser/Electron environments and modern Node.js ESM environm
 import { artcraft } from "https://akkk09.github.io/artcraft-store/api/v1/client.js";
 
 const catalog = await artcraft.getCatalog();
-const effectCraftPlugins = await artcraft.listPlugins({ app: "effectcraft" });
-const plugin = await artcraft.getPlugin("org.effectcraft.trokute.chromatic-fringe");
+const photoCraftPlugins = await artcraft.listPlugins({ app: "photocraft" });
+const plugin = await artcraft.getPlugin("org.photocraft.community.vignette");
 const downloadUrl = artcraft.getDownloadUrl(plugin);
 
-console.log(catalog.plugins.length, effectCraftPlugins, downloadUrl);
+console.log(catalog.plugins.length, photoCraftPlugins, downloadUrl);
 ```
 
 ### Methods
@@ -145,7 +145,7 @@ if not isinstance(plugins, list):
     raise ValueError("Unexpected ArtCraft catalog format")
 
 for plugin in plugins:
-    if isinstance(plugin, dict) and plugin.get("app") == "effectcraft":
+    if isinstance(plugin, dict) and plugin.get("app") == "photocraft":
         print(plugin.get("id"), plugin.get("name"))
 ```
 

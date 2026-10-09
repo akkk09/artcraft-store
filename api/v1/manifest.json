@@ -2,7 +2,7 @@
   "name": "ArtCraft Store API",
   "apiVersion": "v1",
   "type": "static-json",
-  "description": "A public, read-only catalog API for third-party ArtCraft launchers.",
+  "description": "A public, read-only catalog API for PhotoCraft plug-ins and Adobe After Effects scripts/plug-ins.",
   "catalog": "../../catalog.json",
   "clientModule": "./client.js",
   "endpoints": {
@@ -11,12 +11,19 @@
     "pluginLookup": "Fetch the catalog and select the plugin whose id matches the requested ID."
   },
   "downloadResolution": {
-    "priority": ["downloadUrl", "releaseAsset", "artifact"],
+    "priority": [
+      "downloadUrl",
+      "releaseAsset",
+      "artifact"
+    ],
     "relativeArtifactBase": "../../downloads/",
     "note": "downloadUrl may be an absolute URL. Otherwise releaseAsset or artifact is resolved relative to the store's downloads directory."
   },
   "compatibility": {
-    "apps": ["photocraft", "filmcraft", "effectcraft", "vectorcraft"],
+    "apps": [
+      "photocraft",
+      "after-effects"
+    ],
     "unknownFields": "Clients should ignore fields they do not understand."
   }
 }

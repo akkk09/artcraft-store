@@ -5,9 +5,11 @@ on:
       - "plugins/**"
       - "assets/**"
       - "scripts/**"
+      - "web-ui/**"
       - "catalog.json"
       - "build-all.sh"
       - ".github/workflows/build-plugins.yml"
+      - ".github/workflows/deploy-pages.yml"
   push:
     branches: [main]
     tags: ["v*"]
@@ -15,9 +17,11 @@ on:
       - "plugins/**"
       - "assets/**"
       - "scripts/**"
+      - "web-ui/**"
       - "catalog.json"
       - "build-all.sh"
       - ".github/workflows/build-plugins.yml"
+      - ".github/workflows/deploy-pages.yml"
   workflow_dispatch:
 permissions:
   contents: write
@@ -33,6 +37,13 @@ jobs:
         run: python -m json.tool catalog.json > /dev/null
       - name: Check download audit scripts compile
         run: python -m py_compile scripts/validate_catalog.py scripts/check_live_downloads.py
+      - name: Check egui WebAssembly storefront
+        run: cargo check --manifest-path web-ui/Cargo.toml --target wasm32-unknown-unknown
+      - name: Install Trunk
+        run: cargo install trunk --locked
+      - name: Build egui WebAssembly frontend
+        run: trunk build --release --public-url /artcraft-store/ --dist ../web-dist
+        working-directory: web-ui
       - name: Test Gradient Map algorithms
         run: cargo test --manifest-path plugins/gradient-map/Cargo.toml
       - name: Test Color Toolkit algorithms

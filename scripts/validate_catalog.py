@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 from urllib.parse import urlparse
 
-APP_IDS = {"photocraft", "filmcraft", "effectcraft", "vectorcraft"}
+APP_IDS = {"photocraft", "after-effects"}
 PLUGIN_ID_RE = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
 VERSION_RE = re.compile(
     r"^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$"
@@ -140,8 +140,12 @@ def validate_download_pipeline(catalog: dict, root: Path) -> list[str]:
     except OSError as exc:
         return [f"cannot read Pages workflow: {exc}"]
 
-    if "cp dist/* downloads/" not in deploy_workflow:
-        errors.append("Pages workflow does not copy built dist/ artifacts into downloads/")
+    artifact_copy_steps = (
+        "cp dist/* downloads/",
+        "cp dist/* web-dist/downloads/",
+    )
+    if not any(step in deploy_workflow for step in artifact_copy_steps):
+        errors.append("Pages workflow does not copy built dist/ artifacts into the published downloads/ directory")
 
     release_section = build_workflow.split("files: |", 1)
     if len(release_section) != 2:

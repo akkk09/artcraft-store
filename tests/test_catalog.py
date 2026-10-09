@@ -16,6 +16,16 @@ class CatalogValidationTests(unittest.TestCase):
     def test_repository_catalog_is_valid(self):
         self.assertEqual(validate_catalog(self.catalog, ROOT), [])
 
+    def test_catalog_declares_only_supported_extension_hosts(self):
+        self.assertEqual({app["id"] for app in self.catalog["apps"]}, {"photocraft", "after-effects"})
+        self.assertTrue(all(plugin["app"] == "photocraft" for plugin in self.catalog["plugins"]))
+
+    def test_unsupported_app_listing_is_rejected(self):
+        catalog = json.loads(json.dumps(self.catalog))
+        catalog["plugins"][0]["app"] = "filmcraft"
+        errors = validate_catalog(catalog, ROOT)
+        self.assertTrue(any("not a supported app id" in error for error in errors))
+
     def test_duplicate_ids_are_rejected(self):
         catalog = json.loads(json.dumps(self.catalog))
         catalog["plugins"].append(dict(catalog["plugins"][0]))
