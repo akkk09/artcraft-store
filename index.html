@@ -10,14 +10,14 @@
   <style>
     :root {
       color-scheme: dark;
-      --bg: #111110;
-      --panel: #191918;
-      --panel2: #222220;
-      --line: #393936;
-      --text: #f4f1e9;
-      --muted: #a6a49c;
-      --accent: #d9f36a;
-      --accent-ink: #17190f;
+      --bg: #111111;
+      --panel: #191919;
+      --panel2: #242424;
+      --line: #393939;
+      --text: #f4f4f4;
+      --muted: #a6a6a6;
+      --accent: #f4f4f4;
+      --accent-ink: #111111;
       --radius: 12px;
     }
     * { box-sizing: border-box; }
@@ -64,7 +64,7 @@
     }
     .btn.primary { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
     .btn:hover { border-color:var(--accent); }
-    .btn.primary:hover { background:#e7ff91; }
+    .btn.primary:hover { background:#ffffff; }
     .stats { display:flex; gap:0; flex-wrap:wrap; margin-top:66px; border-top:1px solid var(--line); }
     .stat { flex:1; min-width:150px; padding:22px 22px 0 0; margin-right:22px; }
     .stat strong { display:block; font-size:28px; line-height:1.1; letter-spacing:-.06em; }
@@ -95,7 +95,7 @@
       border-radius:var(--radius); padding:24px; display:flex; flex-direction:column;
       transition:border-color .18s, background .18s;
     }
-    .card:hover { border-color:#77776b; background:#1d1d1b; }
+    .card:hover { border-color:#777777; background:#1d1d1d; }
     .card-top { display:flex; align-items:start; justify-content:space-between; gap:12px; }
     .glyph {
       width:46px; height:46px; border-radius:12px; background:var(--panel2);
@@ -103,11 +103,11 @@
       color:var(--accent); font-size:23px;
     }
     .pill { font-size:11px; border:1px solid var(--line); border-radius:999px; padding:5px 10px; color:var(--muted); white-space:nowrap; }
-    .pill.filter-pill { color:var(--accent); border-color:#56632f; }
+    .pill.filter-pill { color:var(--accent); border-color:var(--line); }
     .card h3 { font-size:23px; line-height:1.15; letter-spacing:-.045em; margin:20px 0 8px; }
     .card p { color:var(--muted); font-size:14px; line-height:1.6; margin:0; min-height:44px; }
     .tags { display:flex; gap:6px; flex-wrap:wrap; margin:18px 0 22px; }
-    .tag { font-size:10px; letter-spacing:.03em; color:#c7c7bc; background:#292926; border-radius:4px; padding:5px 8px; }
+    .tag { font-size:10px; letter-spacing:.03em; color:#c7c7c7; background:#292929; border-radius:4px; padding:5px 8px; }
     .card-foot { display:flex; align-items:center; justify-content:space-between; gap:10px; border-top:1px solid var(--line); padding-top:16px; margin-top:auto; }
     .version { color:var(--muted); font-size:12px; }
     .card-links { display:flex; gap:12px; align-items:center; }
