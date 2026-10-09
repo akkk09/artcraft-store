@@ -3,7 +3,7 @@
 #[cfg(test)]
 extern crate std;
 
-use core::{ptr, slice};
+use core::slice;
 
 #[cfg(not(test))]
 #[panic_handler]
@@ -96,7 +96,7 @@ fn preset_index(params: &[u8]) -> usize {
                 let value = &rest[colon + 1..];
                 if value.windows(7).any(|w| w == b"classic") { return 0; }
                 if value.windows(4).any(|w| w == b"warm") { return 1; }
-                if value.windows(3).any(|w| w == b"cool") { return 2; }
+                if value.windows(4).any(|w| w == b"cool") { return 2; }
                 if value.windows(5).any(|w| w == b"faded") { return 3; }
                 if value.windows(9).any(|w| w == b"cinematic") { return 4; }
             }
