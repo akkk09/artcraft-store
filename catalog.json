@@ -41,6 +41,49 @@
   ],
   "plugins": [
     {
+      "id": "org.photocraft.community.film-emulation",
+      "name": "Film Emulation Toolkit",
+      "version": "0.1.0",
+      "author": "ArtCraft Store community",
+      "description": "Applies compact film-inspired color looks with deterministic grain.",
+      "kind": "filter",
+      "abi": 1,
+      "source": "plugins/film-emulation",
+      "artifact": "photocraft_plugin_film_emulation.wasm",
+      "releaseAsset": "photocraft_plugin_film_emulation.wasm",
+      "tags": [
+        "film",
+        "film-look",
+        "color-grading",
+        "grain",
+        "cinematic"
+      ],
+      "app": "photocraft",
+      "compatibility": "PhotoCraft ABI v1"
+    },
+    {
+      "id": "org.filmcraft.community.film-emulation",
+      "name": "Film Emulation Toolkit — FilmCraft Pack",
+      "version": "0.1.0",
+      "author": "ArtCraft Store community",
+      "description": "Five native FilmCraft effect presets with monochrome grain plus matching 17³ .cube LUTs.",
+      "kind": "preset",
+      "source": "plugins/film-emulation",
+      "sourceUrl": "https://github.com/akkk09/artcraft-store/tree/main/plugins/film-emulation",
+      "artifact": "filmcraft-film-emulation-toolkit.zip",
+      "releaseAsset": "filmcraft-film-emulation-toolkit.zip",
+      "tags": [
+        "film",
+        "film-look",
+        "color-grading",
+        "lut",
+        "grain",
+        "cinematic"
+      ],
+      "app": "filmcraft",
+      "compatibility": "FilmCraft effect-presets v1 and .cube LUTs"
+    },
+    {
       "id": "org.photocraft.community.detail-recovery",
       "name": "Detail Recovery",
       "version": "0.1.0",
