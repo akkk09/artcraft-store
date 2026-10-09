@@ -77,12 +77,10 @@ fn direction(params: &[u8]) -> (isize, isize) {
             let rest = &params[i + 11..];
             if let Some(colon) = rest.iter().position(|&b| b == b':') {
                 let value = &rest[colon + 1..];
+                if value.windows(9).any(|w| w == b"down-left") { return (-1, 1); }
+                if value.windows(10).any(|w| w == b"down-right") { return (1, 1); }
                 if value.windows(4).any(|w| w == b"left") { return (-1, 0); }
-                if value.windows(4).any(|w| w == b"down") {
-                    if value.windows(10).any(|w| w == b"down-left") { return (-1, 1); }
-                    if value.windows(11).any(|w| w == b"down-right") { return (1, 1); }
-                    return (0, 1);
-                }
+                if value.windows(4).any(|w| w == b"down") { return (0, 1); }
                 if value.windows(2).any(|w| w == b"up") { return (0, -1); }
             }
         }
