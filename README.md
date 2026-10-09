@@ -31,7 +31,7 @@ Requirements: Rust stable and `rustup`.
 
 ```sh
 rustup target add wasm32-unknown-unknown
-./build-all.sh
+bash build-all.sh
 ```
 
 Built modules are written to each plug-in's `target/wasm32-unknown-unknown/release/` directory.
