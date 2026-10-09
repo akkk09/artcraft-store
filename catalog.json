@@ -41,6 +41,27 @@
   ],
   "plugins": [
     {
+      "id": "org.photocraft.community.color-toolkit",
+      "name": "Color Toolkit",
+      "version": "0.1.0",
+      "author": "ArtCraft Store community",
+      "description": "Adjusts exposure, contrast, and saturation while preserving alpha.",
+      "kind": "filter",
+      "abi": 1,
+      "source": "plugins/color-toolkit",
+      "artifact": "photocraft_plugin_color_toolkit.wasm",
+      "releaseAsset": "photocraft_plugin_color_toolkit.wasm",
+      "tags": [
+        "color",
+        "exposure",
+        "contrast",
+        "saturation",
+        "adjustment"
+      ],
+      "app": "photocraft",
+      "compatibility": "PhotoCraft ABI v1"
+    },
+    {
       "id": "org.photocraft.community.gradient-map",
       "name": "Gradient Map & Duotone",
       "version": "0.1.0",
