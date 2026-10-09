@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "name": "PhotoCraft Plugin Store",
+  "description": "Community-built WebAssembly filter plug-ins for PhotoCraft ABI v1.",
+  "plugins": [
+    {
+      "id": "org.photocraft.community.smudge-blend",
+      "name": "Smudge Blend",
+      "version": "0.1.0",
+      "author": "PhotoCraft Plugin Store",
+      "description": "Directional smudge-inspired pixel filter.",
+      "kind": "filter",
+      "abi": 1,
+      "source": "plugins/smudge-blend",
+      "artifact": "photocraft_plugin_smudge_blend.wasm",
+      "releaseAsset": "photocraft_plugin_smudge_blend.wasm",
+      "tags": ["smudge", "blend", "retouch"],
+      "interactiveBrush": false
+    },
+    {
+      "id": "org.photocraft.community.mixer-blend",
+      "name": "Mixer Blend",
+      "version": "0.1.0",
+      "author": "PhotoCraft Plugin Store",
+      "description": "Wet-paint-inspired local colour mixing filter.",
+      "kind": "filter",
+      "abi": 1,
+      "source": "plugins/mixer-blend",
+      "artifact": "photocraft_plugin_mixer_blend.wasm",
+      "releaseAsset": "photocraft_plugin_mixer_blend.wasm",
+      "tags": ["mixer", "paint", "blend"],
+      "interactiveBrush": false
+    }
+  ]
+}
