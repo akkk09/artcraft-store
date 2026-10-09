@@ -3,6 +3,9 @@ on:
   pull_request:
     paths:
       - "plugins/**"
+      - "assets/**"
+      - "scripts/**"
+      - "catalog.json"
       - "build-all.sh"
       - ".github/workflows/build-plugins.yml"
   push:
@@ -10,6 +13,9 @@ on:
     tags: ["v*"]
     paths:
       - "plugins/**"
+      - "assets/**"
+      - "scripts/**"
+      - "catalog.json"
       - "build-all.sh"
       - ".github/workflows/build-plugins.yml"
   workflow_dispatch:
@@ -47,6 +53,8 @@ jobs:
         run: cargo test --manifest-path plugins/seamless-pattern-generator/Cargo.toml
       - name: Build and stage plug-ins
         run: bash build-all.sh
+      - name: Audit catalog downloads and release assets
+        run: python scripts/validate_catalog.py --check-artifacts
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
