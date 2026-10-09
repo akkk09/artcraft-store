@@ -31,6 +31,8 @@ jobs:
           targets: wasm32-unknown-unknown
       - name: Validate catalog JSON
         run: python -m json.tool catalog.json > /dev/null
+      - name: Check download audit scripts compile
+        run: python -m py_compile scripts/validate_catalog.py scripts/check_live_downloads.py
       - name: Test Gradient Map algorithms
         run: cargo test --manifest-path plugins/gradient-map/Cargo.toml
       - name: Test Color Toolkit algorithms
