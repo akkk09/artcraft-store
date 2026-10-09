@@ -50,7 +50,7 @@
       if (foot) card.insertBefore(panel, foot); else card.append(panel);
       card.insertBefore(list, panel.nextSibling);
       const actions = panel.querySelector(".review-actions");
-      const reviewUrl = ISSUE_NEW + encodeURIComponent("Review: " + name);
+      const reviewUrl = ISSUE_NEW + encodeURIComponent("[Plugin Review] Review: " + name);
       const add = document.createElement("a");
       add.className = "review-btn";
       add.href = reviewUrl;
