@@ -1,6 +1,9 @@
 #![no_std]
 
-use core::{ptr, slice};
+#[cfg(test)]
+extern crate std;
+
+use core::slice;
 
 #[cfg(not(test))]
 #[panic_handler]
