@@ -13,9 +13,16 @@
   document.head.appendChild(style);
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const field = (body, label) => {
-    const re = new RegExp("###\\s*" + label.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\$&") + "\\s*\\n+([\\s\\S]*?)(?=\\n###\\s|$)", "i");
-    const match = String(body || "").match(re);
-    return match ? match[1].trim().replace(/^\s*\n|\n\s*$/g, "") : "";
+    const lines = String(body || "").split(/\\r?\\n/);
+    const heading = "### " + label.trim().toLowerCase();
+    const start = lines.findIndex(line => line.trim().toLowerCase() === heading);
+    if (start < 0) return "";
+    const value = [];
+    for (let i = start + 1; i < lines.length; i++) {
+      if (/^###\\s/.test(lines[i])) break;
+      value.push(lines[i]);
+    }
+    return value.join("\\n").trim();
   };
   const ratingOf = issue => {
     const raw = field(issue.body, "Overall rating");
