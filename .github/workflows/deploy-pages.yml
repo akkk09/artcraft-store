@@ -6,7 +6,10 @@ on:
     paths:
       - "index.html"
       - "catalog.json"
+      - "plugins/**"
+      - "build-all.sh"
       - ".github/workflows/deploy-pages.yml"
+      - ".github/workflows/build-plugins.yml"
   workflow_dispatch:
 
 permissions:
@@ -26,6 +29,16 @@ jobs:
         uses: actions/checkout@v4
       - name: Validate catalog JSON
         run: python -m json.tool catalog.json > /dev/null
+      - name: Install Rust and WASM target
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - name: Build plug-ins
+        run: bash build-all.sh
+      - name: Prepare downloadable WASM files
+        run: |
+          mkdir -p downloads
+          cp dist/*.wasm downloads/
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload website
