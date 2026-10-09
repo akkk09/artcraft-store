@@ -281,7 +281,35 @@
       "sourceUrl": "https://akkk09.github.io/artcraft-store/lut-studio/",
       "artifact": "photocraft_plugin_lut_studio.wasm",
       "releaseAsset": "photocraft_plugin_lut_studio.wasm",
-      "tags": ["lut", "cube", "color-grading", "color-correction", "film-look"],
+      "tags": [
+        "lut",
+        "cube",
+        "color-grading",
+        "color-correction",
+        "film-look"
+      ],
+      "app": "photocraft",
+      "compatibility": "PhotoCraft ABI v1"
+    },
+    {
+      "id": "org.photocraft.community.geometry-fixer",
+      "name": "Geometry Fixer",
+      "version": "0.1.0",
+      "author": "ArtCraft Store community",
+      "description": "Straightens rotation and corrects horizontal or vertical perspective with adjustable zoom, preserving alpha.",
+      "kind": "filter",
+      "abi": 1,
+      "source": "plugins/geometry-fixer",
+      "artifact": "photocraft_plugin_geometry_fixer.wasm",
+      "releaseAsset": "photocraft_plugin_geometry_fixer.wasm",
+      "tags": [
+        "geometry",
+        "perspective",
+        "straighten",
+        "rotation",
+        "transform",
+        "photo-correction"
+      ],
       "app": "photocraft",
       "compatibility": "PhotoCraft ABI v1"
     }

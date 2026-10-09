@@ -41,6 +41,8 @@ jobs:
         run: cargo test --manifest-path plugins/white-balance/Cargo.toml
       - name: Test LUT Studio parser and interpolation
         run: cargo test --manifest-path plugins/lut-studio/Cargo.toml
+      - name: Test Geometry Fixer transform algorithms
+        run: cargo test --manifest-path plugins/geometry-fixer/Cargo.toml
       - name: Build and stage plug-ins
         run: bash build-all.sh
       - name: Upload build artifacts
@@ -65,5 +67,6 @@ jobs:
             dist/photocraft_plugin_vignette.wasm
             dist/photocraft_plugin_white_balance.wasm
             dist/photocraft_plugin_lut_studio.wasm
+            dist/photocraft_plugin_geometry_fixer.wasm
             dist/filmcraft-film-emulation-toolkit.zip
             dist/chromatic-fringe.wat
