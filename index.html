@@ -68,7 +68,7 @@
       const tags = Array.isArray(p.tags) ? p.tags : [];
       const source = p.source ? repo + "/tree/main/" + p.source.replace(/^\/+/, "") : repo;
       const artifact = p.releaseAsset || p.artifact;
-      const download = artifact ? "https://github.com/akkk09/photocraft-plugin-store/releases/latest/download/" + encodeURIComponent(artifact) : null;
+      const download = artifact ? "./downloads/" + encodeURIComponent(artifact) : null;
       const isInteractive = p.interactiveBrush === true;
       return '<article class="card"><div class="card-top"><div class="glyph" aria-hidden="true">' + (kind === "filter" ? "◈" : "✳") + '</div><span class="pill ' + (kind === "filter" ? "filter-pill" : "") + '">' + escapeHtml(kind) + '</span></div><h3>' + escapeHtml(p.name) + '</h3><p>' + escapeHtml(p.description || "Community plugin for PhotoCraft.") + '</p><div class="tags">' + tags.map(t => '<span class="tag">' + escapeHtml(t) + '</span>').join("") + '<span class="tag">ABI v' + escapeHtml(p.abi ?? "?") + '</span>' + (isInteractive ? '<span class="tag">Interactive tool</span>' : "") + '</div><div class="card-foot"><span class="version">v' + escapeHtml(p.version || "0.0.0") + ' · ' + escapeHtml(p.author || "Community") + '</span><div class="card-links"><a class="small-link" href="' + escapeHtml(source) + '">Source ↗</a>' + (download ? '<a class="small-link download" href="' + escapeHtml(download) + '">Download ↓</a>' : "") + '</div></div></article>';
     }
