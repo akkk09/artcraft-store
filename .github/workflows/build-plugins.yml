@@ -1,5 +1,10 @@
 name: Build plug-ins
 on:
+  pull_request:
+    paths:
+      - "plugins/**"
+      - "build-all.sh"
+      - ".github/workflows/build-plugins.yml"
   push:
     branches: [main]
     tags: ["v*"]
@@ -18,6 +23,10 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
+      - name: Validate catalog JSON
+        run: python -m json.tool catalog.json > /dev/null
+      - name: Test Gradient Map algorithms
+        run: cargo test --manifest-path plugins/gradient-map/Cargo.toml
       - name: Build and stage plug-ins
         run: bash build-all.sh
       - name: Upload build artifacts
@@ -34,4 +43,5 @@ jobs:
           files: |
             dist/photocraft_plugin_smudge_blend.wasm
             dist/photocraft_plugin_mixer_blend.wasm
+            dist/photocraft_plugin_gradient_map.wasm
             dist/chromatic-fringe.wat

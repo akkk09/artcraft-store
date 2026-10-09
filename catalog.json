@@ -41,6 +41,26 @@
   ],
   "plugins": [
     {
+      "id": "org.photocraft.community.gradient-map",
+      "name": "Gradient Map & Duotone",
+      "version": "0.1.0",
+      "author": "ArtCraft Store community",
+      "description": "Maps image luminance to a selectable two-colour gradient while preserving alpha.",
+      "kind": "filter",
+      "abi": 1,
+      "source": "plugins/gradient-map",
+      "artifact": "photocraft_plugin_gradient_map.wasm",
+      "releaseAsset": "photocraft_plugin_gradient_map.wasm",
+      "tags": [
+        "gradient",
+        "duotone",
+        "color-grading",
+        "luminance"
+      ],
+      "app": "photocraft",
+      "compatibility": "PhotoCraft ABI v1"
+    },
+    {
       "id": "org.photocraft.community.smudge-blend",
       "name": "Smudge Blend",
       "version": "0.1.0",
