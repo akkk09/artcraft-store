@@ -11,6 +11,67 @@ The static storefront in [`index.html`](index.html) reads [`catalog.json`](catal
 
 This is a community-maintained catalog, not an official ArtCraft support channel. Submissions should be limited to plugins and scripts intended for listing in this store, with a source repository, license, download link, supported app/version, and clear description. Reviews are for existing catalog items only.
 
+## Launcher API (v1)
+
+Third-party launchers can use the public, read-only static API. It requires no API key, account, or backend service.
+
+- **API discovery manifest:** https://akkk09.github.io/artcraft-store/api/v1/manifest.json
+- **Catalog JSON:** https://akkk09.github.io/artcraft-store/catalog.json
+- **Client module:** https://akkk09.github.io/artcraft-store/api/v1/client.js
+
+The catalog endpoint returns JSON with `apps` and `plugins` arrays. Plugin IDs are stable lookup keys; clients should ignore unknown fields so new metadata can be added without breaking older launchers. The manifest documents how download URLs are resolved. This is a static API, so filtering and ID lookup happen client-side; it is not a server-side query API.
+
+### Use the module
+
+In a browser or Electron launcher using JavaScript modules:
+
+```js
+import { artcraft } from "https://akkk09.github.io/artcraft-store/api/v1/client.js";
+
+const plugins = await artcraft.listPlugins({ app: "effectcraft" });
+const plugin = await artcraft.getPlugin("org.effectcraft.trokute.chromatic-fringe");
+const downloadUrl = artcraft.getDownloadUrl(plugin);
+
+console.log(plugins, downloadUrl);
+```
+
+You can also import `createArtCraftClient` and pass a different `baseUrl` when testing a mirror:
+
+```js
+import { createArtCraftClient } from "https://akkk09.github.io/artcraft-store/api/v1/client.js";
+
+const store = createArtCraftClient({ baseUrl: "https://example.com/artcraft-store/" });
+const catalog = await store.getCatalog();
+```
+
+### Use the endpoint from any language
+
+Every launcher can use ordinary HTTP and JSON without adopting the JavaScript module:
+
+```sh
+curl -fsSL https://akkk09.github.io/artcraft-store/catalog.json
+```
+
+Python example:
+
+```python
+import json
+from urllib.request import urlopen
+
+url = "https://akkk09.github.io/artcraft-store/catalog.json"
+with urlopen(url, timeout=10) as response:
+    catalog = json.load(response)
+
+for plugin in catalog["plugins"]:
+    print(plugin["id"], plugin["name"], plugin.get("app"))
+```
+
+The client exposes `getCatalog()`, `listPlugins({ app, kind })`, `getPlugin(id)`, and `getDownloadUrl(plugin)`. `getPlugin` returns `null` when no ID matches; `getDownloadUrl` returns `null` when a listing has no configured artifact. Callers should handle network failures and validate compatibility before installing files.
+
+### Endpoint limitations
+
+This API is intentionally static and read-only. It does not install plugins, guarantee that every listed file is available, or provide server-side filtering, authentication, or rate-limit guarantees. Direct download URLs are resolved from `downloadUrl` when present, otherwise from `releaseAsset` or `artifact` under the store's `downloads/` directory. A catalog entry alone does not prove its download file exists.
+
 ## Store website
 
 1. Open **Settings → Pages** in this repository.
