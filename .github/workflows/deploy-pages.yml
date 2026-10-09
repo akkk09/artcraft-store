@@ -6,7 +6,10 @@ on:
     paths:
       - "index.html"
       - "catalog.json"
+      - "api/v1/**"
       - "plugins/**"
+      - "assets/**"
+      - "scripts/**"
       - "build-all.sh"
       - ".github/workflows/deploy-pages.yml"
       - ".github/workflows/build-plugins.yml"
@@ -35,6 +38,8 @@ jobs:
           targets: wasm32-unknown-unknown
       - name: Build plug-ins
         run: bash build-all.sh
+      - name: Audit catalog downloads and release assets
+        run: python scripts/validate_catalog.py --check-artifacts
       - name: Prepare downloadable extensions
         run: |
           mkdir -p downloads
