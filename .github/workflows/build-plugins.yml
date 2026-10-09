@@ -31,6 +31,8 @@ jobs:
         run: cargo test --manifest-path plugins/color-toolkit/Cargo.toml
       - name: Test Detail Recovery algorithms
         run: cargo test --manifest-path plugins/detail-recovery/Cargo.toml
+      - name: Test Film Emulation algorithms
+        run: cargo test --manifest-path plugins/film-emulation/Cargo.toml
       - name: Build and stage plug-ins
         run: bash build-all.sh
       - name: Upload build artifacts
@@ -50,4 +52,5 @@ jobs:
             dist/photocraft_plugin_gradient_map.wasm
             dist/photocraft_plugin_color_toolkit.wasm
             dist/photocraft_plugin_detail_recovery.wasm
+            dist/photocraft_plugin_film_emulation.wasm
             dist/chromatic-fringe.wat
