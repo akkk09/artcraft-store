@@ -93,6 +93,7 @@ Do not add a listing until its source, license, download, and target-app compati
 | **Mixer Blend** | Filter (ABI v1) | Mixes nearby colours with adjustable pickup, radius, and wetness. |
 | **Gradient Map & Duotone** | Filter (ABI v1) | Maps luminance to one of five two-colour gradients with adjustable intensity. |
 | **Color Toolkit** | Filter (ABI v1) | Adjusts exposure, contrast, and saturation with alpha preservation. |
+| **Detail Recovery** | Filter (ABI v1) | Combines lightweight sharpening and spatial noise reduction. |
 
 The current build workflow only compiles the PhotoCraft Rust/WASM plug-ins. FilmCraft, EffectCraft, and VectorCraft listings can use their own source repositories and download URLs; their native build/install workflows should be integrated separately once the relevant APIs and formats are confirmed. No unverified listings are fabricated for those apps.
 
