@@ -27,6 +27,8 @@ jobs:
         run: python -m json.tool catalog.json > /dev/null
       - name: Test Gradient Map algorithms
         run: cargo test --manifest-path plugins/gradient-map/Cargo.toml
+      - name: Test Color Toolkit algorithms
+        run: cargo test --manifest-path plugins/color-toolkit/Cargo.toml
       - name: Build and stage plug-ins
         run: bash build-all.sh
       - name: Upload build artifacts
@@ -44,4 +46,5 @@ jobs:
             dist/photocraft_plugin_smudge_blend.wasm
             dist/photocraft_plugin_mixer_blend.wasm
             dist/photocraft_plugin_gradient_map.wasm
+            dist/photocraft_plugin_color_toolkit.wasm
             dist/chromatic-fringe.wat
