@@ -205,6 +205,27 @@
       ],
       "app": "effectcraft",
       "compatibility": "EffectCraft plug-in API v1"
+    },
+    {
+      "id": "org.photocraft.community.mosaic-pixelate",
+      "name": "Mosaic Pixelate",
+      "version": "0.1.0",
+      "author": "ArtCraft Store community",
+      "description": "Creates block-based pixelation with adjustable block size and intensity, preserving alpha.",
+      "kind": "filter",
+      "abi": 1,
+      "source": "plugins/mosaic-pixelate",
+      "artifact": "photocraft_plugin_mosaic_pixelate.wasm",
+      "releaseAsset": "photocraft_plugin_mosaic_pixelate.wasm",
+      "tags": [
+        "mosaic",
+        "pixelate",
+        "pixel-art",
+        "stylize",
+        "block"
+      ],
+      "app": "photocraft",
+      "compatibility": "PhotoCraft ABI v1"
     }
   ]
 }
