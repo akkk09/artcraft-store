@@ -13,16 +13,16 @@
   document.head.appendChild(style);
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const field = (body, label) => {
-    const lines = String(body || "").split(/\\r?\\n/);
+    const lines = String(body || "").split(/\r?\n/);
     const heading = "### " + label.trim().toLowerCase();
     const start = lines.findIndex(line => line.trim().toLowerCase() === heading);
     if (start < 0) return "";
     const value = [];
     for (let i = start + 1; i < lines.length; i++) {
-      if (/^###\\s/.test(lines[i])) break;
+      if (/^###\s/.test(lines[i])) break;
       value.push(lines[i]);
     }
-    return value.join("\\n").trim();
+    return value.join("\n").trim();
   };
   const ratingOf = issue => {
     const raw = field(issue.body, "Overall rating");
@@ -108,7 +108,10 @@
   fetch(API, {headers:{"Accept":"application/vnd.github+json"}})
     .then(response => { if (!response.ok) throw new Error("GitHub API returned " + response.status); return response.json(); })
     .then(items => {
-      reviews = items.filter(issue => !issue.pull_request && /^\[Plugin Review\]/i.test(issue.title));
+      reviews = items.filter(issue => !issue.pull_request && (
+        (issue.labels || []).some(label => (typeof label === "string" ? label : label.name).toLowerCase() === "plugin-review")
+        || /^\[Plugin Review\]/i.test(issue.title)
+      ));
       reviewsReady = true;
       renderReviews();
     })
