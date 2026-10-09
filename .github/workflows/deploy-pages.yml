@@ -57,6 +57,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Audit deployed download URLs
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: python scripts/check_live_downloads.py --base-url "$PAGE_URL"
