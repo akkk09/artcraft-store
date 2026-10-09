@@ -128,7 +128,11 @@ fn apply_seamless(
     strength: f32,
     edge_percent: usize,
 ) {
-    if width == 0 || height == 0 || channels == 0 || strength <= 0.0 { return; }
+    if width == 0 || height == 0 || channels == 0 { return; }
+    if strength <= 0.0 {
+        dst.copy_from_slice(src);
+        return;
+    }
     let band_x = ((width * edge_percent) / 100).max(1).min(width / 2 + width % 2);
     let band_y = ((height * edge_percent) / 100).max(1).min(height / 2 + height % 2);
 
