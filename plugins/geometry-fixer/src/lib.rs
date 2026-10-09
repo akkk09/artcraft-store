@@ -251,11 +251,12 @@ mod tests {
     }
 
     #[test]
-    fn perspective_moves_coordinates() {
-        let src = [0.0; 25];
+    fn perspective_changes_a_coordinate_gradient() {
+        let src: [f32; 25] = core::array::from_fn(|i| i as f32);
         let mut dst = [0.0; 25];
-        transform(&src, &mut dst, 5, 5, 1, 0.0, 50.0, -30.0, 100.0);
-        assert_eq!(dst.len(), src.len());
+        transform(&src, &mut dst, 5, 5, 1, 0.0, 60.0, -40.0, 100.0);
+        assert_ne!(dst, src);
+        assert!(dst.iter().all(|v| v.is_finite()));
     }
 
     #[test]
@@ -266,10 +267,11 @@ mod tests {
     }
 
     #[test]
-    fn transparent_border_is_zeroed() {
-        let src = [0.2; 4];
-        let mut dst = vec![1.0; 4];
-        transform(&src, &mut dst, 1, 1, 4, 0.0, 0.0, 0.0, 50.0);
-        assert!(dst.iter().all(|v| v.is_finite()));
+    fn out_of_source_pixels_are_zeroed() {
+        let src = [0.2; 3 * 3 * 4];
+        let mut dst = vec![1.0; 3 * 3 * 4];
+        transform(&src, &mut dst, 3, 3, 4, 0.0, 0.0, 0.0, 50.0);
+        assert_eq!(&dst[0..4], &[0.0; 4]);
+        assert_eq!(dst[16..20], [0.2; 4]);
     }
 }
