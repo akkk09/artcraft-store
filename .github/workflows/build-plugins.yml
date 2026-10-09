@@ -72,4 +72,5 @@ jobs:
             dist/photocraft_plugin_geometry_fixer.wasm
             dist/photocraft_plugin_seamless_pattern_generator.wasm
             dist/filmcraft-film-emulation-toolkit.zip
+            dist/creator-graphics-pack.zip
             dist/chromatic-fringe.wat
