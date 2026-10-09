@@ -3,6 +3,10 @@ on:
   push:
     branches: [main]
     tags: ["v*"]
+    paths:
+      - "plugins/**"
+      - "build-all.sh"
+      - ".github/workflows/build-plugins.yml"
   workflow_dispatch:
 permissions:
   contents: write
