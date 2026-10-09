@@ -1,6 +1,6 @@
 # ArtCraft Store
 
-> Community-maintained catalog for PhotoCraft plug-ins and Adobe After Effects scripts/plug-ins.
+> Community-maintained catalog for PhotoCraft and EffectCraft plug-ins.
 
 ## API integration
 
