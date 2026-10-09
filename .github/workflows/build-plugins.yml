@@ -43,6 +43,8 @@ jobs:
         run: cargo test --manifest-path plugins/lut-studio/Cargo.toml
       - name: Test Geometry Fixer transform algorithms
         run: cargo test --manifest-path plugins/geometry-fixer/Cargo.toml
+      - name: Test Seamless Pattern Generator algorithms
+        run: cargo test --manifest-path plugins/seamless-pattern-generator/Cargo.toml
       - name: Build and stage plug-ins
         run: bash build-all.sh
       - name: Upload build artifacts
@@ -68,5 +70,6 @@ jobs:
             dist/photocraft_plugin_white_balance.wasm
             dist/photocraft_plugin_lut_studio.wasm
             dist/photocraft_plugin_geometry_fixer.wasm
+            dist/photocraft_plugin_seamless_pattern_generator.wasm
             dist/filmcraft-film-emulation-toolkit.zip
             dist/chromatic-fringe.wat

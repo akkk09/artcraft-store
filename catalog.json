@@ -312,6 +312,28 @@
       ],
       "app": "photocraft",
       "compatibility": "PhotoCraft ABI v1"
+    },
+    {
+      "id": "org.photocraft.community.seamless-pattern-generator",
+      "name": "Seamless Pattern Generator",
+      "version": "0.1.0",
+      "author": "ArtCraft Store community",
+      "description": "Reduces visible tiling seams by smoothly blending opposing image edges while preserving alpha.",
+      "kind": "filter",
+      "abi": 1,
+      "source": "plugins/seamless-pattern-generator",
+      "artifact": "photocraft_plugin_seamless_pattern_generator.wasm",
+      "releaseAsset": "photocraft_plugin_seamless_pattern_generator.wasm",
+      "tags": [
+        "seamless",
+        "texture",
+        "tile",
+        "pattern",
+        "repeat",
+        "materials"
+      ],
+      "app": "photocraft",
+      "compatibility": "PhotoCraft ABI v1"
     }
   ]
 }
