@@ -34,7 +34,7 @@ rustup target add wasm32-unknown-unknown
 bash build-all.sh
 ```
 
-Built modules are written to each plug-in's `target/wasm32-unknown-unknown/release/` directory.
+Built modules are copied to `dist/`.
 
 ## License
 
