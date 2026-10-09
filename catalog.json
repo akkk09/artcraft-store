@@ -226,6 +226,27 @@
       ],
       "app": "photocraft",
       "compatibility": "PhotoCraft ABI v1"
+    },
+    {
+      "id": "org.photocraft.community.vignette",
+      "name": "Vignette",
+      "version": "0.1.0",
+      "author": "ArtCraft Store community",
+      "description": "Adds a soft, adjustable edge darkening with a smooth radial falloff while preserving alpha.",
+      "kind": "filter",
+      "abi": 1,
+      "source": "plugins/vignette",
+      "artifact": "photocraft_plugin_vignette.wasm",
+      "releaseAsset": "photocraft_plugin_vignette.wasm",
+      "tags": [
+        "vignette",
+        "portrait",
+        "focus",
+        "cinematic",
+        "edge-darkening"
+      ],
+      "app": "photocraft",
+      "compatibility": "PhotoCraft ABI v1"
     }
   ]
 }
