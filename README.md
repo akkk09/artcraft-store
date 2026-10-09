@@ -95,15 +95,6 @@ Do not add a listing until its source, license, download, and target-app compati
 
 The current build workflow only compiles the PhotoCraft Rust/WASM plug-ins. FilmCraft, EffectCraft, and VectorCraft listings can use their own source repositories and download URLs; their native build/install workflows should be integrated separately once the relevant APIs and formats are confirmed. No unverified listings are fabricated for those apps.
 
-## Validate the catalog
-
-Run the dependency-free catalog validator and its tests with Python 3:
-
-```sh
-python scripts/validate_catalog.py
-python -m unittest discover -s tests -v
-```
-
 ## Build PhotoCraft plug-ins locally
 
 Requirements: Rust stable and `rustup`.
