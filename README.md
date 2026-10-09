@@ -9,6 +9,8 @@ A shared, searchable community catalog for extensions across the ArtCraft creati
 
 The static storefront in [`index.html`](index.html) reads [`catalog.json`](catalog.json) at runtime. Filter by app or search across names, descriptions, tags, and compatibility notes.
 
+This is a community-maintained catalog, not an official ArtCraft support channel. Submissions should be limited to plugins and scripts intended for listing in this store, with a source repository, license, download link, supported app/version, and clear description. Reviews are for existing catalog items only.
+
 ## Store website
 
 1. Open **Settings → Pages** in this repository.
