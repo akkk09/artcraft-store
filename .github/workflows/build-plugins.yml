@@ -18,13 +18,13 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
-      - name: Build both plug-ins
+      - name: Build and stage plug-ins
         run: bash build-all.sh
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: photocraft-plugin-store-wasm
-          path: dist/*.wasm
+          name: artcraft-store-plugins
+          path: dist/*
           if-no-files-found: error
       - name: Publish release assets
         if: startsWith(github.ref, 'refs/tags/')
@@ -34,3 +34,4 @@ jobs:
           files: |
             dist/photocraft_plugin_smudge_blend.wasm
             dist/photocraft_plugin_mixer_blend.wasm
+            dist/chromatic-fringe.wat

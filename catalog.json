@@ -79,6 +79,27 @@
       "interactiveBrush": false,
       "app": "photocraft",
       "compatibility": "PhotoCraft ABI v1"
+    },
+    {
+      "id": "org.effectcraft.trokute.chromatic-fringe",
+      "name": "Chromatic Fringe",
+      "version": "1.0.0",
+      "author": "trokute",
+      "description": "Offsets red and blue color channels in opposite directions.",
+      "kind": "plugin",
+      "abi": 1,
+      "source": "plugins/chromatic-fringe",
+      "sourceUrl": "https://github.com/trokute/artcraft-store/tree/main/plugins/chromatic-fringe",
+      "artifact": "chromatic-fringe.wat",
+      "releaseAsset": "chromatic-fringe.wat",
+      "tags": [
+        "chromatic",
+        "fringe",
+        "color",
+        "rgb"
+      ],
+      "app": "effectcraft",
+      "compatibility": "EffectCraft plug-in API v1"
     }
   ]
 }
