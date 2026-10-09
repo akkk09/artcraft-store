@@ -14,7 +14,7 @@ jobs:
         with:
           targets: wasm32-unknown-unknown
       - name: Build both plug-ins
-        run: ./build-all.sh
+        run: bash build-all.sh
       - name: Publish release assets
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
