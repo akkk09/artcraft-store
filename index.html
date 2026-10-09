@@ -109,6 +109,13 @@
     .tags { display:flex; gap:6px; flex-wrap:wrap; margin:18px 0 22px; }
     .tag { font-size:10px; letter-spacing:.03em; color:#c7c7c7; background:#292929; border-radius:4px; padding:5px 8px; }
     .card-foot { display:flex; align-items:center; justify-content:space-between; gap:10px; border-top:1px solid var(--line); padding-top:16px; margin-top:auto; }
+    .endpoint { margin:0 0 16px; font-size:12px; color:var(--muted); }
+    .endpoint summary { cursor:pointer; width:fit-content; color:var(--text); }
+    .endpoint-body { display:grid; gap:8px; margin-top:10px; }
+    .endpoint-row { min-width:0; }
+    .endpoint-row span { display:block; margin-bottom:3px; font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
+    .endpoint code { display:block; overflow-wrap:anywhere; padding:8px 10px; background:var(--bg); border:1px solid var(--line); border-radius:4px; font:11px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; user-select:all; }
+    .endpoint a { color:var(--text); }
     .version { color:var(--muted); font-size:12px; }
     .card-links { display:flex; gap:12px; align-items:center; }
     .small-link { font-size:12px; font-weight:750; text-decoration:none; color:var(--text); }
@@ -210,7 +217,8 @@
       const source = p.sourceUrl || (p.source ? repo + "/tree/main/" + p.source : repo);
       const artifact = p.downloadUrl || ((p.releaseAsset || p.artifact) ? downloadsBase + encodeURIComponent(p.releaseAsset || p.artifact) : null);
       const compatibility = p.compatibility || (p.abi ? "ABI v" + p.abi : "");
-      return '<article class="card"><div class="card-top"><div class="glyph" aria-hidden="true">' + escapeHtml(appGlyphs[app] || "A") + '</div><span class="pill">' + escapeHtml(appName) + '</span></div><h3>' + escapeHtml(p.name) + '</h3><p>' + escapeHtml(p.description || "Community extension.") + '</p><div class="tags"><span class="tag">' + escapeHtml(kind) + '</span>' + (compatibility ? '<span class="tag">' + escapeHtml(compatibility) + '</span>' : '') + tags.map(t => '<span class="tag">' + escapeHtml(t) + '</span>').join("") + '</div><div class="card-foot"><span class="version">v' + escapeHtml(p.version || "0.0.0") + ' · ' + escapeHtml(p.author || "Community") + '</span><div class="card-links"><a class="small-link" href="' + escapeHtml(source) + '" target="_blank" rel="noopener noreferrer">Source ↗</a>' + (artifact ? '<a class="small-link download" href="' + escapeHtml(artifact) + '">Download ↓</a>' : "") + '</div></div></article>';
+      const endpointDetails = artifact ? '<details class="endpoint"><summary>Developer URLs / API</summary><div class="endpoint-body"><div class="endpoint-row"><span>Direct download endpoint</span><code>' + escapeHtml(artifact) + '</code></div><div class="endpoint-row"><span>Catalog API (JSON)</span><code>' + escapeHtml(catalogUrl) + '</code></div><div class="endpoint-row"><a href="' + escapeHtml(catalogUrl) + '" target="_blank" rel="noopener noreferrer">View catalog JSON ↗</a></div></div></details>' : '<details class="endpoint"><summary>Developer URLs / API</summary><div class="endpoint-body"><div class="endpoint-row"><span>Catalog API (JSON)</span><code>' + escapeHtml(catalogUrl) + '</code></div><p>No direct download endpoint is configured for this listing yet.</p></div></details>';
+      return '<article class="card"><div class="card-top"><div class="glyph" aria-hidden="true">' + escapeHtml(appGlyphs[app] || "A") + '</div><span class="pill">' + escapeHtml(appName) + '</span></div><h3>' + escapeHtml(p.name) + '</h3><p>' + escapeHtml(p.description || "Community extension.") + '</p><div class="tags"><span class="tag">' + escapeHtml(kind) + '</span>' + (compatibility ? '<span class="tag">' + escapeHtml(compatibility) + '</span>' : '') + tags.map(t => '<span class="tag">' + escapeHtml(t) + '</span>').join("") + '</div>' + endpointDetails + '<div class="card-foot"><span class="version">v' + escapeHtml(p.version || "0.0.0") + ' · ' + escapeHtml(p.author || "Community") + '</span><div class="card-links"><a class="small-link" href="' + escapeHtml(source) + '" target="_blank" rel="noopener noreferrer">Source ↗</a>' + (artifact ? '<a class="small-link download" href="' + escapeHtml(artifact) + '">Download ↓</a>' : "") + '</div></div></article>';
     }
     function render() {
       const q = search.value.trim().toLowerCase();
