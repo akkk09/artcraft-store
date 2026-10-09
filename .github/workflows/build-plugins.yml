@@ -53,4 +53,5 @@ jobs:
             dist/photocraft_plugin_color_toolkit.wasm
             dist/photocraft_plugin_detail_recovery.wasm
             dist/photocraft_plugin_film_emulation.wasm
+            dist/filmcraft-film-emulation-toolkit.zip
             dist/chromatic-fringe.wat
