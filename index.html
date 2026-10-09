@@ -3,8 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#10110f">
+  <meta name="theme-color" content="#111111">
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
   <meta name="description" content="Community extensions, plug-ins, scripts, and tools for the ArtCraft creative apps.">
   <title>ArtCraft Store — Community Extensions</title>
   <style>
@@ -26,52 +29,49 @@
       margin: 0;
       background: var(--bg);
       color: var(--text);
-      font: 16px/1.55 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font: 16px/1.6 "Outfit", ui-sans-serif, system-ui, sans-serif;
       letter-spacing: -.012em;
     }
     a { color: inherit; }
     button, input { font: inherit; }
-    .wrap { max-width: 1280px; margin: auto; padding: 0 36px; }
+    .wrap { max-width: 1320px; margin: auto; padding: 0 48px; }
     header {
-      min-height: 82px; border-bottom: 1px solid var(--line);
+      min-height: 88px; border-bottom: 1px solid var(--line);
       display: flex; align-items: center; justify-content: space-between; gap: 24px;
     }
-    .brand { display:flex; align-items:center; gap:12px; text-decoration:none; font-weight:800; letter-spacing:-.045em; font-size:17px; }
+    .brand { display:flex; align-items:center; gap:12px; text-decoration:none; font-weight:700; letter-spacing:-.035em; font-size:17px; }
     .mark {
-      display:grid; place-items:center; width:36px; height:36px; border-radius:50%;
+      display:grid; place-items:center; width:34px; height:34px; border-radius:8px;
       background:var(--accent); color:var(--accent-ink); font-size:18px; font-weight:900;
     }
     .nav { display:flex; gap:26px; color:var(--muted); font-size:13px; }
     .nav a { text-decoration:none; transition:color .15s; }
     .nav a:hover { color:var(--accent); }
-    .hero { padding: clamp(66px, 10vw, 132px) 0 78px; max-width: 980px; }
+    .hero { padding: clamp(76px, 11vw, 148px) 0 100px; max-width: 1080px; }
     .eyebrow {
       display:flex; align-items:center; gap:10px; color:var(--muted);
       font-size:11px; font-weight:750; letter-spacing:.14em; text-transform:uppercase;
     }
     .dot { width:7px; height:7px; border-radius:50%; background:var(--accent); }
-    h1 {
-      font-size:clamp(52px, 9.4vw, 112px); letter-spacing:-.085em;
-      line-height:.94; margin:26px 0 28px; font-weight:680; max-width:1000px;
-    }
-    .hero p { font-size:clamp(17px, 2vw, 21px); line-height:1.6; max-width:690px; color:var(--muted); margin:0; }
+    h1 { font-family:"Instrument Serif", Georgia, serif; font-size:clamp(64px, 10vw, 132px); letter-spacing:-.045em; line-height:.88; margin:28px 0 32px; font-weight:400; max-width:1040px; }
+    .hero p { font-size:clamp(17px, 2vw, 20px); line-height:1.7; max-width:650px; color:var(--muted); margin:0; }
     .hero-actions { display:flex; gap:12px; flex-wrap:wrap; margin-top:34px; }
     .btn {
       display:inline-flex; align-items:center; justify-content:center; gap:10px;
-      padding:13px 18px; border-radius:999px; text-decoration:none; font-weight:700;
+      padding:13px 19px; border-radius:5px; text-decoration:none; font-weight:600;
       font-size:13px; border:1px solid var(--line); background:transparent;
       transition:background .15s, border-color .15s, color .15s;
     }
     .btn.primary { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
     .btn:hover { border-color:var(--accent); }
     .btn.primary:hover { background:#ffffff; }
-    .stats { display:flex; gap:0; flex-wrap:wrap; margin-top:66px; border-top:1px solid var(--line); }
+    .stats { display:flex; gap:0; flex-wrap:wrap; margin-top:76px; border-top:1px solid var(--line); }
     .stat { flex:1; min-width:150px; padding:22px 22px 0 0; margin-right:22px; }
     .stat strong { display:block; font-size:28px; line-height:1.1; letter-spacing:-.06em; }
     .stat span { display:block; color:var(--muted); font-size:12px; margin-top:8px; }
-    .catalog { padding:54px 0 92px; border-top:1px solid var(--line); }
+    .catalog { padding:66px 0 104px; border-top:1px solid var(--line); }
     .section-head { display:flex; align-items:end; justify-content:space-between; gap:20px; margin-bottom:26px; }
-    .section-head h2 { font-size:clamp(30px, 4vw, 46px); letter-spacing:-.065em; line-height:1.05; margin:12px 0 0; }
+    .section-head h2 { font-family:"Instrument Serif", Georgia, serif; font-size:clamp(38px, 5vw, 60px); font-weight:400; letter-spacing:-.035em; line-height:1; margin:14px 0 0; }
     .section-head p { color:var(--muted); margin:8px 0 0; font-size:14px; }
     .tools { display:flex; gap:10px; flex-wrap:wrap; margin:28px 0 16px; }
     .search { flex:1; min-width:220px; position:relative; }
@@ -89,10 +89,10 @@
       transition:all .15s;
     }
     .filter.active, .filter:hover { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
-    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
     .card {
       min-width:0; border:1px solid var(--line); background:var(--panel);
-      border-radius:var(--radius); padding:24px; display:flex; flex-direction:column;
+      border-radius:5px; padding:26px; display:flex; flex-direction:column;
       transition:border-color .18s, background .18s;
     }
     .card:hover { border-color:#777777; background:#1d1d1d; }
@@ -104,7 +104,7 @@
     }
     .pill { font-size:11px; border:1px solid var(--line); border-radius:999px; padding:5px 10px; color:var(--muted); white-space:nowrap; }
     .pill.filter-pill { color:var(--accent); border-color:var(--line); }
-    .card h3 { font-size:23px; line-height:1.15; letter-spacing:-.045em; margin:20px 0 8px; }
+    .card h3 { font-family:"Instrument Serif", Georgia, serif; font-size:30px; line-height:1.05; font-weight:400; letter-spacing:-.02em; margin:22px 0 10px; }
     .card p { color:var(--muted); font-size:14px; line-height:1.6; margin:0; min-height:44px; }
     .tags { display:flex; gap:6px; flex-wrap:wrap; margin:18px 0 22px; }
     .tag { font-size:10px; letter-spacing:.03em; color:#c7c7c7; background:#292929; border-radius:4px; padding:5px 8px; }
@@ -113,29 +113,29 @@
     .card-links { display:flex; gap:12px; align-items:center; }
     .small-link { font-size:12px; font-weight:750; text-decoration:none; color:var(--text); }
     .small-link:hover { color:var(--accent); }
-    .small-link.download { background:var(--accent); color:var(--accent-ink); padding:9px 13px; border-radius:999px; }
+    .small-link.download { background:var(--accent); color:var(--accent-ink); padding:9px 13px; border-radius:4px; }
     .notice { display:flex; gap:13px; border:1px solid var(--line); background:transparent; border-radius:10px; padding:18px 20px; margin-top:20px; }
     .notice .icon { font-size:19px; color:var(--accent); }
     .notice strong { display:block; font-size:13px; }
     .notice p { color:var(--muted); font-size:13px; margin:3px 0 0; }
     .empty { grid-column:1/-1; border:1px dashed var(--line); border-radius:12px; padding:38px; text-align:center; color:var(--muted); }
-    .how { border-top:1px solid var(--line); padding:62px 0 76px; }
-    .how h2 { font-size:clamp(30px,4vw,44px); letter-spacing:-.065em; margin:12px 0 28px; }
+    .how { border-top:1px solid var(--line); padding:76px 0 88px; }
+    .how h2 { font-family:"Instrument Serif", Georgia, serif; font-size:clamp(38px,5vw,58px); font-weight:400; letter-spacing:-.035em; margin:14px 0 32px; }
     .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
-    .step { border:1px solid var(--line); border-radius:12px; padding:22px; }
+    .step { border:1px solid var(--line); border-radius:5px; padding:24px; }
     .step b { color:var(--accent); font-size:11px; letter-spacing:.13em; }
-    .step h3 { font-size:18px; letter-spacing:-.03em; margin:16px 0 7px; }
+    .step h3 { font-family:"Instrument Serif", Georgia, serif; font-size:25px; font-weight:400; letter-spacing:-.015em; margin:18px 0 8px; }
     .step p { font-size:13px; color:var(--muted); margin:0; }
     .step code { color:var(--accent); }
     footer { border-top:1px solid var(--line); padding:24px 0 34px; color:var(--muted); font-size:12px; display:flex; justify-content:space-between; gap:15px; flex-wrap:wrap; }
     footer a { color:var(--text); text-decoration:none; }
     footer a:hover { color:var(--accent); }
     @media(max-width:700px) {
-      .wrap { padding:0 18px; }
+      .wrap { padding:0 20px; }
       header { min-height:70px; }
       .nav { gap:14px; font-size:12px; }
       .hero { padding:66px 0 54px; }
-      h1 { font-size:clamp(48px, 14vw, 76px); }
+      h1 { font-size:clamp(54px, 15vw, 82px); }
       .hero p { font-size:16px; }
       .stats { margin-top:42px; }
       .stat { min-width:110px; margin-right:12px; padding-right:10px; }
@@ -164,19 +164,19 @@
     </header>
     <main>
       <section class="hero">
-        <div class="eyebrow"><span class="dot"></span> The community extension catalog</div>
+        <div class="eyebrow"><span class="dot"></span> Community-built · Open source · Made for creators</div>
         <h1>Make more.<br>Make it yours.</h1>
-        <p>Community-made extensions for the ArtCraft creative apps. Discover tools, effects, and experiments built to give your creative workflow more control.</p>
+        <p>Tools made by the community for the ArtCraft creative apps. Find extensions, effects, and experiments that put more control in your hands.</p>
         <div class="hero-actions"><a class="btn primary" href="#catalog">Browse catalog <span aria-hidden="true">↓</span></a><a class="btn" href="https://github.com/akkk09/artcraft-store">Contribute on GitHub ↗</a></div>
         <div class="stats"><div class="stat"><strong id="plugin-count">—</strong><span>catalogued items</span></div><div class="stat"><strong>04</strong><span>creative apps</span></div><div class="stat"><strong>Open</strong><span>community and source</span></div></div>
       </section>
       <section class="catalog" id="catalog">
-        <div class="section-head"><div><div class="eyebrow">The catalog</div><h2>Browse extensions</h2><p>Search by name, feature, or app. Filter the catalog by the app you use.</p></div></div>
+        <div class="section-head"><div><div class="eyebrow">01 / The catalog</div><h2>Extensions for your workflow.</h2><p>Search by name, feature, or app. Filter the catalog by the app you use.</p></div></div>
         <div class="tools"><label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Search extensions, scripts, tools…" aria-label="Search catalog"></label></div><div class="filters app-filters" role="group" aria-label="Filter by ArtCraft app"><button class="filter active" data-app-filter="all" aria-pressed="true">All apps</button><button class="filter" data-app-filter="photocraft" aria-pressed="false">PhotoCraft</button><button class="filter" data-app-filter="filmcraft" aria-pressed="false">FilmCraft</button><button class="filter" data-app-filter="effectcraft" aria-pressed="false">EffectCraft</button><button class="filter" data-app-filter="vectorcraft" aria-pressed="false">VectorCraft</button></div>
         <div class="grid" id="plugin-grid" aria-live="polite"><div class="empty">Loading catalog…</div></div>
         <div class="notice"><span class="icon" aria-hidden="true">ⓘ</span><div><strong>Check compatibility before installing</strong><p>Each app has its own extension format and compatibility requirements. Listings appear only when they have been added to the catalog; an app filter with no results means no items are currently listed for it.</p></div></div>
       </section>
-            <section class="how" id="install"><div class="eyebrow">Get started</div><h2>Use an extension</h2><div class="steps">
+            <section class="how" id="install"><div class="eyebrow">02 / Getting started</div><h2>Make it part of your process.</h2><div class="steps">
         <article class="step"><b>01 / CHOOSE</b><h3>Select your app</h3><p>Filter by PhotoCraft, FilmCraft, EffectCraft, or VectorCraft and check compatibility notes.</p></article>
         <article class="step"><b>02 / REVIEW</b><h3>Inspect the listing</h3><p>Check the version, source code, file type, and requirements before downloading.</p></article>
         <article class="step"><b>03 / INSTALL</b><h3>Follow app-specific steps</h3><p>Download the item and follow its documented installation instructions. Automatic installation depends on support in the target app.</p></article>
