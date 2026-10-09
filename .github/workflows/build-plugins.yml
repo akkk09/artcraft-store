@@ -34,4 +34,5 @@ jobs:
           files: |
             dist/photocraft_plugin_smudge_blend.wasm
             dist/photocraft_plugin_mixer_blend.wasm
+            dist/photocraft_plugin_gradient_map.wasm
             dist/chromatic-fringe.wat
