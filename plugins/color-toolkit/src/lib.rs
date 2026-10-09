@@ -95,11 +95,38 @@ fn luminance(color: Color) -> f32 {
     0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b
 }
 
+// Core-only approximation of 2^stops; avoids pulling a math library into WASM.
+// The fractional part uses a degree-7 Taylor approximation of exp(x), x in [0, ln(2)].
+fn exposure_gain(stops: f32) -> f32 {
+    let mut whole = stops as i32;
+    if stops < whole as f32 { whole -= 1; }
+    let fraction = stops - whole as f32;
+    let x = fraction * 0.69314718056;
+    let mut exp_x = 1.0f32;
+    let mut term = 1.0f32;
+    let mut n = 1;
+    while n <= 7 {
+        term *= x / n as f32;
+        exp_x += term;
+        n += 1;
+    }
+
+    let mut gain = 1.0f32;
+    if whole > 0 {
+        let mut i = 0;
+        while i < whole { gain *= 2.0; i += 1; }
+    } else {
+        let mut i = whole;
+        while i < 0 { gain *= 0.5; i += 1; }
+    }
+    gain * exp_x
+}
+
 fn apply_color(color: Color, exposure: f32, contrast: f32, saturation: f32) -> Color {
     if exposure == 0.0 && contrast == 0.0 && saturation == 1.0 {
         return color;
     }
-    let gain = 2.0f32.powf(exposure);
+    let gain = exposure_gain(exposure);
     let mut result = Color {
         r: color.r * gain,
         g: color.g * gain,
@@ -183,6 +210,12 @@ mod tests {
 
     fn close(actual: f32, expected: f32) {
         assert!((actual - expected).abs() < 0.0001, "actual={actual}, expected={expected}");
+    }
+
+    #[test]
+    fn half_stop_exposure_uses_square_root_of_two() {
+        close(exposure_gain(0.5), core::f32::consts::SQRT_2);
+        close(exposure_gain(-0.5), 1.0 / core::f32::consts::SQRT_2);
     }
 
     #[test]
