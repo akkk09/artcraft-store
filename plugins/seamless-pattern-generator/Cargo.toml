@@ -1,0 +1,14 @@
+[package]
+name = "photocraft-plugin-seamless-pattern-generator"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "photocraft_plugin_seamless_pattern_generator"
+crate-type = ["cdylib"]
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"

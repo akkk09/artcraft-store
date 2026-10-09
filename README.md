@@ -100,6 +100,7 @@ Do not add a listing until its source, license, download, and target-app compati
 | **White Balance** | Filter (ABI v1) | Corrects warm/cool color casts and green/magenta tint. |
 | **LUT Studio** | Filter + browser tool | Applies bundled 3D LUTs in PhotoCraft; imports custom `.cube` files and exports image/video frames in the browser studio. |
 | **Geometry Fixer** | Filter (ABI v1) | Straightens rotation, adjusts horizontal/vertical perspective, and controls zoom on a fixed canvas. |
+| **Seamless Pattern Generator** | Filter (ABI v1) | Reduces texture tiling seams by blending opposing edges with a smooth falloff. |
 
 The build workflow compiles the PhotoCraft Rust/WASM plug-ins and packages the Film Emulation Toolkit's FilmCraft-native effect presets and .cube LUTs. The browser-based LUT Studio is available at `https://akkk09.github.io/artcraft-store/lut-studio/`. FilmCraft does not currently expose a third-party video-effect plug-in ABI, so its supported integration is an importable preset/LUT pack rather than an executable plug-in. Other FilmCraft, EffectCraft, and VectorCraft listings still need their own verified formats and download sources.
 
