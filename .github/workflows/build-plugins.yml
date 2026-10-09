@@ -3,6 +3,9 @@ on:
   pull_request:
     paths:
       - "plugins/**"
+      - "assets/**"
+      - "scripts/**"
+      - "catalog.json"
       - "build-all.sh"
       - ".github/workflows/build-plugins.yml"
   push:
@@ -10,6 +13,9 @@ on:
     tags: ["v*"]
     paths:
       - "plugins/**"
+      - "assets/**"
+      - "scripts/**"
+      - "catalog.json"
       - "build-all.sh"
       - ".github/workflows/build-plugins.yml"
   workflow_dispatch:
@@ -25,6 +31,8 @@ jobs:
           targets: wasm32-unknown-unknown
       - name: Validate catalog JSON
         run: python -m json.tool catalog.json > /dev/null
+      - name: Check download audit scripts compile
+        run: python -m py_compile scripts/validate_catalog.py scripts/check_live_downloads.py
       - name: Test Gradient Map algorithms
         run: cargo test --manifest-path plugins/gradient-map/Cargo.toml
       - name: Test Color Toolkit algorithms
@@ -47,6 +55,8 @@ jobs:
         run: cargo test --manifest-path plugins/seamless-pattern-generator/Cargo.toml
       - name: Build and stage plug-ins
         run: bash build-all.sh
+      - name: Audit catalog downloads and release assets
+        run: python scripts/validate_catalog.py --check-artifacts
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:

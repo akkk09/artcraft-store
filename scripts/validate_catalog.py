@@ -119,6 +119,53 @@ def validate_catalog(
                         f"{label} artifact is missing from dist/: {artifact}"
                     )
 
+    if check_artifacts:
+        errors.extend(validate_download_pipeline(catalog, root))
+
+    return errors
+
+
+def validate_download_pipeline(catalog: dict, root: Path) -> list[str]:
+    """Check that catalog artifacts are built, deployed, and published consistently."""
+    errors: list[str] = []
+    build_path = root / ".github" / "workflows" / "build-plugins.yml"
+    deploy_path = root / ".github" / "workflows" / "deploy-pages.yml"
+
+    try:
+        build_workflow = build_path.read_text(encoding="utf-8")
+    except OSError as exc:
+        return [f"cannot read release workflow: {exc}"]
+    try:
+        deploy_workflow = deploy_path.read_text(encoding="utf-8")
+    except OSError as exc:
+        return [f"cannot read Pages workflow: {exc}"]
+
+    if "cp dist/* downloads/" not in deploy_workflow:
+        errors.append("Pages workflow does not copy built dist/ artifacts into downloads/")
+
+    release_section = build_workflow.split("files: |", 1)
+    if len(release_section) != 2:
+        errors.append("release workflow is missing its explicit asset file list")
+        published_assets: set[str] = set()
+    else:
+        published_assets = {
+            line.strip()[len("dist/"):]
+            for line in release_section[1].splitlines()
+            if line.strip().startswith("dist/")
+            and Path(line.strip()[len("dist/"):]).name == line.strip()[len("dist/"):]
+        }
+
+    for index, plugin in enumerate(catalog.get("plugins", [])):
+        if not isinstance(plugin, dict) or plugin.get("downloadUrl"):
+            continue
+        artifact = plugin.get("releaseAsset") or plugin.get("artifact")
+        if not isinstance(artifact, str) or not artifact:
+            continue
+        if artifact not in published_assets:
+            errors.append(
+                f"plugins[{index}] artifact is not included in tagged release assets: {artifact}"
+            )
+
     return errors
 
 
