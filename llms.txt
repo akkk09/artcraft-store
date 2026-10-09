@@ -1,0 +1,20 @@
+# ArtCraft Store
+
+> Community-maintained catalog of extensions for PhotoCraft, FilmCraft, EffectCraft, and VectorCraft.
+
+## API integration
+
+- [Agent-friendly API v1 reference](https://akkk09.github.io/artcraft-store/api/v1/README.md): integration steps, catalog fields, download resolution, JavaScript methods, and security considerations.
+- [API discovery manifest](https://akkk09.github.io/artcraft-store/api/v1/manifest.json): machine-readable API metadata and endpoint locations.
+- [Catalog JSON](https://akkk09.github.io/artcraft-store/catalog.json): current catalog data; filter the `plugins` array client-side.
+- [JavaScript client module](https://akkk09.github.io/artcraft-store/api/v1/client.js): dependency-free ES module for fetching and filtering the catalog and resolving download URLs.
+- [Repository README](https://github.com/akkk09/artcraft-store#readme): project overview and contributor information.
+
+## Important integration notes
+
+- The API is static, public, read-only, and requires no API key.
+- There is no server-side search or plugin lookup endpoint.
+- Download URL resolution priority is `downloadUrl`, then `releaseAsset`, then `artifact`.
+- Resolved URLs and catalog entries do not guarantee artifact availability, compatibility, integrity, or safety.
+- Launchers must implement their own compatibility checks, safe download/install behavior, and user consent.
+- Clients should ignore unknown fields and tolerate missing optional metadata.
