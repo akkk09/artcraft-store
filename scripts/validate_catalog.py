@@ -149,12 +149,10 @@ def validate_download_pipeline(catalog: dict, root: Path) -> list[str]:
         published_assets: set[str] = set()
     else:
         published_assets = {
-            match.group(1)
-            for match in re.finditer(
-                r"^\\s+dist/([A-Za-z0-9._-]+)\\s*$",
-                release_section[1],
-                re.MULTILINE,
-            )
+            line.strip()[len("dist/"):]
+            for line in release_section[1].splitlines()
+            if line.strip().startswith("dist/")
+            and Path(line.strip()[len("dist/"):]).name == line.strip()[len("dist/"):]
         }
 
     for index, plugin in enumerate(catalog.get("plugins", [])):
