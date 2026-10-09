@@ -80,7 +80,7 @@ impl StoreApp {
     fn app_name(app: &str) -> &'static str {
         match app {
             "photocraft" => "PhotoCraft",
-            "after-effects" => "After Effects",
+            "effectcraft" => "EffectCraft",
             _ => "ArtCraft",
         }
     }
@@ -201,7 +201,7 @@ impl eframe::App for StoreApp {
                     ui.add_space(15.0);
                     ui.label(RichText::new("Tools for your\ncreative flow.").size(48.0).strong().color(Color32::from_rgb(243, 243, 243)));
                     ui.add_space(10.0);
-                    ui.label(RichText::new("Small, focused extensions for PhotoCraft and Adobe After Effects, built by the community.")
+                    ui.label(RichText::new("Small, focused extensions for PhotoCraft and EffectCraft, built by the community.")
                         .size(15.0).color(Color32::from_rgb(180, 180, 180)));
                     ui.add_space(18.0);
                     ui.horizontal_wrapped(|ui| {
@@ -231,7 +231,7 @@ impl eframe::App for StoreApp {
                         for (key, label) in [
                             ("all", "All apps"),
                             ("photocraft", "PhotoCraft"),
-                            ("after-effects", "After Effects"),
+                            ("effectcraft", "EffectCraft"),
                         ] {
                             let selected = self.active_app == key;
                             if ui.selectable_label(selected, RichText::new(label).size(12.0)).clicked() {
