@@ -138,7 +138,10 @@ fn transform(src: &[f32], dst: &mut [f32], width: usize, height: usize, channels
     let cy = (height.saturating_sub(1)) as f32 * 0.5;
     let scale = (width.min(height) as f32 * 0.5).max(0.5);
     let radians = rotation_deg * (core::f32::consts::PI / 180.0);
-    let (sin_a, cos_a) = radians.sin_cos();
+    // Small-angle polynomial avoids a libm dependency in this no_std WASM filter.
+    let r2 = radians * radians;
+    let sin_a = radians * (1.0 - r2 / 6.0 + r2 * r2 / 120.0);
+    let cos_a = 1.0 - r2 / 2.0 + r2 * r2 / 24.0;
     let zoom = (zoom_percent / 100.0).clamp(0.5, 2.0);
     let px = horizontal.clamp(-100.0, 100.0) * 0.003;
     let py = vertical.clamp(-100.0, 100.0) * 0.003;
