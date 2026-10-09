@@ -2,7 +2,7 @@
 set -euo pipefail
 TARGET=wasm32-unknown-unknown
 mkdir -p dist
-for plugin in smudge-blend mixer-blend gradient-map color-toolkit detail-recovery film-emulation mosaic-pixelate vignette; do
+for plugin in smudge-blend mixer-blend gradient-map color-toolkit detail-recovery film-emulation mosaic-pixelate vignette white-balance; do
   cargo build --manifest-path "plugins/$plugin/Cargo.toml" --release --target "$TARGET"
 done
 cp plugins/smudge-blend/target/$TARGET/release/photocraft_plugin_smudge_blend.wasm dist/
@@ -13,6 +13,7 @@ cp plugins/detail-recovery/target/$TARGET/release/photocraft_plugin_detail_recov
 cp plugins/film-emulation/target/$TARGET/release/photocraft_plugin_film_emulation.wasm dist/
 cp plugins/mosaic-pixelate/target/$TARGET/release/photocraft_plugin_mosaic_pixelate.wasm dist/
 cp plugins/vignette/target/$TARGET/release/photocraft_plugin_vignette.wasm dist/
+cp plugins/white-balance/target/$TARGET/release/photocraft_plugin_white_balance.wasm dist/
 python plugins/film-emulation/package_filmcraft.py --output dist/filmcraft-film-emulation-toolkit.zip
 cp plugins/chromatic-fringe/chromatic-fringe.wat dist/
 printf 'Built plug-ins in dist/\n'

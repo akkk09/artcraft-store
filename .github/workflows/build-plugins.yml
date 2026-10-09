@@ -37,6 +37,8 @@ jobs:
         run: cargo test --manifest-path plugins/mosaic-pixelate/Cargo.toml
       - name: Test Vignette algorithms
         run: cargo test --manifest-path plugins/vignette/Cargo.toml
+      - name: Test White Balance algorithms
+        run: cargo test --manifest-path plugins/white-balance/Cargo.toml
       - name: Build and stage plug-ins
         run: bash build-all.sh
       - name: Upload build artifacts
@@ -59,5 +61,6 @@ jobs:
             dist/photocraft_plugin_film_emulation.wasm
             dist/photocraft_plugin_mosaic_pixelate.wasm
             dist/photocraft_plugin_vignette.wasm
+            dist/photocraft_plugin_white_balance.wasm
             dist/filmcraft-film-emulation-toolkit.zip
             dist/chromatic-fringe.wat
