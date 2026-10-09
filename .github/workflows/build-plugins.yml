@@ -1,6 +1,7 @@
 name: Build plug-ins
 on:
   push:
+    branches: [main]
     tags: ["v*"]
   workflow_dispatch:
 permissions:
@@ -15,6 +16,12 @@ jobs:
           targets: wasm32-unknown-unknown
       - name: Build both plug-ins
         run: bash build-all.sh
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: photocraft-plugin-store-wasm
+          path: dist/*.wasm
+          if-no-files-found: error
       - name: Publish release assets
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
