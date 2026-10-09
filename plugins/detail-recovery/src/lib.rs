@@ -36,6 +36,7 @@ pub extern "C" fn pc_manifest() -> i64 {
     ((MANIFEST.len() as i64) << 32) | (MANIFEST.as_ptr() as u32 as i64)
 }
 
+#[cfg(target_arch = "wasm32")]
 #[no_mangle]
 pub extern "C" fn pc_alloc(size: i32) -> i32 {
     if size <= 0 { return 0; }
@@ -50,6 +51,10 @@ pub extern "C" fn pc_alloc(size: i32) -> i32 {
     unsafe { HEAP_NEXT = end; }
     start as i32
 }
+
+#[cfg(not(target_arch = "wasm32"))]
+#[no_mangle]
+pub extern "C" fn pc_alloc(_size: i32) -> i32 { 0 }
 
 fn int_param(params: &[u8], key: &[u8], default: i32) -> i32 {
     let mut i = 0;
