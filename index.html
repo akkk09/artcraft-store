@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#10110f">
-  <meta name="description" content="Discover community-built WebAssembly filters for PhotoCraft.">
-  <title>Plugin Store — PhotoCraft</title>
+  <meta name="description" content="Community extensions, plug-ins, scripts, and tools for the ArtCraft creative apps.">
+  <title>ArtCraft Store — Community Extensions</title>
   <style>
     :root{color-scheme:dark;--bg:#111210;--panel:#191a18;--panel2:#222320;--line:#343531;--text:#e9eae5;--muted:#a3a59d;--lime:#b8c99a;--limeink:#171b12;--radius:10px}
     *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -18,7 +18,7 @@
     .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 16px;border-radius:7px;text-decoration:none;font-weight:650;font-size:14px;border:1px solid var(--line);background:transparent}.btn.primary{background:var(--lime);color:var(--limeink);border-color:var(--lime)}.btn:hover{transform:translateY(-1px)}
     .stats{display:flex;gap:12px;flex-wrap:wrap;margin-top:44px}.stat{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:12px 16px;min-width:130px}.stat strong{display:block;font-size:20px;letter-spacing:-.04em}.stat span{color:var(--muted);font-size:12px}
     .catalog{padding:34px 0 76px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:20px}.section-head h2{font-size:28px;letter-spacing:-.05em;margin:0}.section-head p{color:var(--muted);margin:4px 0 0;font-size:14px}
-    .tools{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0}.search{flex:1;min-width:220px;position:relative}.search span{position:absolute;left:14px;top:10px;color:var(--muted)}input[type=search]{width:100%;padding:11px 14px 11px 40px;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:12px;outline:none}input[type=search]:focus{border-color:var(--lime)}.filters{display:flex;gap:8px;flex-wrap:wrap}.filter{border:1px solid var(--line);border-radius:7px;background:transparent;color:var(--muted);padding:9px 12px;cursor:pointer;font-size:13px}.filter.active,.filter:hover{background:var(--lime);color:var(--limeink);border-color:var(--lime)}
+    .tools{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0}.search{flex:1;min-width:220px;position:relative}.search span{position:absolute;left:14px;top:10px;color:var(--muted)}input[type=search]{width:100%;padding:11px 14px 11px 40px;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:12px;outline:none}input[type=search]:focus{border-color:var(--lime)}.filters{display:flex;gap:8px;flex-wrap:wrap}.app-filters{margin:0 0 22px}.filter{border:1px solid var(--line);border-radius:7px;background:transparent;color:var(--muted);padding:9px 12px;cursor:pointer;font-size:13px}.filter.active,.filter:hover{background:var(--lime);color:var(--limeink);border-color:var(--lime)}
     .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{min-width:0;border:1px solid var(--line);background:var(--panel);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;transition:border-color .18s}.card:hover{border-color:#62685a}.card-top{display:flex;align-items:start;justify-content:space-between;gap:12px}.glyph{width:42px;height:42px;border-radius:8px;background:#252820;border:1px solid #3a3d34;display:grid;place-items:center;color:var(--lime);font-size:24px}.pill{font-size:11px;border:1px solid var(--line);border-radius:999px;padding:5px 9px;color:var(--muted);white-space:nowrap}.pill.filter-pill{color:var(--lime);border-color:#4b5932}.card h3{font-size:20px;letter-spacing:-.025em;margin:18px 0 5px}.card p{color:var(--muted);font-size:14px;margin:0;min-height:44px}.tags{display:flex;gap:6px;flex-wrap:wrap;margin:16px 0}.tag{font-size:11px;color:#c2c8b8;background:#282925;border-radius:4px;padding:4px 7px}.card-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid #ffffff12;padding-top:15px;margin-top:auto}.version{color:var(--muted);font-size:12px}.card-links{display:flex;gap:8px;align-items:center}.small-link{font-size:12px;font-weight:750;text-decoration:none;color:var(--text)}.small-link:hover{color:var(--lime)}.small-link.download{background:var(--lime);color:var(--limeink);padding:8px 11px;border-radius:9px}
     .notice{display:flex;gap:13px;border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:16px 18px;margin-top:20px}.notice .icon{font-size:19px}.notice strong{display:block;font-size:13px}.notice p{color:#c1bdab;font-size:13px;margin:3px 0 0}.empty{grid-column:1/-1;border:1px dashed var(--line);border-radius:16px;padding:34px;text-align:center;color:var(--muted)}
     .how{border-top:1px solid var(--line);padding:48px 0 60px}.how h2{font-size:27px;letter-spacing:-.05em;margin:0 0 22px}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.step{border:1px solid var(--line);border-radius:8px;padding:18px}.step b{color:var(--lime);font-size:12px;letter-spacing:.1em}.step h3{font-size:16px;margin:12px 0 5px}.step p{font-size:13px;color:var(--muted);margin:0}.step code{color:#e4f5bf}
@@ -30,61 +30,63 @@
 <body>
   <div class="wrap">
     <header>
-      <a class="brand" href="./" aria-label="PhotoCraft Plugin Store home"><span class="mark">P</span><span>PhotoCraft <span style="color:var(--muted);font-weight:500">/ Plugin Store</span></span></a>
+      <a class="brand" href="./" aria-label="ArtCraft Store home"><span class="mark">A</span><span>ArtCraft <span style="color:var(--muted);font-weight:500">/ Store</span></span></a>
       <nav class="nav" aria-label="Main navigation"><a href="#catalog">Browse</a><a href="#install">Installation</a><a href="https://github.com/akkk09/photocraft-plugin-store">GitHub ↗</a></nav>
     </header>
     <main>
       <section class="hero">
-        <div class="eyebrow"><span class="dot"></span> Community plug-ins · Open source</div>
-        <h1>PhotoCraft plug-ins</h1>
-        <p>Browse community-built filters for PhotoCraft. Each listing includes its version, compatibility, and source code.</p>
-        <div class="hero-actions"><a class="btn primary" href="#catalog">Browse plug-ins <span aria-hidden="true">↓</span></a><a class="btn" href="https://github.com/akkk09/photocraft-plugin-store">Contribute on GitHub ↗</a></div>
-        <div class="stats"><div class="stat"><strong id="plugin-count">—</strong><span>catalogued plugins</span></div><div class="stat"><strong>WASM</strong><span>plugin format</span></div><div class="stat"><strong>Open</strong><span>source-first catalog</span></div></div>
+        <div class="eyebrow"><span class="dot"></span> Community extensions · Open source</div>
+        <h1>Tools for your creative workflow.</h1>
+        <p>A shared catalog for the ArtCraft apps: PhotoCraft plug-ins, FilmCraft extensions, EffectCraft scripts, and VectorCraft tools.</p>
+        <div class="hero-actions"><a class="btn primary" href="#catalog">Browse catalog <span aria-hidden="true">↓</span></a><a class="btn" href="https://github.com/akkk09/photocraft-plugin-store">Contribute on GitHub ↗</a></div>
+        <div class="stats"><div class="stat"><strong id="plugin-count">—</strong><span>catalogued items</span></div><div class="stat"><strong>4 apps</strong><span>one shared catalog</span></div><div class="stat"><strong>Open</strong><span>source-first listings</span></div></div>
       </section>
       <section class="catalog" id="catalog">
-        <div class="section-head"><div><div class="eyebrow">The catalog</div><h2>Available plug-ins</h2><p>Search by name or effect, or filter by type.</p></div></div>
-        <div class="tools"><label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Search plug-ins…" aria-label="Search plugins"></label><div class="filters" role="group" aria-label="Filter by type"><button class="filter active" data-filter="all" aria-pressed="true">All plugins</button><button class="filter" data-filter="filter" aria-pressed="false">Filters</button><button class="filter" data-filter="tool" aria-pressed="false">Brushes & tools</button></div></div>
+        <div class="section-head"><div><div class="eyebrow">The catalog</div><h2>Browse extensions</h2><p>Search by name, feature, or app. Filter the catalog by the app you use.</p></div></div>
+        <div class="tools"><label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Search extensions, scripts, tools…" aria-label="Search catalog"></label></div><div class="filters app-filters" role="group" aria-label="Filter by ArtCraft app"><button class="filter active" data-app-filter="all" aria-pressed="true">All apps</button><button class="filter" data-app-filter="photocraft" aria-pressed="false">PhotoCraft</button><button class="filter" data-app-filter="filmcraft" aria-pressed="false">FilmCraft</button><button class="filter" data-app-filter="effectcraft" aria-pressed="false">EffectCraft</button><button class="filter" data-app-filter="vectorcraft" aria-pressed="false">VectorCraft</button></div>
         <div class="grid" id="plugin-grid" aria-live="polite"><div class="empty">Loading catalog…</div></div>
-        <div class="notice"><span class="icon" aria-hidden="true">ⓘ</span><div><strong>Know what you're installing</strong><p>This store currently lists ABI v1 whole-image filters. They are not interactive drag-to-paint brushes. Review the source and compatibility notes before using a plugin.</p></div></div>
+        <div class="notice"><span class="icon" aria-hidden="true">ⓘ</span><div><strong>Check compatibility before installing</strong><p>Each app has its own extension format and compatibility requirements. Listings appear only when they have been added to the catalog; an app filter with no results means no items are currently listed for it.</p></div></div>
       </section>
-      <section class="how" id="install"><div class="eyebrow">Get started</div><h2>Install a plug-in</h2><div class="steps">
-        <article class="step"><b>01 / CHOOSE</b><h3>Pick a plugin</h3><p>Search the catalog, check its type, version, and source repository.</p></article>
-        <article class="step"><b>02 / DOWNLOAD</b><h3>Get the WASM file</h3><p>Download the WASM file from the plug-in listing.</p></article>
-        <article class="step"><b>03 / INSTALL</b><h3>Load in PhotoCraft</h3><p>Open PhotoCraft and use its plug-in installation option, if supported by your build. Select the downloaded <code>.wasm</code> file.</p></article>
+      <section class="how" id="install"><div class="eyebrow">Get started</div><h2>Use an extension</h2><div class="steps">
+        <article class="step"><b>01 / CHOOSE</b><h3>Select your app</h3><p>Filter by PhotoCraft, FilmCraft, EffectCraft, or VectorCraft and check compatibility notes.</p></article>
+        <article class="step"><b>02 / REVIEW</b><h3>Inspect the listing</h3><p>Check the version, source code, file type, and requirements before downloading.</p></article>
+        <article class="step"><b>03 / INSTALL</b><h3>Follow app-specific steps</h3><p>Download the item and follow its documented installation instructions. Automatic installation depends on support in the target app.</p></article>
       </div></section>
     </main>
-    <footer><span>Community project · Not affiliated with PhotoCraft maintainers.</span><span><a href="https://github.com/akkk09/photocraft-plugin-store">Source code</a> · <a href="catalog.json">Catalog JSON</a> · MIT</span></footer>
+    <footer><span>Community project · Not affiliated with ArtCraft app maintainers.</span><span><a href="https://github.com/akkk09/photocraft-plugin-store">Source code</a> · <a href="catalog.json">Catalog JSON</a> · MIT</span></footer>
   </div>
   <script>
     const grid = document.querySelector("#plugin-grid");
     const search = document.querySelector("#search");
-    const filters = [...document.querySelectorAll("[data-filter]")];
+    const appFilters = [...document.querySelectorAll("[data-app-filter]")];
     let plugins = [];
-    let activeFilter = "all";
+    let activeApp = "all";
     const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
     const repo = "https://github.com/akkk09/photocraft-plugin-store";
+    const appNames = {photocraft:"PhotoCraft",filmcraft:"FilmCraft",effectcraft:"EffectCraft",vectorcraft:"VectorCraft"};
+    const appGlyphs = {photocraft:"P",filmcraft:"F",effectcraft:"E",vectorcraft:"V"};
     function pluginCard(p) {
-      const kind = String(p.kind || "plugin").toLowerCase();
+      const kind = String(p.kind || "extension").toLowerCase();
+      const app = String(p.app || "photocraft").toLowerCase();
+      const appName = appNames[app] || app;
       const tags = Array.isArray(p.tags) ? p.tags : [];
-      const source = p.source ? repo + "/tree/main/" + p.source.replace(/^\/+/, "") : repo;
-      const artifact = p.releaseAsset || p.artifact;
-      const download = artifact ? "./downloads/" + encodeURIComponent(artifact) : null;
-      const isInteractive = p.interactiveBrush === true;
-      return '<article class="card"><div class="card-top"><div class="glyph" aria-hidden="true">' + (kind === "filter" ? "◈" : "✳") + '</div><span class="pill ' + (kind === "filter" ? "filter-pill" : "") + '">' + escapeHtml(kind) + '</span></div><h3>' + escapeHtml(p.name) + '</h3><p>' + escapeHtml(p.description || "Community plugin for PhotoCraft.") + '</p><div class="tags">' + tags.map(t => '<span class="tag">' + escapeHtml(t) + '</span>').join("") + '<span class="tag">ABI v' + escapeHtml(p.abi ?? "?") + '</span>' + (isInteractive ? '<span class="tag">Interactive tool</span>' : "") + '</div><div class="card-foot"><span class="version">v' + escapeHtml(p.version || "0.0.0") + ' · ' + escapeHtml(p.author || "Community") + '</span><div class="card-links"><a class="small-link" href="' + escapeHtml(source) + '">Source ↗</a>' + (download ? '<a class="small-link download" href="' + escapeHtml(download) + '">Download ↓</a>' : "") + '</div></div></article>';
+      const source = p.sourceUrl || (p.source ? repo + "/tree/main/" + p.source : repo);
+      const artifact = p.downloadUrl || ((p.releaseAsset || p.artifact) ? "./downloads/" + encodeURIComponent(p.releaseAsset || p.artifact) : null);
+      const compatibility = p.compatibility || (p.abi ? "ABI v" + p.abi : "");
+      return '<article class="card"><div class="card-top"><div class="glyph" aria-hidden="true">' + escapeHtml(appGlyphs[app] || "A") + '</div><span class="pill">' + escapeHtml(appName) + '</span></div><h3>' + escapeHtml(p.name) + '</h3><p>' + escapeHtml(p.description || "Community extension.") + '</p><div class="tags"><span class="tag">' + escapeHtml(kind) + '</span>' + (compatibility ? '<span class="tag">' + escapeHtml(compatibility) + '</span>' : '') + tags.map(t => '<span class="tag">' + escapeHtml(t) + '</span>').join("") + '</div><div class="card-foot"><span class="version">v' + escapeHtml(p.version || "0.0.0") + ' · ' + escapeHtml(p.author || "Community") + '</span><div class="card-links"><a class="small-link" href="' + escapeHtml(source) + '" target="_blank" rel="noopener noreferrer">Source ↗</a>' + (artifact ? '<a class="small-link download" href="' + escapeHtml(artifact) + '">Download ↓</a>' : "") + '</div></div></article>';
     }
     function render() {
       const q = search.value.trim().toLowerCase();
       const shown = plugins.filter(p => {
-        const kind = String(p.kind || "").toLowerCase();
-        const matchType = activeFilter === "all" || (activeFilter === "tool" ? kind === "tool" || kind === "brush" : kind === activeFilter);
-        const haystack = [p.name,p.description,p.author,p.kind,...(p.tags || [])].join(" ").toLowerCase();
-        return matchType && haystack.includes(q);
+        const app = String(p.app || "photocraft").toLowerCase();
+        const haystack = [p.name,p.description,p.author,p.kind,app,p.compatibility,...(p.tags || [])].join(" ").toLowerCase();
+        return (activeApp === "all" || app === activeApp) && haystack.includes(q);
       });
-      grid.innerHTML = shown.length ? shown.map(pluginCard).join("") : '<div class="empty">No plugins match that search. Try another term or filter.</div>';
+      grid.innerHTML = shown.length ? shown.map(pluginCard).join("") : '<div class="empty">No catalog items match. Try another app or search term.</div>';
     }
-    filters.forEach(button => button.addEventListener("click", () => {
-      activeFilter = button.dataset.filter;
-      filters.forEach(b => { const active = b === button; b.classList.toggle("active", active); b.setAttribute("aria-pressed", String(active)); });
+    appFilters.forEach(button => button.addEventListener("click", () => {
+      activeApp = button.dataset.appFilter;
+      appFilters.forEach(b => { const active = b === button; b.classList.toggle("active", active); b.setAttribute("aria-pressed", String(active)); });
       render();
     }));
     search.addEventListener("input", render);
