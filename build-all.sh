@@ -18,6 +18,7 @@ cp plugins/lut-studio/target/$TARGET/release/photocraft_plugin_lut_studio.wasm d
 cp plugins/geometry-fixer/target/$TARGET/release/photocraft_plugin_geometry_fixer.wasm dist/
 cp plugins/seamless-pattern-generator/target/$TARGET/release/photocraft_plugin_seamless_pattern_generator.wasm dist/
 python plugins/film-emulation/package_filmcraft.py --output dist/filmcraft-film-emulation-toolkit.zip
+python plugins/creator-graphics-pack/package.py --output dist/creator-graphics-pack.zip
 cp plugins/chromatic-fringe/chromatic-fringe.wat dist/
 printf 'Built plug-ins in dist/\n'
 ls -lh dist/*

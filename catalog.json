@@ -334,6 +334,31 @@
       ],
       "app": "photocraft",
       "compatibility": "PhotoCraft ABI v1"
+    },
+    {
+      "id": "org.vectorcraft.community.creator-graphics-pack",
+      "name": "Creator Graphics Pack",
+      "version": "1.0.0",
+      "author": "ArtCraft Store community",
+      "description": "Editable SVG templates for video thumbnails, channel banners, end screens, lower thirds, social posts, and creator avatars.",
+      "kind": "preset",
+      "source": "assets/creator-graphics-pack",
+      "sourceUrl": "https://github.com/akkk09/artcraft-store/tree/main/assets/creator-graphics-pack",
+      "artifact": "creator-graphics-pack.zip",
+      "releaseAsset": "creator-graphics-pack.zip",
+      "tags": [
+        "creator",
+        "youtube",
+        "thumbnail",
+        "banner",
+        "social",
+        "lower-third",
+        "svg",
+        "vector",
+        "template"
+      ],
+      "app": "vectorcraft",
+      "compatibility": "Editable SVG; import/open in SVG-compatible vector editors"
     }
   ]
 }
