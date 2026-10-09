@@ -41,6 +41,27 @@
   ],
   "plugins": [
     {
+      "id": "org.photocraft.community.detail-recovery",
+      "name": "Detail Recovery",
+      "version": "0.1.0",
+      "author": "ArtCraft Store community",
+      "description": "Reduces small noise and restores local detail with lightweight spatial filtering.",
+      "kind": "filter",
+      "abi": 1,
+      "source": "plugins/detail-recovery",
+      "artifact": "photocraft_plugin_detail_recovery.wasm",
+      "releaseAsset": "photocraft_plugin_detail_recovery.wasm",
+      "tags": [
+        "sharpen",
+        "denoise",
+        "noise-reduction",
+        "detail",
+        "retouch"
+      ],
+      "app": "photocraft",
+      "compatibility": "PhotoCraft ABI v1"
+    },
+    {
       "id": "org.photocraft.community.color-toolkit",
       "name": "Color Toolkit",
       "version": "0.1.0",

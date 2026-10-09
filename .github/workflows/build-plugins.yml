@@ -29,6 +29,8 @@ jobs:
         run: cargo test --manifest-path plugins/gradient-map/Cargo.toml
       - name: Test Color Toolkit algorithms
         run: cargo test --manifest-path plugins/color-toolkit/Cargo.toml
+      - name: Test Detail Recovery algorithms
+        run: cargo test --manifest-path plugins/detail-recovery/Cargo.toml
       - name: Build and stage plug-ins
         run: bash build-all.sh
       - name: Upload build artifacts
@@ -47,4 +49,5 @@ jobs:
             dist/photocraft_plugin_mixer_blend.wasm
             dist/photocraft_plugin_gradient_map.wasm
             dist/photocraft_plugin_color_toolkit.wasm
+            dist/photocraft_plugin_detail_recovery.wasm
             dist/chromatic-fringe.wat
