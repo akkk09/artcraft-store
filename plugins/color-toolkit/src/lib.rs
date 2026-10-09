@@ -96,6 +96,9 @@ fn luminance(color: Color) -> f32 {
 }
 
 fn apply_color(color: Color, exposure: f32, contrast: f32, saturation: f32) -> Color {
+    if exposure == 0.0 && contrast == 0.0 && saturation == 1.0 {
+        return color;
+    }
     let gain = 2.0f32.powf(exposure);
     let mut result = Color {
         r: color.r * gain,
