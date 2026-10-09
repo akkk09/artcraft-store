@@ -1,6 +1,6 @@
 (module
   (memory (export "memory") 2)
-  (data (i32.const 16) "{\"api\":1,\"id\":\"org.effectcraft.trokute.chromatic-fringe\",\"name\":\"Chromatic Fringe\",\"category\":\"Stylize\",\"version\":\"1.0.0\",\"author\":\"EffectCraft contributors\",\"description\":\"Offsets red and blue color channels in opposite directions.\",\"params\":[{\"id\":\"amount\",\"name\":\"Shift\",\"type\":\"slider\",\"default\":6,\"min\":0,\"max\":32,\"sliderMax\":16,\"decimals\":0},{\"id\":\"mix\",\"name\":\"Blend\",\"type\":\"slider\",\"default\":100,\"min\":0,\"max\":100,\"decimals\":0}]}\00")
+  (data (i32.const 16) "{\"api\":1,\"id\":\"org.effectcraft.trokute.chromatic-fringe\",\"name\":\"Chromatic Fringe\",\"category\":\"Stylize\",\"version\":\"1.0.0\",\"author\":\"trokute\",\"description\":\"Offsets red and blue color channels in opposite directions.\",\"params\":[{\"id\":\"amount\",\"name\":\"Shift\",\"type\":\"slider\",\"default\":6,\"min\":0,\"max\":32,\"sliderMax\":16,\"decimals\":0},{\"id\":\"mix\",\"name\":\"Blend\",\"type\":\"slider\",\"default\":100,\"min\":0,\"max\":100,\"decimals\":0}]}\00")
   (func (export "ec_api_version") (result i32) i32.const 1)
   (func (export "ec_manifest_ptr") (result i32) i32.const 16)
   (func (export "ec_manifest_len") (result i32)
