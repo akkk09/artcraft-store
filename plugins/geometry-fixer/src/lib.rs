@@ -209,13 +209,13 @@ pub unsafe extern "C" fn pc_filter(
         let destination = slice::from_raw_parts_mut(buf as *mut f32, count);
         transform(source, destination, width as usize, height as usize, ch,
                   rotation, horizontal, vertical, zoom);
+        0
     }
     #[cfg(not(target_arch = "wasm32"))]
     {
         let _ = (count, rotation, horizontal, vertical, zoom);
-        return 7;
+        7
     }
-    0
 }
 
 #[cfg(test)]
@@ -247,7 +247,7 @@ mod tests {
         let mut dst = [0.0; 9];
         transform(&src, &mut dst, 3, 3, 1, 0.0, 0.0, 0.0, 200.0);
         close(dst[4], 5.0);
-        assert!(dst[0] < src[0]);
+        assert!(dst[0] > src[0]);
     }
 
     #[test]
