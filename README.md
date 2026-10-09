@@ -1,11 +1,9 @@
 # ArtCraft Store
 
-A shared, searchable community catalog for extensions across the ArtCraft creative apps:
+A shared, searchable community catalog for apps with supported extension systems:
 
 - **PhotoCraft** — plug-ins, filters, and tools
-- **FilmCraft** — plug-ins, effects, and presets
-- **EffectCraft** — scripts and plug-ins
-- **VectorCraft** — plug-ins, tools, and presets
+- **Adobe After Effects** — scripts and plug-ins
 
 The static storefront in [`index.html`](index.html) reads [`catalog.json`](catalog.json) at runtime. Filter by app or search across names, descriptions, tags, and compatibility notes.
 
@@ -28,8 +26,8 @@ In a browser or Electron launcher using JavaScript modules:
 ```js
 import { artcraft } from "https://akkk09.github.io/artcraft-store/api/v1/client.js";
 
-const plugins = await artcraft.listPlugins({ app: "effectcraft" });
-const plugin = await artcraft.getPlugin("org.effectcraft.trokute.chromatic-fringe");
+const plugins = await artcraft.listPlugins({ app: "photocraft" });
+const plugin = await artcraft.getPlugin("org.photocraft.community.vignette");
 const downloadUrl = artcraft.getDownloadUrl(plugin);
 
 console.log(plugins, downloadUrl);
@@ -81,7 +79,7 @@ This API is intentionally static and read-only. It does not install plugins, gua
 
 ## Adding an item
 
-Add an entry to `catalog.json` under `plugins`. Supported fields include `id`, `app`, `name`, `version`, `author`, `description`, `kind`, `tags`, `compatibility`, `sourceUrl`, `downloadUrl`, `artifact`, and `releaseAsset`. The `app` value should be one of `photocraft`, `filmcraft`, `effectcraft`, or `vectorcraft`. Use `sourceUrl` and `downloadUrl` for extensions hosted outside this repository. The storefront supports app-specific formats; it does not assume every item is a WASM file.
+Add an entry to `catalog.json` under `plugins`. Supported fields include `id`, `app`, `name`, `version`, `author`, `description`, `kind`, `tags`, `compatibility`, `sourceUrl`, `downloadUrl`, `artifact`, and `releaseAsset`. The `app` value should be `photocraft` or `after-effects`. Only list an app when the extension targets a supported plug-in or scripting interface. Use `sourceUrl` and `downloadUrl` for extensions hosted outside this repository. The storefront supports app-specific formats; it does not assume every item is a WASM file.
 
 Do not add a listing until its source, license, download, and target-app compatibility have been checked.
 
@@ -101,9 +99,8 @@ Do not add a listing until its source, license, download, and target-app compati
 | **LUT Studio** | Filter + browser tool | Applies bundled 3D LUTs in PhotoCraft; imports custom `.cube` files and exports image/video frames in the browser studio. |
 | **Geometry Fixer** | Filter (ABI v1) | Straightens rotation, adjusts horizontal/vertical perspective, and controls zoom on a fixed canvas. |
 | **Seamless Pattern Generator** | Filter (ABI v1) | Reduces texture tiling seams by blending opposing edges with a smooth falloff. |
-| **Creator Graphics Pack** | SVG template pack | Editable video thumbnail, channel banner, end screen, lower third, social post, and avatar templates. |
 
-The build workflow compiles the PhotoCraft Rust/WASM plug-ins and packages the Film Emulation Toolkit's FilmCraft-native effect presets and .cube LUTs, plus the editable Creator Graphics Pack. The browser-based LUT Studio is available at `https://akkk09.github.io/artcraft-store/lut-studio/`. FilmCraft does not currently expose a third-party video-effect plug-in ABI, so its supported integration is an importable preset/LUT pack rather than an executable plug-in. Other FilmCraft, EffectCraft, and VectorCraft listings still need their own verified formats and download sources.
+The build workflow compiles the PhotoCraft Rust/WASM plug-ins. The browser-based LUT Studio is available at `https://akkk09.github.io/artcraft-store/lut-studio/`. The catalog is limited to PhotoCraft and Adobe After Effects, the two apps identified as supporting plug-ins or scripts. There are no After Effects listings yet; entries will appear when a compatible script or plug-in is ready.
 
 ## Build PhotoCraft plug-ins locally
 
@@ -114,7 +111,7 @@ rustup target add wasm32-unknown-unknown
 bash build-all.sh
 ```
 
-PhotoCraft WASM modules and the FilmCraft preset/LUT ZIP are copied to `dist/`.
+PhotoCraft WASM modules are copied to `dist/`. Legacy asset-bundle build steps may remain, but those bundles are not listed as supported app extensions in the catalog.
 
 ## License
 

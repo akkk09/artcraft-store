@@ -80,9 +80,7 @@ impl StoreApp {
     fn app_name(app: &str) -> &'static str {
         match app {
             "photocraft" => "PhotoCraft",
-            "filmcraft" => "FilmCraft",
-            "effectcraft" => "EffectCraft",
-            "vectorcraft" => "VectorCraft",
+            "after-effects" => "After Effects",
             _ => "ArtCraft",
         }
     }
@@ -203,14 +201,14 @@ impl eframe::App for StoreApp {
                     ui.add_space(15.0);
                     ui.label(RichText::new("Tools for your\ncreative flow.").size(48.0).strong().color(Color32::from_rgb(241, 244, 239)));
                     ui.add_space(10.0);
-                    ui.label(RichText::new("Small, focused extensions for the ArtCraft apps. Find effects, filters, scripts, and assets built by the community.")
+                    ui.label(RichText::new("Small, focused extensions for PhotoCraft and Adobe After Effects, built by the community.")
                         .size(15.0).color(Color32::from_rgb(174, 183, 173)));
                     ui.add_space(18.0);
                     ui.horizontal_wrapped(|ui| {
                         ui.label(RichText::new(format!("{:02}", self.plugins.len())).size(20.0).strong().color(Color32::from_rgb(193, 238, 113)));
                         ui.label(RichText::new("catalog items").size(12.0).color(Color32::from_rgb(139, 149, 139)));
                         ui.add_space(18.0);
-                        ui.label(RichText::new("04").size(20.0).strong().color(Color32::from_rgb(193, 238, 113)));
+                        ui.label(RichText::new("02").size(20.0).strong().color(Color32::from_rgb(193, 238, 113)));
                         ui.label(RichText::new("creative apps").size(12.0).color(Color32::from_rgb(139, 149, 139)));
                         ui.add_space(18.0);
                         ui.label(RichText::new("MIT").size(20.0).strong().color(Color32::from_rgb(193, 238, 113)));
@@ -233,9 +231,7 @@ impl eframe::App for StoreApp {
                         for (key, label) in [
                             ("all", "All apps"),
                             ("photocraft", "PhotoCraft"),
-                            ("filmcraft", "FilmCraft"),
-                            ("effectcraft", "EffectCraft"),
-                            ("vectorcraft", "VectorCraft"),
+                            ("after-effects", "After Effects"),
                         ] {
                             let selected = self.active_app == key;
                             if ui.selectable_label(selected, RichText::new(label).size(12.0)).clicked() {
