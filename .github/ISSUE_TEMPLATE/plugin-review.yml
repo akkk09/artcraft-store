@@ -1,17 +1,17 @@
 name: Plugin or script review
-description: Share a review for an ArtCraft Store plugin, script, filter, preset, or tool.
+description: Review a plugin or script already listed in the ArtCraft Store.
 title: "[Plugin Review] "
 labels: ["plugin-review"]
 body:
   - type: markdown
     attributes:
       value: |
-        Reviews are public GitHub issues. Please review only an item you have tried, and include the version you tested.
+        Reviews are public GitHub issues. Submit reviews only for plugins or scripts already listed in this store. Please review only an item you have tried, and include the version you tested.
   - type: input
     id: item_name
     attributes:
       label: Plugin or script name
-      description: Use the exact name shown in the ArtCraft Store.
+      description: Use the exact name of an existing listing in the ArtCraft Store. Do not use this form for general feedback or feature requests.
       placeholder: Smudge Blend
     validations:
       required: true
