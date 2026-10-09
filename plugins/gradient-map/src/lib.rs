@@ -26,6 +26,7 @@ static MANIFEST: &[u8] = br#"{
   "area":"content"
 }"#;
 
+#[cfg(target_arch = "wasm32")]
 static mut HEAP_NEXT: usize = 65536;
 
 #[no_mangle]
@@ -36,31 +37,26 @@ pub extern "C" fn pc_manifest() -> i64 {
     ((MANIFEST.len() as i64) << 32) | (MANIFEST.as_ptr() as u32 as i64)
 }
 
+#[cfg(target_arch = "wasm32")]
 #[no_mangle]
 pub extern "C" fn pc_alloc(size: i32) -> i32 {
     if size <= 0 { return 0; }
     let size = size as usize;
     let start = unsafe { (HEAP_NEXT + 7) & !7usize };
     let end = match start.checked_add(size) { Some(value) => value, None => return 0 };
-
-    #[cfg(target_arch = "wasm32")]
-    {
-        let pages_needed = end.saturating_add(65535) / 65536;
-        let pages_now = core::arch::wasm32::memory_size(0);
-        if pages_needed > pages_now {
-            let grown = core::arch::wasm32::memory_grow(0, pages_needed - pages_now);
-            if grown == usize::MAX { return 0; }
-        }
+    let pages_needed = end.saturating_add(65535) / 65536;
+    let pages_now = core::arch::wasm32::memory_size(0);
+    if pages_needed > pages_now {
+        let grown = core::arch::wasm32::memory_grow(0, pages_needed - pages_now);
+        if grown == usize::MAX { return 0; }
     }
-    #[cfg(not(target_arch = "wasm32"))]
-    {
-        let _ = end;
-        return 0;
-    }
-
     unsafe { HEAP_NEXT = end; }
     start as i32
 }
+
+#[cfg(not(target_arch = "wasm32"))]
+#[no_mangle]
+pub extern "C" fn pc_alloc(_size: i32) -> i32 { 0 }
 
 #[derive(Clone, Copy)]
 struct Color { r: f32, g: f32, b: f32 }
@@ -84,7 +80,7 @@ fn preset_index(params: &[u8]) -> usize {
                 if value.windows(10).any(|w| w == b"warm-cream") { return 1; }
                 if value.windows(11).any(|w| w == b"blue-orange") { return 2; }
                 if value.windows(11).any(|w| w == b"purple-pink") { return 3; }
-                if value.windows(10).any(|w| w == b"teal-yellow") { return 4; }
+                if value.windows(11).any(|w| w == b"teal-yellow") { return 4; }
             }
             return 2;
         }
