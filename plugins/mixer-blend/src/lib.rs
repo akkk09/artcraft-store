@@ -2,6 +2,14 @@
 
 use core::{ptr, slice};
 
+#[panic_handler]
+fn panic(_info: &core::panic::PanicInfo) -> ! {
+    loop {
+        core::hint::spin_loop();
+    }
+}
+
+
 static MANIFEST: &[u8] = br#"{
   "id":"org.photocraft.community.mixer-blend",
   "name":"Mixer Blend",
