@@ -68,7 +68,7 @@
       "author": "ArtCraft Store community",
       "description": "Five native FilmCraft effect presets with monochrome grain plus matching 17³ .cube LUTs.",
       "kind": "preset",
-      "source": "plugins/film-emulation/filmcraft",
+      "source": "plugins/film-emulation",
       "sourceUrl": "https://github.com/akkk09/artcraft-store/tree/main/plugins/film-emulation",
       "artifact": "filmcraft-film-emulation-toolkit.zip",
       "releaseAsset": "filmcraft-film-emulation-toolkit.zip",
