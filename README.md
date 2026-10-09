@@ -96,7 +96,7 @@ Do not add a listing until its source, license, download, and target-app compati
 | **Detail Recovery** | Filter (ABI v1) | Combines lightweight sharpening and spatial noise reduction. |
 | **Film Emulation Toolkit** | Filter (ABI v1) | Applies film-inspired color looks with deterministic grain. |
 
-The current build workflow only compiles the PhotoCraft Rust/WASM plug-ins. FilmCraft, EffectCraft, and VectorCraft listings can use their own source repositories and download URLs; their native build/install workflows should be integrated separately once the relevant APIs and formats are confirmed. No unverified listings are fabricated for those apps.
+The build workflow compiles the PhotoCraft Rust/WASM plug-ins and packages the Film Emulation Toolkit's FilmCraft-native effect presets and .cube LUTs. FilmCraft does not currently expose a third-party video-effect plug-in ABI, so its supported integration is an importable preset/LUT pack rather than an executable plug-in. Other FilmCraft, EffectCraft, and VectorCraft listings still need their own verified formats and download sources.
 
 ## Build PhotoCraft plug-ins locally
 
@@ -107,7 +107,7 @@ rustup target add wasm32-unknown-unknown
 bash build-all.sh
 ```
 
-Built modules are copied to `dist/`.
+PhotoCraft WASM modules and the FilmCraft preset/LUT ZIP are copied to `dist/`.
 
 ## License
 
