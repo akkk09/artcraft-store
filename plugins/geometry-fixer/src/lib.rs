@@ -114,8 +114,10 @@ fn sample_bilinear(src: &[f32], width: usize, height: usize, channels: usize,
         out.fill(0.0);
         return false;
     }
-    let x0 = x.floor() as usize;
-    let y0 = y.floor() as usize;
+    // Coordinates are checked non-negative above; float-to-int truncation is floor here.
+    // This keeps the no_std WASM build independent of libm.
+    let x0 = x as usize;
+    let y0 = y as usize;
     let x1 = (x0 + 1).min(width - 1);
     let y1 = (y0 + 1).min(height - 1);
     let fx = x - x0 as f32;
