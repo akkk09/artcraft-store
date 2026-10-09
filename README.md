@@ -1,46 +1,37 @@
-# PhotoCraft Plugin Store
+# ArtCraft Store
 
-A community catalog of plug-ins for [PhotoCraft](https://github.com/storytold/photocraft), with a static, searchable storefront powered directly by [`catalog.json`](catalog.json).
+A shared, searchable community catalog for extensions across the ArtCraft creative apps:
+
+- **PhotoCraft** — plug-ins, filters, and tools
+- **FilmCraft** — plug-ins, effects, and presets
+- **EffectCraft** — scripts and plug-ins
+- **VectorCraft** — plug-ins, tools, and presets
+
+The static storefront in [`index.html`](index.html) reads [`catalog.json`](catalog.json) at runtime. Filter by app or search across names, descriptions, tags, and compatibility notes.
 
 ## Store website
 
-The website lives in [`index.html`](index.html) and has no build-time JavaScript dependencies. It reads `catalog.json` at runtime, so adding a valid plugin entry automatically adds a card to the catalog.
-
-To publish it:
-
 1. Open **Settings → Pages** in this repository.
 2. Under **Build and deployment**, select **GitHub Actions** as the source.
-3. Push to `main` or manually run **Deploy plugin store website** from the Actions tab.
-4. Open the URL shown in the workflow's deployment environment.
+3. Push to `main` or manually run **Deploy plugin store website** from Actions.
+4. Open the deployment URL shown in the workflow.
 
-The workflow validates `catalog.json` and deploys the site using GitHub Pages.
+## Adding an item
 
-## Available plug-ins
+Add an entry to `catalog.json` under `plugins`. Supported fields include `id`, `app`, `name`, `version`, `author`, `description`, `kind`, `tags`, `compatibility`, `sourceUrl`, `downloadUrl`, `artifact`, and `releaseAsset`. The `app` value should be one of `photocraft`, `filmcraft`, `effectcraft`, or `vectorcraft`. Use `sourceUrl` and `downloadUrl` for extensions hosted outside this repository. The storefront supports app-specific formats; it does not assume every item is a WASM file.
+
+Do not add a listing until its source, license, download, and target-app compatibility have been checked.
+
+## Current PhotoCraft plug-ins
 
 | Plug-in | Type | What it does |
 |---|---|---|
 | **Smudge Blend** | Filter (ABI v1) | Smears pixels in a chosen direction with adjustable strength and radius. |
 | **Mixer Blend** | Filter (ABI v1) | Mixes nearby colours with adjustable pickup, radius, and wetness. |
 
-### Important compatibility note
+The current build workflow only compiles the PhotoCraft Rust/WASM plug-ins. FilmCraft, EffectCraft, and VectorCraft listings can use their own source repositories and download URLs; their native build/install workflows should be integrated separately once the relevant APIs and formats are confirmed. No unverified listings are fabricated for those apps.
 
-PhotoCraft's current public plug-in ABI v1 supports **whole-buffer filters only**. It does not expose pointer/mouse-drag events, brush cursors, or persistent per-stroke state. Therefore these entries are smudge-/mixer-inspired filters, **not interactive brush tools** like Photoshop's brushes. A true drag-to-paint brush requires changes to PhotoCraft's core tool system.
-
-## Install
-
-1. Open a plug-in's **Download** link (it points to the latest GitHub Release asset).
-2. In a compatible PhotoCraft build, choose **Filter → Plug-ins → Install Plug-in…** and select the downloaded `.wasm` file.
-3. The filter appears under **Filter → Plug-ins**.
-
-If a release has not been published yet, its download link will not resolve until the first release containing the named asset is available.
-
-The repository's GitHub Actions workflow builds both plug-ins for `wasm32-unknown-unknown` and publishes the `.wasm` files when a version tag (for example, `v0.1.0`) is pushed.
-
-## Catalog schema
-
-Each plugin entry should provide a stable `id`, `name`, `version`, `author`, `description`, `kind`, `abi`, `source`, and `tags`. Use `interactiveBrush: true` only for genuinely interactive tools supported by the host API. Optional `artifact` and `releaseAsset` fields identify a downloadable release asset.
-
-## Build locally
+## Build PhotoCraft plug-ins locally
 
 Requirements: Rust stable and `rustup`.
 
@@ -53,4 +44,4 @@ Built modules are copied to `dist/`.
 
 ## License
 
-MIT. Community project; not affiliated with the PhotoCraft maintainers.
+MIT. Community project; not affiliated with the ArtCraft app maintainers.
