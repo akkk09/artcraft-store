@@ -35,11 +35,13 @@
   let reviews = [];
   let reviewsReady = false;
   function enhanceCards() {
+    let addedCard = false;
     document.querySelectorAll("#plugin-grid .card").forEach(card => {
       if (card.dataset.reviewsReady) return;
       const name = card.querySelector("h3")?.textContent?.trim();
       if (!name) return;
       card.dataset.reviewsReady = "true";
+      addedCard = true;
       const panel = document.createElement("div");
       panel.className = "review-panel";
       panel.innerHTML = '<div class="review-score">Loading reviews…</div><div class="review-actions"></div>';
@@ -70,7 +72,7 @@
       actions.append(toggle);
       card.dataset.reviewName = name;
     });
-    renderReviews();
+    if (addedCard) renderReviews();
   }
   function renderReviews() {
     document.querySelectorAll("#plugin-grid .card[data-review-name]").forEach(card => {
