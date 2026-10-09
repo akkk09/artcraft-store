@@ -11,6 +11,7 @@ cp plugins/gradient-map/target/$TARGET/release/photocraft_plugin_gradient_map.wa
 cp plugins/color-toolkit/target/$TARGET/release/photocraft_plugin_color_toolkit.wasm dist/
 cp plugins/detail-recovery/target/$TARGET/release/photocraft_plugin_detail_recovery.wasm dist/
 cp plugins/film-emulation/target/$TARGET/release/photocraft_plugin_film_emulation.wasm dist/
+python plugins/film-emulation/package_filmcraft.py --output dist/filmcraft-film-emulation-toolkit.zip
 cp plugins/chromatic-fringe/chromatic-fringe.wat dist/
 printf 'Built plug-ins in dist/\n'
 ls -lh dist/*
