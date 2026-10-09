@@ -36,7 +36,7 @@ Common plugin fields:
 | Field | Meaning | Consumer guidance |
 |---|---|---|
 | `id` | Listing identifier | Use for lookup; treat as an opaque string. |
-| `app` | Target ArtCraft app ID | Known IDs: `photocraft`, `after-effects`. |
+| `app` | Target ArtCraft app ID | Known IDs: `photocraft`, `effectcraft`. |
 | `name` | Display name | Treat as untrusted display text. |
 | `version` | Listing/plugin version | Do not assume it follows a particular versioning scheme unless your installer defines one. |
 | `author` | Author/maintainer label | Informational metadata, not identity verification. |
@@ -86,10 +86,11 @@ import { artcraft } from "https://akkk09.github.io/artcraft-store/api/v1/client.
 
 const catalog = await artcraft.getCatalog();
 const photoCraftPlugins = await artcraft.listPlugins({ app: "photocraft" });
+const effectCraftPlugins = await artcraft.listPlugins({ app: "effectcraft" });
 const plugin = await artcraft.getPlugin("org.photocraft.community.vignette");
 const downloadUrl = artcraft.getDownloadUrl(plugin);
 
-console.log(catalog.plugins.length, photoCraftPlugins, downloadUrl);
+console.log(catalog.plugins.length, photoCraftPlugins, effectCraftPlugins, downloadUrl);
 ```
 
 ### Methods

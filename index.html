@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <meta name="description" content="Community plug-ins for PhotoCraft and scripts or plug-ins for Adobe After Effects.">
+  <meta name="description" content="Community plug-ins for PhotoCraft and EffectCraft.">
   <title>ArtCraft Store — Community Extensions</title>
   <style>
     :root {
@@ -173,18 +173,18 @@
       <section class="hero">
         <div class="eyebrow"><span class="dot"></span> Community-built · Open source · Made for creators</div>
         <h1>Make more.<br>Make it yours.</h1>
-        <p>Tools made by the community for PhotoCraft and Adobe After Effects. Find compatible plug-ins and scripts built for your workflow.</p>
+        <p>Tools made by the community for PhotoCraft and EffectCraft. Find compatible plug-ins built for your workflow.</p>
         <div class="hero-actions"><a class="btn primary" href="#catalog">Browse catalog <span aria-hidden="true">↓</span></a><a class="btn" href="https://github.com/akkk09/artcraft-store">Contribute on GitHub ↗</a></div>
         <div class="stats"><div class="stat"><strong id="plugin-count">—</strong><span>catalogued items</span></div><div class="stat"><strong>02</strong><span>supported apps</span></div><div class="stat"><strong>Open</strong><span>community and source</span></div></div>
       </section>
       <section class="catalog" id="catalog">
         <div class="section-head"><div><div class="eyebrow">01 / The catalog</div><h2>Extensions for your workflow.</h2><p>Search by name, feature, or app. Filter the catalog by the app you use.</p></div></div>
-        <div class="tools"><label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Search extensions, scripts, tools…" aria-label="Search catalog"></label></div><div class="filters app-filters" role="group" aria-label="Filter by supported app"><button class="filter active" data-app-filter="all" aria-pressed="true">All apps</button><button class="filter" data-app-filter="photocraft" aria-pressed="false">PhotoCraft</button><button class="filter" data-app-filter="after-effects" aria-pressed="false">After Effects</button></div>
+        <div class="tools"><label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Search extensions, scripts, tools…" aria-label="Search catalog"></label></div><div class="filters app-filters" role="group" aria-label="Filter by supported app"><button class="filter active" data-app-filter="all" aria-pressed="true">All apps</button><button class="filter" data-app-filter="photocraft" aria-pressed="false">PhotoCraft</button><button class="filter" data-app-filter="effectcraft" aria-pressed="false">EffectCraft</button></div>
         <div class="grid" id="plugin-grid" aria-live="polite"><div class="empty">Loading catalog…</div></div>
         <div class="notice"><span class="icon" aria-hidden="true">ⓘ</span><div><strong>Check compatibility before installing</strong><p>Each app has its own extension format and compatibility requirements. Listings appear only when they have been added to the catalog; an app filter with no results means no items are currently listed for it.</p></div></div>
       </section>
             <section class="how" id="install"><div class="eyebrow">02 / Getting started</div><h2>Make it part of your process.</h2><div class="steps">
-        <article class="step"><b>01 / CHOOSE</b><h3>Select your app</h3><p>Filter by PhotoCraft or After Effects and check compatibility notes.</p></article>
+        <article class="step"><b>01 / CHOOSE</b><h3>Select your app</h3><p>Filter by PhotoCraft or EffectCraft and check compatibility notes.</p></article>
         <article class="step"><b>02 / REVIEW</b><h3>Inspect the listing</h3><p>Check the version, source code, file type, and requirements before downloading.</p></article>
         <article class="step"><b>03 / INSTALL</b><h3>Follow app-specific steps</h3><p>Download the item and follow its documented installation instructions. Automatic installation depends on support in the target app.</p></article>
       </div></section>
@@ -207,8 +207,8 @@
     const downloadsBase = new URL("downloads/", siteBase).href;
     const catalogLink = document.querySelector("#catalog-json-link");
     if (catalogLink) catalogLink.href = catalogUrl;
-    const appNames = {photocraft:"PhotoCraft","after-effects":"After Effects"};
-    const appGlyphs = {photocraft:"P","after-effects":"A"};
+    const appNames = {photocraft:"PhotoCraft",effectcraft:"EffectCraft"};
+    const appGlyphs = {photocraft:"P",effectcraft:"E"};
     function pluginCard(p) {
       const kind = String(p.kind || "extension").toLowerCase();
       const app = String(p.app || "photocraft").toLowerCase();
