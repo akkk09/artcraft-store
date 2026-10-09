@@ -57,13 +57,13 @@ impl StoreApp {
         visuals.extreme_bg_color = Color32::from_rgb(12, 14, 13);
         visuals.faint_bg_color = Color32::from_rgb(29, 33, 30);
         visuals.widgets.noninteractive.bg_fill = Color32::from_rgb(23, 27, 24);
-        visuals.widgets.noninteractive.fg_stroke = Stroke::new(1.0, Color32::from_rgb(210, 216, 209));
+        visuals.widgets.noninteractive.fg_stroke = Stroke::new(1.0_f32, Color32::from_rgb(210, 216, 209));
         visuals.widgets.inactive.bg_fill = Color32::from_rgb(31, 36, 32);
-        visuals.widgets.inactive.fg_stroke = Stroke::new(1.0, Color32::from_rgb(224, 229, 222));
+        visuals.widgets.inactive.fg_stroke = Stroke::new(1.0_f32, Color32::from_rgb(224, 229, 222));
         visuals.widgets.hovered.bg_fill = Color32::from_rgb(48, 57, 48);
         visuals.widgets.active.bg_fill = Color32::from_rgb(193, 238, 113);
         visuals.selection.bg_fill = Color32::from_rgb(193, 238, 113);
-        visuals.selection.stroke = Stroke::new(1.0, Color32::from_rgb(18, 22, 17));
+        visuals.selection.stroke = Stroke::new(1.0_f32, Color32::from_rgb(18, 22, 17));
         cc.egui_ctx.set_visuals(visuals);
 
         // Embed the validated catalog so the first render does not wait on a network request.
@@ -111,7 +111,7 @@ impl StoreApp {
     fn card(ui: &mut egui::Ui, plugin: &Plugin) {
         Frame::new()
             .fill(Color32::from_rgb(23, 27, 24))
-            .stroke(Stroke::new(1.0, Color32::from_rgb(49, 57, 50)))
+            .stroke(Stroke::new(1.0_f32, Color32::from_rgb(49, 57, 50)))
             .inner_margin(16.0)
             .show(ui, |ui| {
                 ui.set_min_width(ui.available_width());
@@ -280,7 +280,7 @@ impl eframe::App for StoreApp {
 
                     ui.add_space(20.0);
                     Frame::new().fill(Color32::from_rgb(23, 27, 24))
-                        .stroke(Stroke::new(1.0, Color32::from_rgb(49, 57, 50)))
+                        .stroke(Stroke::new(1.0_f32, Color32::from_rgb(49, 57, 50)))
                         .inner_margin(14.0).show(ui, |ui| {
                             ui.label(RichText::new("Before you install").strong().color(Color32::from_rgb(193, 238, 113)));
                             ui.label(RichText::new("Check each listing’s source, file format, and compatibility. Downloads are served from the store or the project that maintains the item.")
@@ -304,14 +304,22 @@ impl eframe::App for StoreApp {
 
 #[cfg(target_arch = "wasm32")]
 fn main() {
-    use wasm_bindgen::prelude::*;
+    use wasm_bindgen::JsCast;
 
     console_error_panic_hook::set_once();
     wasm_bindgen_futures::spawn_local(async {
+        let canvas = web_sys::window()
+            .expect("window unavailable")
+            .document()
+            .expect("document unavailable")
+            .get_element_by_id("the_canvas_id")
+            .expect("canvas element missing")
+            .dyn_into::<web_sys::HtmlCanvasElement>()
+            .expect("element is not a canvas");
         let options = eframe::WebOptions::default();
         eframe::WebRunner::new()
             .start(
-                "the_canvas_id",
+                canvas,
                 options,
                 Box::new(|cc| Ok(Box::new(StoreApp::new(cc)))),
             )
