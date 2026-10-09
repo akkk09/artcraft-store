@@ -34,7 +34,7 @@ fn lut_for(p:usize)->(&'static [[f32;3]],usize){match p{1=>(&LUT_WARM,SIZE_WARM)
 fn apply(pixel:&mut[f32],colors:usize,alpha:bool,data:&[[f32;3]],size:usize,amount:f32){
  if alpha&&pixel[colors]<=0.0{return;}if amount<=0.0{return;}
  if colors==3{let a=[pixel[0],pixel[1],pixel[2]];let b=sample_trilinear(data,size,[0.0;3],[1.0;3],a);for c in 0..3{pixel[c]=a[c]+(b[c]-a[c])*amount;}}
- else{let a=pixel[0];let b=sample_trilinear(data,size,[0.0;3],[1.0;3],[a;3]);let y=.2126*b[0]+.7152*b[1]+.0722*b[2];pixel[0]=a+(y-a)*amount;}
+ else{let a=pixel[0];let b=sample_trilinear(data,size,[0.0;3],[1.0;3],[a;3]);let y=0.2126*b[0]+0.7152*b[1]+0.0722*b[2];pixel[0]=a+(y-a)*amount;}
 }
 #[no_mangle] pub unsafe extern "C" fn pc_filter(buf:i32,len:i32,w:i32,h:i32,ch:i32,format:i32,params_ptr:i32,params_len:i32)->i32{
  if buf<=0||len<0||w<=0||h<=0||ch<=0||params_ptr<=0||params_len<0{return 1;}
