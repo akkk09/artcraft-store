@@ -35,10 +35,10 @@ jobs:
           targets: wasm32-unknown-unknown
       - name: Build plug-ins
         run: bash build-all.sh
-      - name: Prepare downloadable WASM files
+      - name: Prepare downloadable extensions
         run: |
           mkdir -p downloads
-          cp dist/*.wasm downloads/
+          cp dist/* downloads/
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload website

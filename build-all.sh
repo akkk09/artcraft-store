@@ -7,5 +7,6 @@ for plugin in smudge-blend mixer-blend; do
 done
 cp plugins/smudge-blend/target/$TARGET/release/photocraft_plugin_smudge_blend.wasm dist/
 cp plugins/mixer-blend/target/$TARGET/release/photocraft_plugin_mixer_blend.wasm dist/
+cp plugins/chromatic-fringe/chromatic-fringe.wat dist/
 printf 'Built plug-ins in dist/\n'
-ls -lh dist/*.wasm
+ls -lh dist/*
