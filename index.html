@@ -47,7 +47,20 @@
         <div class="grid" id="plugin-grid" aria-live="polite"><div class="empty">Loading catalog…</div></div>
         <div class="notice"><span class="icon" aria-hidden="true">ⓘ</span><div><strong>Check compatibility before installing</strong><p>Each app has its own extension format and compatibility requirements. Listings appear only when they have been added to the catalog; an app filter with no results means no items are currently listed for it.</p></div></div>
       </section>
-      <section class="how" id="install"><div class="eyebrow">Get started</div><h2>Use an extension</h2><div class="steps">
+            <section class="how" id="ideas">
+        <div class="eyebrow">Community wishlist</div>
+        <h2>Useful tools worth adding</h2>
+        <p style="color:var(--muted);max-width:680px;margin:-12px 0 22px">These are suggested project ideas, not claims that these tools already exist in the catalog. Use them to guide future submissions.</p>
+        <div class="steps">
+          <article class="step"><b>PHOTOCRAFT / WORKFLOW</b><h3>Batch export presets</h3><p>Save named export settings, resize many images, and add optional watermarks in one run.</p></article>
+          <article class="step"><b>FILMCRAFT / EDITING</b><h3>Subtitle and safe-area checker</h3><p>Flag captions that sit too close to the frame edge and check subtitle readability before export.</p></article>
+          <article class="step"><b>EFFECTCRAFT / SCRIPTING</b><h3>Reusable script snippets</h3><p>Share small, documented examples for repetitive effects, parameter animation, and batch tasks.</p></article>
+          <article class="step"><b>VECTORCRAFT / SVG</b><h3>SVG cleanup and optimizer</h3><p>Remove unused metadata, reduce file size, and report features that may not import cleanly.</p></article>
+          <article class="step"><b>ALL APPS / ACCESSIBILITY</b><h3>Contrast and readability checks</h3><p>Check text contrast, color-blind-safe palettes, and small text in artwork or video graphics.</p></article>
+          <article class="step"><b>ALL APPS / QUALITY</b><h3>Compatibility and test reports</h3><p>List supported app versions, required permissions, source links, and known issues for each release.</p></article>
+        </div>
+      </section>
+<section class="how" id="install"><div class="eyebrow">Get started</div><h2>Use an extension</h2><div class="steps">
         <article class="step"><b>01 / CHOOSE</b><h3>Select your app</h3><p>Filter by PhotoCraft, FilmCraft, EffectCraft, or VectorCraft and check compatibility notes.</p></article>
         <article class="step"><b>02 / REVIEW</b><h3>Inspect the listing</h3><p>Check the version, source code, file type, and requirements before downloading.</p></article>
         <article class="step"><b>03 / INSTALL</b><h3>Follow app-specific steps</h3><p>Download the item and follow its documented installation instructions. Automatic installation depends on support in the target app.</p></article>
@@ -94,5 +107,6 @@
       .then(data => { plugins = Array.isArray(data.plugins) ? data.plugins : []; document.querySelector("#plugin-count").textContent = plugins.length; render(); })
       .catch(() => { document.querySelector("#plugin-count").textContent = "—"; grid.innerHTML = '<div class="empty">The catalog could not be loaded. Please open <a href="catalog.json">catalog.json</a> or try again later.</div>'; });
   </script>
+  <script src="./reviews.js" defer></script>
 </body>
 </html>

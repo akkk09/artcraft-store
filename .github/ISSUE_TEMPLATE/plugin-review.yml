@@ -1,0 +1,73 @@
+name: Plugin or script review
+description: Share a review for an ArtCraft Store plugin, script, filter, preset, or tool.
+title: "[Plugin Review] "
+labels: ["plugin-review"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Reviews are public GitHub issues. Please review only an item you have tried, and include the version you tested.
+  - type: input
+    id: item_name
+    attributes:
+      label: Plugin or script name
+      description: Use the exact name shown in the ArtCraft Store.
+      placeholder: Smudge Blend
+    validations:
+      required: true
+  - type: input
+    id: item_id
+    attributes:
+      label: Catalog item ID (if shown)
+      description: Optional stable ID for matching this review to the listing.
+  - type: input
+    id: app
+    attributes:
+      label: ArtCraft app
+      placeholder: PhotoCraft, FilmCraft, EffectCraft, or VectorCraft
+    validations:
+      required: true
+  - type: input
+    id: tested_version
+    attributes:
+      label: Item version tested
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: dropdown
+    id: rating
+    attributes:
+      label: Overall rating
+      options:
+        - "5 — Excellent"
+        - "4 — Good"
+        - "3 — Okay"
+        - "2 — Poor"
+        - "1 — Bad"
+    validations:
+      required: true
+  - type: dropdown
+    id: reliability
+    attributes:
+      label: Did it work as expected?
+      options:
+        - "Yes"
+        - "Partly"
+        - "No"
+    validations:
+      required: true
+  - type: textarea
+    id: review
+    attributes:
+      label: Your review
+      description: What worked well? What could be better? Mention bugs or performance if relevant.
+      placeholder: Describe your experience...
+    validations:
+      required: true
+  - type: checkboxes
+    id: honest
+    attributes:
+      label: Review guidelines
+      options:
+        - label: I tried this version and this review reflects my own experience.
+          required: true
