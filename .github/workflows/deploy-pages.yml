@@ -38,7 +38,9 @@ jobs:
         with:
           targets: wasm32-unknown-unknown
       - name: Install Trunk
-        run: cargo install trunk --locked
+        uses: jetli/trunk-action@v0.5.1
+        with:
+          version: latest
       - name: Build plug-ins
         run: bash build-all.sh
       - name: Audit catalog downloads and release assets
