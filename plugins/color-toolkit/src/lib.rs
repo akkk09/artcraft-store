@@ -158,7 +158,7 @@ fn apply_pixel(pixel: &mut [f32], color_channels: usize, has_alpha: bool,
         pixel[2] = result.b;
     } else {
         // Saturation has no effect on grayscale/duotone data.
-        let gain = 2.0f32.powf(exposure);
+        let gain = exposure_gain(exposure);
         pixel[0] = (pixel[0] * gain - 0.5) * (1.0 + contrast) + 0.5;
     }
 }
