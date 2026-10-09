@@ -247,6 +247,27 @@
       ],
       "app": "photocraft",
       "compatibility": "PhotoCraft ABI v1"
+    },
+    {
+      "id": "org.photocraft.community.white-balance",
+      "name": "White Balance",
+      "version": "0.1.0",
+      "author": "ArtCraft Store community",
+      "description": "Corrects warm/cool color casts and green/magenta tint with lightweight channel gains.",
+      "kind": "filter",
+      "abi": 1,
+      "source": "plugins/white-balance",
+      "artifact": "photocraft_plugin_white_balance.wasm",
+      "releaseAsset": "photocraft_plugin_white_balance.wasm",
+      "tags": [
+        "white-balance",
+        "temperature",
+        "tint",
+        "color-correction",
+        "color-grading"
+      ],
+      "app": "photocraft",
+      "compatibility": "PhotoCraft ABI v1"
     }
   ]
 }
