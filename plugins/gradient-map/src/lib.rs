@@ -132,6 +132,33 @@ fn interpolate(low: Color, high: Color, t: f32) -> Color {
     }
 }
 
+fn map_pixel(
+    pixel: &mut [f32],
+    color_ch: usize,
+    has_alpha: bool,
+    low: Color,
+    high: Color,
+    intensity: f32,
+) {
+    if has_alpha && pixel[color_ch] <= 0.0 {
+        return;
+    }
+    let original = if color_ch == 3 {
+        Color { r: pixel[0], g: pixel[1], b: pixel[2] }
+    } else {
+        Color { r: pixel[0], g: pixel[0], b: pixel[0] }
+    };
+    let mapped = interpolate(low, high, luminance(original));
+    if color_ch == 3 {
+        pixel[0] = original.r + (mapped.r - original.r) * intensity;
+        pixel[1] = original.g + (mapped.g - original.g) * intensity;
+        pixel[2] = original.b + (mapped.b - original.b) * intensity;
+    } else {
+        let mapped_gray = luminance(mapped);
+        pixel[0] = original.r + (mapped_gray - original.r) * intensity;
+    }
+}
+
 #[no_mangle]
 pub unsafe extern "C" fn pc_filter(
     buf: i32, buf_len: i32, width: i32, height: i32, channels: i32,
@@ -166,21 +193,7 @@ pub unsafe extern "C" fn pc_filter(
 
     let pixels = slice::from_raw_parts_mut(buf as *mut f32, count);
     for pixel in pixels.chunks_exact_mut(ch) {
-        if has_alpha && pixel[ch - 1] <= 0.0 { continue; }
-        let original = if color_ch == 3 {
-            Color { r: pixel[0], g: pixel[1], b: pixel[2] }
-        } else {
-            Color { r: pixel[0], g: pixel[0], b: pixel[0] }
-        };
-        let mapped = interpolate(low, high, luminance(original));
-        if color_ch == 3 {
-            pixel[0] = original.r + (mapped.r - original.r) * intensity;
-            pixel[1] = original.g + (mapped.g - original.g) * intensity;
-            pixel[2] = original.b + (mapped.b - original.b) * intensity;
-        } else {
-            let mapped_gray = luminance(mapped);
-            pixel[0] = original.r + (mapped_gray - original.r) * intensity;
-        }
+        map_pixel(pixel, color_ch, has_alpha, low, high, intensity);
     }
     0
 }
@@ -215,6 +228,29 @@ mod tests {
     fn intensity_parser_clamps_out_of_range_values() {
         assert_eq!(int_param(br#"{"intensity":140}"#, b"intensity", 100).clamp(0, 100), 100);
         assert_eq!(int_param(br#"{"intensity":5}"#, b"intensity", 100).clamp(0, 100), 5);
+    }
+
+    #[test]
+    fn transparent_pixel_is_unchanged() {
+        let mut pixel = [0.2, 0.4, 0.6, 0.0];
+        let before = pixel;
+        map_pixel(&mut pixel, 3, true, rgb_from_u8([0, 0, 0]), rgb_from_u8([255, 120, 20]), 1.0);
+        assert_eq!(pixel, before);
+    }
+
+    #[test]
+    fn alpha_is_preserved() {
+        let mut pixel = [0.2, 0.4, 0.6, 0.37];
+        map_pixel(&mut pixel, 3, true, rgb_from_u8([0, 0, 0]), rgb_from_u8([255, 120, 20]), 1.0);
+        assert_eq!(pixel[3], 0.37);
+    }
+
+    #[test]
+    fn zero_intensity_keeps_pixel_unchanged() {
+        let mut pixel = [0.2, 0.4, 0.6];
+        let before = pixel;
+        map_pixel(&mut pixel, 3, false, rgb_from_u8([0, 0, 0]), rgb_from_u8([255, 120, 20]), 0.0);
+        assert_eq!(pixel, before);
     }
 
     #[test]
