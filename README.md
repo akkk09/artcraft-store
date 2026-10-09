@@ -95,6 +95,7 @@ Do not add a listing until its source, license, download, and target-app compati
 | **Color Toolkit** | Filter (ABI v1) | Adjusts exposure, contrast, and saturation with alpha preservation. |
 | **Detail Recovery** | Filter (ABI v1) | Combines lightweight sharpening and spatial noise reduction. |
 | **Film Emulation Toolkit** | Filter (ABI v1) | Applies film-inspired color looks with deterministic grain. |
+| **Mosaic Pixelate** | Filter (ABI v1) | Creates block-based pixelation with adjustable block size and intensity. |
 
 The build workflow compiles the PhotoCraft Rust/WASM plug-ins and packages the Film Emulation Toolkit's FilmCraft-native effect presets and .cube LUTs. FilmCraft does not currently expose a third-party video-effect plug-in ABI, so its supported integration is an importable preset/LUT pack rather than an executable plug-in. Other FilmCraft, EffectCraft, and VectorCraft listings still need their own verified formats and download sources.
 
