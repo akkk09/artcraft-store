@@ -23,6 +23,8 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
+      - name: Validate catalog JSON
+        run: python -m json.tool catalog.json > /dev/null
       - name: Test Gradient Map algorithms
         run: cargo test --manifest-path plugins/gradient-map/Cargo.toml
       - name: Build and stage plug-ins
