@@ -13,10 +13,10 @@ pub const MANIFEST: &str = r#"{
   "description": "Real-time symmetry and mirroring tool for VectorCraft: mirror selections across arbitrary axes, quad axes, or radial kaleidoscopic sectors.",
   "params": {
     "axis_angle": {"type": "number", "min": -180, "max": 180, "default": 90.0},
-    "pivot_x": {"type": "number", "default": 0.0},
-    "pivot_y": {"type": "number", "default": 0.0},
-    "symmetry_axes": {"type": "integer", "min": 1, "max": 12, "default": 1},
-    "keep_original": {"type": "boolean", "default": true}
+    "pivot_x": {"type": "number", "min": -10000.0, "max": 10000.0, "default": 0.0},
+    "pivot_y": {"type": "number", "min": -10000.0, "max": 10000.0, "default": 0.0},
+    "symmetry_axes": {"type": "int", "min": 1, "max": 12, "default": 1},
+    "keep_original": {"type": "bool", "default": true}
   }
 }"#;
 
@@ -147,20 +147,55 @@ fn tokenize_svg_path(d: &str) -> Vec<String> {
     tokens
 }
 
-/// Clones and reflects an object's geometry across the given axis.
-pub fn mirror_single_object(obj: &Value, px: f64, py: f64, theta_rad: f64) -> Value {
+pub fn mirror_single_object(obj: &Value, px: f64, py: f64, theta_rad: f64, is_new: bool) -> Value {
     let mut mirrored = obj.clone();
 
     if let Value::Object(map) = &mut mirrored {
-        // 1. Transform SVG path 'd' or 'path'
+        if is_new {
+            map.remove("id");
+        }
+
+        // 1. Transform VectorCraft native path: { subpaths: [ { anchors: [ { p, in, out } ] } ] }
+        if let Some(path_val) = map.get_mut("path") {
+            if let Some(subpaths) = path_val.get_mut("subpaths").and_then(|s| s.as_array_mut()) {
+                for subpath in subpaths {
+                    if let Some(anchors) = subpath.get_mut("anchors").and_then(|a| a.as_array_mut()) {
+                        for anchor in anchors {
+                            if let Some(Value::Array(p)) = anchor.get_mut("p") {
+                                if p.len() >= 2 {
+                                    let (rx, ry) = reflect_point(p[0].as_f64().unwrap_or(0.0), p[1].as_f64().unwrap_or(0.0), px, py, theta_rad);
+                                    p[0] = json!(rx);
+                                    p[1] = json!(ry);
+                                }
+                            }
+                            if let Some(Value::Array(i)) = anchor.get_mut("in") {
+                                if i.len() >= 2 {
+                                    let (rx, ry) = reflect_point(i[0].as_f64().unwrap_or(0.0), i[1].as_f64().unwrap_or(0.0), px, py, theta_rad);
+                                    i[0] = json!(rx);
+                                    i[1] = json!(ry);
+                                }
+                            }
+                            if let Some(Value::Array(o)) = anchor.get_mut("out") {
+                                if o.len() >= 2 {
+                                    let (rx, ry) = reflect_point(o[0].as_f64().unwrap_or(0.0), o[1].as_f64().unwrap_or(0.0), px, py, theta_rad);
+                                    o[0] = json!(rx);
+                                    o[1] = json!(ry);
+                                }
+                            }
+                        }
+                    }
+                }
+            } else if let Value::String(path) = path_val {
+                *path_val = json!(reflect_svg_path(path, px, py, theta_rad));
+            }
+        }
+
+        // 2. Transform SVG path 'd' if present
         if let Some(Value::String(d)) = map.get("d") {
             map.insert("d".to_string(), json!(reflect_svg_path(d, px, py, theta_rad)));
         }
-        if let Some(Value::String(path)) = map.get("path") {
-            map.insert("path".to_string(), json!(reflect_svg_path(path, px, py, theta_rad)));
-        }
 
-        // 2. Transform points array [[x, y], ...]
+        // 3. Transform points array [[x, y], ...]
         if let Some(Value::Array(points)) = map.get_mut("points") {
             for pt in points {
                 if let Value::Array(xy) = pt {
@@ -181,7 +216,7 @@ pub fn mirror_single_object(obj: &Value, px: f64, py: f64, theta_rad: f64) -> Va
             }
         }
 
-        // 3. Transform explicit position x, y
+        // 4. Transform explicit position x, y
         if let (Some(x_val), Some(y_val)) = (map.get("x"), map.get("y")) {
             let x = x_val.as_f64().unwrap_or(0.0);
             let y = y_val.as_f64().unwrap_or(0.0);
@@ -190,11 +225,11 @@ pub fn mirror_single_object(obj: &Value, px: f64, py: f64, theta_rad: f64) -> Va
             map.insert("y".to_string(), json!(ry));
         }
 
-        // 4. Transform children recursively
+        // 5. Transform children recursively
         if let Some(Value::Array(children)) = map.get_mut("children") {
             let mut reflected_children = Vec::with_capacity(children.len());
             for child in children.iter() {
-                reflected_children.push(mirror_single_object(child, px, py, theta_rad));
+                reflected_children.push(mirror_single_object(child, px, py, theta_rad, is_new));
             }
             *children = reflected_children;
         }
@@ -217,7 +252,7 @@ pub fn apply_mirrorme(doc: &mut Value, params: &MirrorParams) {
             // For each symmetry axis line
             for k in 0..params.symmetry_axes {
                 let axis_rad = base_angle_rad + (k as f64 * PI / params.symmetry_axes as f64);
-                let mirrored = mirror_single_object(obj, params.pivot_x, params.pivot_y, axis_rad);
+                let mirrored = mirror_single_object(obj, params.pivot_x, params.pivot_y, axis_rad, params.keep_original);
                 new_objects.push(mirrored);
             }
         }

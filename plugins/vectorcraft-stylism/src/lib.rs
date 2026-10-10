@@ -13,16 +13,16 @@ pub const MANIFEST: &str = r#"{
   "description": "Live vector styling, path offset, drop shadows, and multi-contour glow effects for VectorCraft.",
   "params": {
     "offset_distance": {"type": "number", "min": -200.0, "max": 200.0, "default": 0.0},
-    "join": {"type": "string", "enum": ["round", "miter", "bevel"], "default": "round"},
+    "join": {"type": "choice", "options": ["round", "miter", "bevel"], "default": "round"},
     "miter_limit": {"type": "number", "min": 1.0, "max": 10.0, "default": 4.0},
-    "shadow_dx": {"type": "number", "default": 5.0},
-    "shadow_dy": {"type": "number", "default": 5.0},
+    "shadow_dx": {"type": "number", "min": -1000.0, "max": 1000.0, "default": 5.0},
+    "shadow_dy": {"type": "number", "min": -1000.0, "max": 1000.0, "default": 5.0},
     "shadow_blur": {"type": "number", "min": 0.0, "max": 50.0, "default": 8.0},
     "shadow_opacity": {"type": "number", "min": 0.0, "max": 1.0, "default": 0.4},
-    "shadow_enabled": {"type": "boolean", "default": false},
+    "shadow_enabled": {"type": "bool", "default": false},
     "glow_radius": {"type": "number", "min": 0.0, "max": 50.0, "default": 0.0},
     "glow_opacity": {"type": "number", "min": 0.0, "max": 1.0, "default": 0.6},
-    "glow_enabled": {"type": "boolean", "default": false}
+    "glow_enabled": {"type": "bool", "default": false}
   }
 }"#;
 
@@ -274,6 +274,38 @@ fn val_from_points(points: &[Vec2]) -> Value {
 
 pub fn apply_offset_to_object(obj: &mut Value, d: f64, join: JoinType, miter_limit: f64) {
     if let Value::Object(map) = obj {
+        if let Some(path_val) = map.get_mut("path") {
+            if let Some(subpaths) = path_val.get_mut("subpaths").and_then(|s| s.as_array_mut()) {
+                for subpath in subpaths {
+                    let closed = subpath.get("closed").and_then(|v| v.as_bool()).unwrap_or(true);
+                    if let Some(anchors) = subpath.get_mut("anchors").and_then(|a| a.as_array_mut()) {
+                        let pts: Vec<Vec2> = anchors.iter().filter_map(|anc| {
+                            let p = anc.get("p")?.as_array()?;
+                            Some(Vec2::new(p.get(0)?.as_f64()?, p.get(1)?.as_f64()?))
+                        }).collect();
+                        if pts.len() >= 2 {
+                            let offset_pts = offset_polyline(&pts, d, join, miter_limit, closed);
+                            if offset_pts.len() == pts.len() {
+                                for (anc, new_p) in anchors.iter_mut().zip(offset_pts.iter()) {
+                                    if let Some(Value::Array(p_arr)) = anc.get_mut("p") {
+                                        p_arr[0] = json!(new_p.x);
+                                        p_arr[1] = json!(new_p.y);
+                                    }
+                                }
+                            } else {
+                                *anchors = offset_pts.into_iter().map(|pt| {
+                                    json!({
+                                        "p": [pt.x, pt.y],
+                                        "in": [pt.x, pt.y],
+                                        "out": [pt.x, pt.y]
+                                    })
+                                }).collect();
+                            }
+                        }
+                    }
+                }
+            }
+        }
         if let Some(pts_val) = map.get("points") {
             if let Some(pts) = points_from_val(pts_val) {
                 let closed = map.get("closed").and_then(|v| v.as_bool()).unwrap_or(true);
@@ -287,6 +319,29 @@ pub fn apply_offset_to_object(obj: &mut Value, d: f64, join: JoinType, miter_lim
 pub fn create_drop_shadow_object(obj: &Value, dx: f64, dy: f64, opacity: f64) -> Value {
     let mut shadow = obj.clone();
     if let Value::Object(map) = &mut shadow {
+        map.remove("id");
+
+        if let Some(path_val) = map.get_mut("path") {
+            if let Some(subpaths) = path_val.get_mut("subpaths").and_then(|s| s.as_array_mut()) {
+                for subpath in subpaths {
+                    if let Some(anchors) = subpath.get_mut("anchors").and_then(|a| a.as_array_mut()) {
+                        for anchor in anchors {
+                            for key in &["p", "in", "out"] {
+                                if let Some(Value::Array(arr)) = anchor.get_mut(*key) {
+                                    if arr.len() >= 2 {
+                                        if let (Some(x), Some(y)) = (arr[0].as_f64(), arr[1].as_f64()) {
+                                            arr[0] = json!(x + dx);
+                                            arr[1] = json!(y + dy);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         // Shift points by (dx, dy)
         if let Some(pts_val) = map.get_mut("points") {
             if let Some(mut pts) = points_from_val(pts_val) {
@@ -303,11 +358,20 @@ pub fn create_drop_shadow_object(obj: &Value, dx: f64, dy: f64, opacity: f64) ->
             map.insert("x".to_string(), json!(x));
             map.insert("y".to_string(), json!(y));
         }
-        // Tint to black shadow with opacity
-        map.insert("fill".to_string(), json!({
-            "color": [0.0, 0.0, 0.0],
+
+        let shadow_paint = json!({
+            "type": "solid",
+            "color": {
+                "model": "rgb",
+                "r": 0.0,
+                "g": 0.0,
+                "b": 0.0
+            },
             "opacity": opacity
-        }));
+        });
+        map.insert("fills".to_string(), json!([shadow_paint.clone()]));
+        map.insert("fill".to_string(), shadow_paint);
+        map.remove("strokes");
         map.remove("stroke");
     }
     shadow
@@ -315,18 +379,24 @@ pub fn create_drop_shadow_object(obj: &Value, dx: f64, dy: f64, opacity: f64) ->
 
 pub fn create_glow_object(obj: &Value, radius: f64, opacity: f64) -> Value {
     let mut glow = obj.clone();
+    apply_offset_to_object(&mut glow, radius, JoinType::Round, 4.0);
+
     if let Value::Object(map) = &mut glow {
-        let closed = map.get("closed").and_then(|v| v.as_bool()).unwrap_or(true);
-        if let Some(pts_val) = map.get_mut("points") {
-            if let Some(pts) = points_from_val(pts_val) {
-                let offset_pts = offset_polyline(&pts, radius, JoinType::Round, 4.0, closed);
-                *pts_val = val_from_points(&offset_pts);
-            }
-        }
-        map.insert("fill".to_string(), json!({
-            "color": [1.0, 0.88, 0.2],
+        map.remove("id");
+
+        let glow_paint = json!({
+            "type": "solid",
+            "color": {
+                "model": "rgb",
+                "r": 1.0,
+                "g": 0.88,
+                "b": 0.2
+            },
             "opacity": opacity
-        }));
+        });
+        map.insert("fills".to_string(), json!([glow_paint.clone()]));
+        map.insert("fill".to_string(), glow_paint);
+        map.remove("strokes");
         map.remove("stroke");
     }
     glow

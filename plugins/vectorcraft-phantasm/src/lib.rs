@@ -19,7 +19,7 @@ pub const MANIFEST: &str = r#"{
     "lightness": {"type": "number", "min": -100, "max": 100, "default": 0},
     "temperature": {"type": "number", "min": -100, "max": 100, "default": 0},
     "tint": {"type": "number", "min": -100, "max": 100, "default": 0},
-    "invert": {"type": "boolean", "default": false}
+    "invert": {"type": "bool", "default": false}
   }
 }"#;
 
@@ -250,6 +250,26 @@ fn format_hex_color(r: f64, g: f64, b: f64, a: f64) -> String {
 
 pub fn adjust_color_value(val: &mut Value, params: &PhantasmParams) {
     match val {
+        Value::Object(map) => {
+            if let Some(model) = map.get("model").and_then(|m| m.as_str()) {
+                if model == "rgb" {
+                    let r = map.get("r").and_then(|v| v.as_f64()).unwrap_or(0.0);
+                    let g = map.get("g").and_then(|v| v.as_f64()).unwrap_or(0.0);
+                    let b = map.get("b").and_then(|v| v.as_f64()).unwrap_or(0.0);
+                    let (nr, ng, nb) = adjust_rgb(r, g, b, params);
+                    map.insert("r".to_string(), json!(nr));
+                    map.insert("g".to_string(), json!(ng));
+                    map.insert("b".to_string(), json!(nb));
+                } else if model == "gray" {
+                    let gray = map.get("gray").and_then(|v| v.as_f64()).unwrap_or(0.0);
+                    let (nr, ng, nb) = adjust_rgb(gray, gray, gray, params);
+                    let n_gray = 0.2126 * nr + 0.7152 * ng + 0.0722 * nb;
+                    map.insert("gray".to_string(), json!(n_gray));
+                }
+            } else if let Some(c) = map.get_mut("color") {
+                adjust_color_value(c, params);
+            }
+        }
         Value::Array(arr) => {
             if arr.len() >= 3 {
                 let is_byte_range = arr.iter().take(3).any(|c| c.as_f64().unwrap_or(0.0) > 1.0);
@@ -293,10 +313,26 @@ fn transform_paint(paint: &mut Value, params: &PhantasmParams) {
 
 pub fn transform_object(obj: &mut Value, params: &PhantasmParams) {
     if let Value::Object(map) = obj {
+        if let Some(fills) = map.get_mut("fills").and_then(|f| f.as_array_mut()) {
+            for fill in fills {
+                transform_paint(fill, params);
+            }
+        }
         if let Some(fill) = map.get_mut("fill") {
             transform_paint(fill, params);
         }
+        if let Some(strokes) = map.get_mut("strokes").and_then(|s| s.as_array_mut()) {
+            for stroke in strokes {
+                if let Some(paint) = stroke.get_mut("paint") {
+                    transform_paint(paint, params);
+                }
+                transform_paint(stroke, params);
+            }
+        }
         if let Some(stroke) = map.get_mut("stroke") {
+            if let Some(paint) = stroke.get_mut("paint") {
+                transform_paint(paint, params);
+            }
             transform_paint(stroke, params);
         }
         // Raster embedded image pixels support
@@ -321,6 +357,8 @@ pub fn transform_object(obj: &mut Value, params: &PhantasmParams) {
 pub unsafe extern "C" fn vc_run(input: *const u8, input_len: u32, params: *const u8, params_len: u32) -> i64 {
     let in_slice = unsafe { std::slice::from_raw_parts(input, input_len as usize) };
     let param_slice = unsafe { std::slice::from_raw_parts(params, params_len as usize) };
+    let _ = std::fs::write("/tmp/vc_input.json", in_slice);
+    let _ = std::fs::write("/tmp/vc_params.json", param_slice);
 
     let mut doc: Value = match serde_json::from_slice(in_slice) {
         Ok(v) => v,
