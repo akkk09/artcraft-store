@@ -175,6 +175,7 @@ Community projects that fork the core ArtCraft application repositories to add e
 | Project | Base App | Author | Description | Links |
 |---|---|---|---|---|
 | **EffectCraft (OpenFX & .aep Import)** | EffectCraft | [glumbis](https://github.com/glumbis) | Native OpenFX (OFX) plug-in host (Boris FX Sapphire, RE:Vision RSMB & Twixtor) + Adobe After Effects `.aep` / `.aepx` project import. | [Latest Release](https://github.com/glumbis/effectcraft/releases/latest) · [Source](https://github.com/glumbis/effectcraft) |
+| **FilmCraft + OpenFX** | FilmCraft | [glumbis](https://github.com/glumbis) | Native OpenFX (OFX) plug-in host (Boris FX Sapphire, RE:Vision RSMB & Twixtor) with timeline effect controls and keyframing. | [Latest Release](https://github.com/glumbis/filmcraft/releases/latest) · [Source](https://github.com/glumbis/filmcraft) |
 
 ## Building plug-ins locally
 

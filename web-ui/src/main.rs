@@ -902,7 +902,11 @@ impl StoreApp {
         }
 
         // Community Forks Section in Docs
-        if !self.forks.is_empty() && (self.docs_app == "all" || self.docs_app == "effectcraft") {
+        let relevant_docs_forks: Vec<&Fork> = self.forks
+            .iter()
+            .filter(|f| self.docs_app == "all" || f.app == self.docs_app)
+            .collect();
+        if !relevant_docs_forks.is_empty() {
             ui.add_space(10.0);
             Frame::new()
                 .fill(Color32::from_rgb(26, 26, 26))
@@ -916,7 +920,7 @@ impl StoreApp {
                     ui.label(RichText::new("Some community projects fork the core ArtCraft repositories to extend the engine itself with external plugin standards (e.g., OpenFX) or proprietary project file parsers. These run as standalone modified builds rather than standard user plugins.")
                         .size(13.5).color(Color32::from_rgb(180, 180, 180)));
                     ui.add_space(14.0);
-                    for fork in &self.forks {
+                    for fork in relevant_docs_forks {
                         Self::fork_card(ui, fork);
                         ui.add_space(8.0);
                     }
@@ -1479,7 +1483,11 @@ impl eframe::App for StoreApp {
                                 self.docs_app = target_app;
                             }
 
-                            if !self.forks.is_empty() {
+                            let relevant_forks: Vec<&Fork> = self.forks
+                                .iter()
+                                .filter(|f| self.active_app == "all" || f.app == self.active_app)
+                                .collect();
+                            if !relevant_forks.is_empty() {
                                 ui.add_space(26.0);
                                 ui.separator();
                                 ui.add_space(20.0);
@@ -1490,7 +1498,7 @@ impl eframe::App for StoreApp {
                                 ui.label(RichText::new("Community projects that fork the core application repository to add experimental engine features, external plugin standards (such as OpenFX), or project file interchange.")
                                     .size(14.0).color(Color32::from_rgb(180, 180, 180)));
                                 ui.add_space(14.0);
-                                for fork in &self.forks {
+                                for fork in relevant_forks {
                                     Self::fork_card(ui, fork);
                                     ui.add_space(10.0);
                                 }

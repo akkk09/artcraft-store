@@ -1529,7 +1529,7 @@ ZOOM EXTENTS</code></pre>
         Unlike standard plug-ins, community forks directly modify the underlying ArtCraft application repositories to introduce custom engine runtimes, external plugin hosting standards (such as OpenFX), or third-party project interchange.
       </p>
 
-      <div style="background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; margin-top: 14px;">
+      <div class="fork-item" data-app="effectcraft" style="background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; margin-top: 14px;">
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; flex-wrap: wrap;">
           <div style="display: flex; align-items: center; gap: 12px;">
             <div class="doc-glyph" style="font-size: 18px; width: 36px; height: 36px;">E</div>
@@ -1558,6 +1558,39 @@ ZOOM EXTENTS</code></pre>
           <li>Extract and run the custom <code>effectcraft.exe</code> executable (portable build, does not overwrite upstream install).</li>
           <li>Installed OpenFX bundles in <code>C:\Program Files\Common Files\OFX\Plugins\</code> appear in the <strong>Effects</strong> panel under their respective vendor categories.</li>
           <li>Import After Effects compositions via <strong>File ▸ Import ▸ After Effects Project (.aep)...</strong>.</li>
+        </ol>
+      </div>
+
+      <div class="fork-item" data-app="filmcraft" style="background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; margin-top: 14px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="doc-glyph" style="font-size: 18px; width: 36px; height: 36px;">F</div>
+            <div>
+              <h4 style="margin: 0; font-size: 17px; font-weight: 700;">FilmCraft + OpenFX</h4>
+              <div style="font-size: 11.5px; color: var(--muted);">by glumbis · Unofficial Fork of FilmCraft (Rust / OpenFX Host)</div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <a href="https://github.com/glumbis/filmcraft/releases/latest" target="_blank" rel="noopener noreferrer" class="copy-btn" style="text-decoration:none; display:inline-block; padding: 6px 12px; font-size: 12px; background: var(--accent); color: var(--accent-ink); border-color: var(--accent);">Latest Release (v0.5.0-ofx.1) ↗</a>
+            <a href="https://github.com/glumbis/filmcraft" target="_blank" rel="noopener noreferrer" class="copy-btn" style="text-decoration:none; display:inline-block; padding: 6px 12px; font-size: 12px;">Source Repo ↗</a>
+          </div>
+        </div>
+        <p style="font-size: 13px; color: #c8c8c8; margin: 0 0 12px;">
+          An experimental community fork of FilmCraft adding native <strong>OpenFX (OFX)</strong> plug-in hosting support. Run OpenFX plug-ins inside FilmCraft as timeline video effects (Boris FX Sapphire, RE:Vision Effects RSMB &amp; Twixtor) with parameter inspectors and keyframing.
+        </p>
+        <div class="path-boxes">
+          <div class="path-row">
+            <strong>OpenFX Path:</strong>
+            <code>C:\Program Files\Common Files\OFX\Plugins\</code>
+            <button class="copy-btn" data-copy="C:\Program Files\Common Files\OFX\Plugins\">Copy</button>
+          </div>
+        </div>
+        <ol class="steps-list" style="margin-top: 12px;">
+          <li>Download the standalone release archive from <a href="https://github.com/glumbis/filmcraft/releases/latest" target="_blank" rel="noopener noreferrer" style="color:var(--accent); text-decoration:underline;">glumbis/filmcraft releases</a> (<code>FilmCraft-OFX-windows.zip</code>).</li>
+          <li>Extract the archive and run <code>Install FilmCraft.bat</code> (per-user install, no admin privileges required).</li>
+          <li>Launch <strong>FilmCraft (OFX)</strong> from your Start menu or install folder.</li>
+          <li>Installed OpenFX bundles in <code>C:\Program Files\Common Files\OFX\Plugins\</code> appear in the <strong>Effects</strong> panel under <strong>Video Effects</strong>.</li>
+          <li>Apply effects to video clips on the timeline; adjust parameters and animate keyframes directly in <strong>Effect Controls</strong>.</li>
         </ol>
       </div>
     </section>
@@ -2055,7 +2088,15 @@ cargo test --manifest-path plugins/myplugin/Cargo.toml</code></pre>
 
       const forksSection = document.getElementById("community-forks");
       if (forksSection) {
-        forksSection.style.display = (activeApp === "all" || activeApp === "effectcraft") ? "block" : "none";
+        const forkCards = forksSection.querySelectorAll(".fork-item");
+        let visibleForks = 0;
+        forkCards.forEach(card => {
+          const app = card.dataset.app;
+          const matches = (activeApp === "all" || app === activeApp);
+          card.style.display = matches ? "block" : "none";
+          if (matches) visibleForks++;
+        });
+        forksSection.style.display = (visibleForks > 0) ? "block" : "none";
       }
     }
 
