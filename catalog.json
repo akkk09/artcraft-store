@@ -16,7 +16,8 @@
       "id": "effectcraft",
       "name": "EffectCraft",
       "extensionTypes": [
-        "plugin"
+        "plugin",
+        "tool"
       ]
     }
   ],
@@ -293,6 +294,97 @@
       ],
       "app": "effectcraft",
       "compatibility": "EffectCraft plug-in API v1"
+    },
+    {
+      "id": "org.effectcraft.community.depthcraft",
+      "name": "DepthCraft",
+      "version": "0.1.0",
+      "author": "ArtCraft Store community",
+      "description": "Monocular depth estimation, edge-preserving bilateral filtering, and atmospheric fog generator.",
+      "kind": "plugin",
+      "abi": 1,
+      "source": "plugins/depthcraft",
+      "sourceUrl": "https://github.com/akkk09/artcraft-store/tree/main/plugins/depthcraft",
+      "artifact": "depthcraft.wasm",
+      "releaseAsset": "depthcraft.wasm",
+      "tags": [
+        "depth",
+        "ai",
+        "fog",
+        "stylize",
+        "3d",
+        "displacement"
+      ],
+      "app": "effectcraft",
+      "compatibility": "EffectCraft plug-in API v1"
+    },
+    {
+      "id": "org.effectcraft.community.easecraft",
+      "name": "EaseCraft",
+      "version": "0.1.0",
+      "author": "ArtCraft Store community",
+      "description": "Interactive cubic Bézier curve graph editor, transition presets, and keyframe easing tool.",
+      "kind": "tool",
+      "abi": 1,
+      "source": "plugins/easecraft",
+      "sourceUrl": "https://github.com/akkk09/artcraft-store/tree/main/plugins/easecraft",
+      "artifact": "EaseCraft.jsx",
+      "releaseAsset": "EaseCraft.jsx",
+      "tags": [
+        "easing",
+        "bezier",
+        "graph-editor",
+        "animation",
+        "keyframes"
+      ],
+      "app": "effectcraft",
+      "compatibility": "EffectCraft ScriptUI / ExtendScript"
+    },
+    {
+      "id": "org.effectcraft.community.captioncraft",
+      "name": "CaptionCraft",
+      "version": "0.1.0",
+      "author": "ArtCraft Store community",
+      "description": "Caption authoring, SRT/VTT subtitle import and export, and typography layout tool.",
+      "kind": "tool",
+      "abi": 1,
+      "source": "plugins/captioncraft",
+      "sourceUrl": "https://github.com/akkk09/artcraft-store/tree/main/plugins/captioncraft",
+      "artifact": "CaptionCraft.jsx",
+      "releaseAsset": "CaptionCraft.jsx",
+      "tags": [
+        "captions",
+        "subtitles",
+        "srt",
+        "webvtt",
+        "typography",
+        "text"
+      ],
+      "app": "effectcraft",
+      "compatibility": "EffectCraft ScriptUI / ExtendScript"
+    },
+    {
+      "id": "org.effectcraft.community.quietcraft",
+      "name": "QuietCraft",
+      "version": "0.1.0",
+      "author": "ArtCraft Store community",
+      "description": "Automated audio silence detection, noise-floor thresholding, and speech derushing tool.",
+      "kind": "tool",
+      "abi": 1,
+      "source": "plugins/quietcraft",
+      "sourceUrl": "https://github.com/akkk09/artcraft-store/tree/main/plugins/quietcraft",
+      "artifact": "QuietCraft.jsx",
+      "releaseAsset": "QuietCraft.jsx",
+      "tags": [
+        "audio",
+        "silence-cut",
+        "derush",
+        "podcast",
+        "speech",
+        "jump-cut"
+      ],
+      "app": "effectcraft",
+      "compatibility": "EffectCraft ScriptUI / ExtendScript"
     }
   ]
 }

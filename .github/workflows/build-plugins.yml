@@ -97,3 +97,7 @@ jobs:
             dist/filmcraft-film-emulation-toolkit.zip
             dist/creator-graphics-pack.zip
             dist/chromatic-fringe.wat
+            dist/depthcraft.wasm
+            dist/EaseCraft.jsx
+            dist/CaptionCraft.jsx
+            dist/QuietCraft.jsx

@@ -1,0 +1,17 @@
+[package]
+name = "easecraft"
+version = "0.1.0"
+edition = "2024"
+description = "Original keyframe curve easing tool, solver, and preset manager for EffectCraft"
+license = "MIT OR Apache-2.0"
+authors = ["EffectCraft Contributors"]
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[[bin]]
+name = "easecraft-cli"
+path = "src/main.rs"
+
+[workspace]
