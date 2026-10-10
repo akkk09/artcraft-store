@@ -209,27 +209,30 @@ fn jitter_color(val: &mut Value, dh: f64, ds: f64, dl: f64) {
 
 /// Computes the bounding box center (cx, cy) of an object
 fn get_object_centroid(obj: &Value) -> (f64, f64) {
-    if let Some(path_val) = obj.get("path") {
-        if let Some(subpaths) = path_val.get("subpaths").and_then(|s| s.as_array()) {
-            let mut sum_x = 0.0;
-            let mut sum_y = 0.0;
-            let mut count = 0;
-            for subpath in subpaths {
-                if let Some(anchors) = subpath.get("anchors").and_then(|a| a.as_array()) {
-                    for anc in anchors {
-                        if let Some(p) = anc.get("p").and_then(|v| v.as_array()) {
-                            if p.len() >= 2 {
-                                sum_x += p[0].as_f64().unwrap_or(0.0);
-                                sum_y += p[1].as_f64().unwrap_or(0.0);
-                                count += 1;
-                            }
+    let subpaths_opt = obj.get("path")
+        .and_then(|p| p.get("subpaths"))
+        .or_else(|| obj.get("kind").and_then(|k| k.get("path")).and_then(|p| p.get("subpaths")))
+        .and_then(|s| s.as_array());
+
+    if let Some(subpaths) = subpaths_opt {
+        let mut sum_x = 0.0;
+        let mut sum_y = 0.0;
+        let mut count = 0;
+        for subpath in subpaths {
+            if let Some(anchors) = subpath.get("anchors").and_then(|a| a.as_array()) {
+                for anc in anchors {
+                    if let Some(p) = anc.get("p").and_then(|v| v.as_array()) {
+                        if p.len() >= 2 {
+                            sum_x += p[0].as_f64().unwrap_or(0.0);
+                            sum_y += p[1].as_f64().unwrap_or(0.0);
+                            count += 1;
                         }
                     }
                 }
             }
-            if count > 0 {
-                return (sum_x / count as f64, sum_y / count as f64);
-            }
+        }
+        if count > 0 {
+            return (sum_x / count as f64, sum_y / count as f64);
         }
     }
     if let Some(pts) = obj.get("points").and_then(|p| p.as_array()) {
@@ -286,20 +289,26 @@ pub fn transform_single_object(obj: &mut Value, params: &RandominoParams, rng: &
 
     // 2. Transform points & subpath anchors
     if let Value::Object(map) = obj {
-        if let Some(path_val) = map.get_mut("path") {
-            if let Some(subpaths) = path_val.get_mut("subpaths").and_then(|s| s.as_array_mut()) {
-                for subpath in subpaths {
-                    if let Some(anchors) = subpath.get_mut("anchors").and_then(|a| a.as_array_mut()) {
-                        for anchor in anchors {
-                            for key in &["p", "in", "out"] {
-                                if let Some(Value::Array(arr)) = anchor.get_mut(*key) {
-                                    if arr.len() >= 2 {
-                                        let px = arr[0].as_f64().unwrap_or(0.0);
-                                        let py = arr[1].as_f64().unwrap_or(0.0);
-                                        let (rx, ry) = transform_xy(px, py);
-                                        arr[0] = json!(rx);
-                                        arr[1] = json!(ry);
-                                    }
+        let mut subpaths_target = if let Some(path_obj) = map.get_mut("path").and_then(|p| p.as_object_mut()) {
+            path_obj.get_mut("subpaths").and_then(|s| s.as_array_mut())
+        } else if let Some(kind_obj) = map.get_mut("kind").and_then(|k| k.as_object_mut()) {
+            kind_obj.get_mut("path").and_then(|p| p.get_mut("subpaths")).and_then(|s| s.as_array_mut())
+        } else {
+            None
+        };
+
+        if let Some(subpaths) = subpaths_target.as_deref_mut() {
+            for subpath in subpaths {
+                if let Some(anchors) = subpath.get_mut("anchors").and_then(|a| a.as_array_mut()) {
+                    for anchor in anchors {
+                        for key in &["p", "in", "out"] {
+                            if let Some(Value::Array(arr)) = anchor.get_mut(*key) {
+                                if arr.len() >= 2 {
+                                    let px = arr[0].as_f64().unwrap_or(0.0);
+                                    let py = arr[1].as_f64().unwrap_or(0.0);
+                                    let (rx, ry) = transform_xy(px, py);
+                                    arr[0] = json!(rx);
+                                    arr[1] = json!(ry);
                                 }
                             }
                         }
@@ -336,6 +345,17 @@ pub fn transform_single_object(obj: &mut Value, params: &RandominoParams, rng: &
             let ds = if params.sat_jitter > 0.0 { rng.range(-params.sat_jitter, params.sat_jitter) } else { 0.0 };
             let dl = if params.lightness_jitter > 0.0 { rng.range(-params.lightness_jitter, params.lightness_jitter) } else { 0.0 };
 
+            if let Some(app) = map.get_mut("appearance").and_then(|a| a.as_object_mut()) {
+                if let Some(items) = app.get_mut("items").and_then(|i| i.as_array_mut()) {
+                    for item in items {
+                        if let Some(paint) = item.get_mut("paint") {
+                            if let Some(c) = paint.get_mut("color") {
+                                jitter_color(c, dh, ds, dl);
+                            }
+                        }
+                    }
+                }
+            }
             if let Some(fills) = map.get_mut("fills").and_then(|f| f.as_array_mut()) {
                 for fill in fills {
                     if let Some(c) = fill.get_mut("color") {
