@@ -301,6 +301,79 @@
     .steps-list li {
       margin-bottom: 4px;
     }
+    .dev-guide-block {
+      margin-top: 24px;
+      border-top: 1px solid var(--line);
+      padding-top: 20px;
+    }
+    .dev-guide-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .dev-guide-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge-pill {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: #252525;
+      border: 1px solid #444;
+      color: #dfdfdf;
+      white-space: nowrap;
+    }
+    .guide-box {
+      background: #111;
+      border: 1px solid #282828;
+      border-radius: 6px;
+      padding: 16px;
+      margin: 12px 0 16px;
+    }
+    .guide-box h4 {
+      margin: 0 0 8px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #f5f5f5;
+    }
+    .guide-box p {
+      margin: 0 0 10px;
+      font-size: 13px;
+      color: #b8b8b8;
+      line-height: 1.55;
+    }
+    .guide-box ul, .guide-box ol {
+      margin: 6px 0 10px 20px;
+      padding: 0;
+      font-size: 12.5px;
+      color: #c4c4c4;
+      line-height: 1.6;
+    }
+    .guide-box li {
+      margin-bottom: 4px;
+    }
+    .snippet-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-top: 10px;
+      margin-bottom: 4px;
+    }
     .dev-card {
       background: #181818;
       border: 1px solid var(--line);
@@ -435,6 +508,143 @@
           <li>Access the filter under the <strong>Filter</strong> menu in its registered category.</li>
           <li>For 3D LUTs: Apply via <strong>Image ▸ Adjustments ▸ Apply 3D LUT...</strong> or use <a href="./lut-studio/" style="color:var(--text);font-weight:600">LUT Studio</a>.</li>
         </ol>
+
+        <div class="dev-guide-block">
+          <div class="dev-guide-header">
+            <h3 class="dev-guide-title">⚙ Plugin Developer Guide: PhotoCraft</h3>
+            <span class="badge-pill">Rust · WASM ABI v1</span>
+          </div>
+
+          <div class="guide-box">
+            <h4>1. Architecture &amp; C ABI v1 Specification</h4>
+            <p>PhotoCraft loads sandboxed WebAssembly filters compiled to the <code>wasm32-unknown-unknown</code> target. Plugins run in linear memory without operating system syscalls. Every filter exports four mandatory symbols:</p>
+            <ul>
+              <li><code>pc_abi_version() -&gt; i32</code>: Returns integer <code>1</code>.</li>
+              <li><code>pc_manifest() -&gt; i64</code>: Returns 64-bit packed pointer and length <code>((len &lt;&lt; 32) | ptr)</code> to a static JSON manifest string.</li>
+              <li><code>pc_alloc(size: i32) -&gt; i32</code>: Allocates memory inside the WebAssembly instance for input parameters and temporary buffers.</li>
+              <li><code>pc_filter(buf: i32, buf_len: i32, width: i32, height: i32, channels: i32, format: i32, params_ptr: i32, params_len: i32) -&gt; i32</code>: Applies the pixel transformation in-place. Returns <code>0</code> on success.</li>
+            </ul>
+          </div>
+
+          <div class="guide-box">
+            <h4>2. Complete Rust Implementation (Cargo.toml + src/lib.rs)</h4>
+            <div class="snippet-title">
+              <span>Cargo.toml</span>
+            </div>
+            <pre><code>[package]
+name = "photocraft-plugin-tint"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib"]</code></pre>
+
+            <div class="snippet-title">
+              <span>src/lib.rs (no_std, zero-allocation pixel filter)</span>
+            </div>
+            <pre><code>#![no_std]
+use core::slice;
+
+#[cfg(not(test))]
+#[panic_handler]
+fn panic(_info: &amp;core::panic::PanicInfo) -&gt; ! {
+    loop { core::hint::spin_loop(); }
+}
+
+static MANIFEST: &amp;[u8] = br#"{
+  "id": "org.photocraft.community.tint",
+  "name": "Duotone Tint &amp; Luminance",
+  "version": "0.1.0",
+  "kind": "filter",
+  "author": "Your Name",
+  "description": "Applies duotone luminance tinting to active layer pixels.",
+  "params": {
+    "intensity": { "type": "int", "min": 0, "max": 100, "default": 80 }
+  },
+  "overlap": 0,
+  "area": "content"
+}"#;
+
+#[cfg(target_arch = "wasm32")]
+static mut HEAP_NEXT: usize = 65536;
+
+#[no_mangle]
+pub extern "C" fn pc_abi_version() -&gt; i32 { 1 }
+
+#[no_mangle]
+pub extern "C" fn pc_manifest() -&gt; i64 {
+    ((MANIFEST.len() as i64) &lt;&lt; 32) | (MANIFEST.as_ptr() as u32 as i64)
+}
+
+#[cfg(target_arch = "wasm32")]
+#[no_mangle]
+pub extern "C" fn pc_alloc(size: i32) -&gt; i32 {
+    if size &lt;= 0 { return 0; }
+    let size = size as usize;
+    let start = unsafe { (HEAP_NEXT + 7) &amp; !7usize };
+    let end = match start.checked_add(size) { Some(v) =&gt; v, None =&gt; return 0 };
+    let pages_needed = end.saturating_add(65535) / 65536;
+    let pages_now = core::arch::wasm32::memory_size(0);
+    if pages_needed &gt; pages_now {
+        let grown = core::arch::wasm32::memory_grow(0, pages_needed - pages_now);
+        if grown == usize::MAX { return 0; }
+    }
+    unsafe { HEAP_NEXT = end; }
+    start as i32
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+#[no_mangle]
+pub extern "C" fn pc_alloc(_size: i32) -&gt; i32 { 0 }
+
+#[no_mangle]
+pub unsafe extern "C" fn pc_filter(
+    buf: i32, buf_len: i32, width: i32, height: i32, channels: i32,
+    format: i32, _params_ptr: i32, _params_len: i32,
+) -&gt; i32 {
+    if buf &lt;= 0 || width &lt;= 0 || height &lt;= 0 || channels &lt; 3 { return 1; }
+    let count = (width as usize) * (height as usize) * (channels as usize);
+    if count * 4 != (buf_len as usize) { return 2; }
+
+    let pixels = slice::from_raw_parts_mut(buf as *mut f32, count);
+    let ch = channels as usize;
+    for pixel in pixels.chunks_exact_mut(ch) {
+        let (r, g, b) = (pixel[0], pixel[1], pixel[2]);
+        let lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        // Warm sepia tint: high luminance preserves highlights, low warms shadows
+        pixel[0] = (lum * 1.15).clamp(0.0, 1.0);
+        pixel[1] = (lum * 0.95).clamp(0.0, 1.0);
+        pixel[2] = (lum * 0.75).clamp(0.0, 1.0);
+        // Alpha channel in pixel[3] remains untouched
+    }
+    0
+}</code></pre>
+          </div>
+
+          <div class="guide-box">
+            <h4>3. Build &amp; Test Commands</h4>
+            <pre><code># 1. Compile to sandboxed WebAssembly (ABI v1)
+cargo build --target wasm32-unknown-unknown --release
+
+# 2. Locate compiled binary
+cp target/wasm32-unknown-unknown/release/photocraft_plugin_tint.wasm dist/
+
+# 3. Test locally in PhotoCraft
+cp dist/photocraft_plugin_tint.wasm ~/.config/photocraft/plugins/</code></pre>
+          </div>
+
+          <div class="guide-box">
+            <h4>4. Authoring 3D Color LUTs (.cube)</h4>
+            <p>PhotoCraft also supports industry-standard 17x17x17, 33x33x33, and 65x65x65 3D Look-Up Tables. The file must begin with exact cube dimension headers followed by normalized RGB float samples (red changes fastest):</p>
+            <pre><code>TITLE "Vintage Warm Look"
+LUT_3D_SIZE 17
+DOMAIN_MIN 0.0 0.0 0.0
+DOMAIN_MAX 1.0 1.0 1.0
+0.000000 0.000000 0.000000
+0.062500 0.000000 0.000000
+... (17^3 = 4913 RGB lines)</code></pre>
+          </div>
+        </div>
       </article>
 
       <!-- EffectCraft -->
@@ -470,6 +680,170 @@
           <li>Open your panel from the <strong>Window</strong> menu (e.g. <strong>Window ▸ QuietCraft.jsx</strong>).</li>
           <li>Dock the panel anywhere in your workspace alongside Effect Controls and Timeline.</li>
         </ol>
+
+        <div class="dev-guide-block">
+          <div class="dev-guide-header">
+            <h3 class="dev-guide-title">⚙ Plugin Developer Guide: EffectCraft</h3>
+            <span class="badge-pill">WASM API v1 &amp; ScriptUI / ExtendScript</span>
+          </div>
+
+          <!-- Track A: WASM Render Effect -->
+          <div class="guide-box">
+            <h4>Track A: Native Video Render Effect (WASM API v1)</h4>
+            <p>Video rendering effects are sandboxed WebAssembly binaries operating on high-dynamic-range floating-point pixel buffers (<code>[f32; 4]</code> RGBA). They execute per-frame in the render pipeline with time and resolution awareness.</p>
+            <ul>
+              <li><code>ec_api_version() -&gt; i32</code>: Returns <code>1</code>.</li>
+              <li><code>ec_manifest_ptr() -&gt; i32</code> &amp; <code>ec_manifest_len() -&gt; i32</code>: Returns pointer and byte length to the effect's JSON metadata.</li>
+              <li><code>ec_alloc(bytes: i32) -&gt; i32</code>: Allocates a reusable 8-byte aligned memory buffer for parameters and pixels.</li>
+              <li><code>ec_render(pixels, width, height, params, nparams, time, scale) -&gt; i32</code>: In-place frame render callback. <code>time</code> is seconds from comp start; <code>scale</code> is preview downsample multiplier (e.g. 1.0 = Full, 0.5 = Half).</li>
+            </ul>
+
+            <div class="snippet-title">
+              <span>EffectCraft WASM Effect (src/lib.rs)</span>
+            </div>
+            <pre><code>use std::cell::RefCell;
+
+pub const MANIFEST: &amp;str = r#"{
+  "api": 1,
+  "id": "org.effectcraft.plugins.chroma_pulse",
+  "name": "Chroma Pulse",
+  "category": "Color Correction",
+  "version": "1.0.0",
+  "author": "Community Developer",
+  "description": "Procedural chromatic glow oscillating over composition time.",
+  "params": [
+    {"id": "intensity", "name": "Pulse Intensity", "type": "slider", "default": 50.0, "min": 0.0, "max": 100.0},
+    {"id": "frequency", "name": "Pulse Speed (Hz)", "type": "slider", "default": 2.0, "min": 0.1, "max": 10.0}
+  ]
+}"#;
+
+thread_local! {
+    static BUF: RefCell&lt;Vec&lt;u64&gt;&gt; = const { RefCell::new(Vec::new()) };
+}
+
+#[no_mangle]
+pub extern "C" fn ec_api_version() -&gt; i32 { 1 }
+
+#[no_mangle]
+pub extern "C" fn ec_manifest_ptr() -&gt; i32 { MANIFEST.as_ptr() as usize as i32 }
+
+#[no_mangle]
+pub extern "C" fn ec_manifest_len() -&gt; i32 { MANIFEST.len() as i32 }
+
+#[no_mangle]
+pub extern "C" fn ec_alloc(bytes: i32) -&gt; i32 {
+    BUF.with(|b| {
+        let mut b = b.borrow_mut();
+        let words = (bytes.max(0) as usize).div_ceil(8);
+        if b.len() &lt; words { b.resize(words, 0); }
+        b.as_mut_ptr() as usize as i32
+    })
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn ec_render(
+    pixels: i32, width: i32, height: i32,
+    params: i32, nparams: i32, time: f64, _scale: f64,
+) -&gt; i32 {
+    if width &lt;= 0 || height &lt;= 0 || nparams &lt; 2 { return 1; }
+    let p = std::slice::from_raw_parts(params as usize as *const f64, nparams as usize);
+    let intensity = (p[0] / 100.0) as f32;
+    let frequency = p[1] as f32;
+
+    let pulse = 1.0 + intensity * ((time as f32 * frequency * 6.28318).sin() * 0.5);
+    let total_pixels = (width as usize) * (height as usize);
+    let px = std::slice::from_raw_parts_mut(pixels as usize as *mut [f32; 4], total_pixels);
+
+    for pixel in px.iter_mut() {
+        pixel[0] = (pixel[0] * pulse).min(1.0); // Red pulse
+        pixel[1] = (pixel[1] * (2.0 - pulse)).min(1.0); // Inverse Green pulse
+        // Blue and Alpha remain preserved
+    }
+    0
+}</code></pre>
+          </div>
+
+          <!-- Track B: ScriptUI Panel -->
+          <div class="guide-box">
+            <h4>Track B: ScriptUI Panels &amp; Automation Tools (.jsx)</h4>
+            <p>EffectCraft incorporates an After Effects-compatible object model with atomic undo groups and dockable ScriptUI panels. Panels live in <code>Scripts/ScriptUI Panels/</code> and are launched from the <strong>Window</strong> menu.</p>
+            <div class="snippet-title">
+              <span>Dockable ScriptUI Extension Boilerplate (MyTool.jsx)</span>
+            </div>
+            <pre><code>// EffectCraft ScriptUI Panel Extension
+(function (thisObj) {
+  "use strict";
+
+  // Create dockable palette or floating window
+  var win = thisObj instanceof Panel ? thisObj : new Window("palette", "My Animation Tool", undefined, { resizeable: true });
+  win.orientation = "column";
+  win.alignChildren = ["fill", "top"];
+  win.spacing = 8;
+  win.margins = 10;
+
+  // Header & Controls
+  var title = win.add("statictext", undefined, "KEYFRAME BUILDER");
+  title.graphics.foregroundColor = win.graphics.newPen(win.graphics.PenType.SOLID_COLOR, [0.95, 0.95, 0.95, 1], 1);
+
+  var grpOptions = win.add("group");
+  grpOptions.orientation = "row";
+  grpOptions.add("statictext", undefined, "Duration (s):");
+  var txtDuration = grpOptions.add("edittext", undefined, "2.0");
+  txtDuration.characters = 6;
+
+  var chkFade = win.add("checkbox", undefined, "Add Automatic Opacity Fade");
+  chkFade.value = true;
+
+  var btnApply = win.add("button", undefined, "Build Animation on Selected");
+
+  // Click Handler with Atomic Undo
+  btnApply.onClick = function () {
+    var comp = app.project.activeItem;
+    if (!comp || !(comp instanceof CompItem)) {
+      alert("Please open and select a composition first.");
+      return;
+    }
+    if (comp.selectedLayers.length === 0) {
+      alert("Please select at least one layer to animate.");
+      return;
+    }
+
+    var dur = parseFloat(txtDuration.text) || 2.0;
+
+    // Fold all timeline mutations into a single undo step
+    app.beginUndoGroup("Apply Animation Rig");
+    try {
+      for (var i = 0; i &lt; comp.selectedLayers.length; i++) {
+        var layer = comp.selectedLayers[i];
+        var pos = layer.property("ADBE Transform Group").property("ADBE Position");
+        var currPos = pos.value;
+
+        // Add animated keyframes
+        pos.setValueAtTime(0, [currPos[0] - 200, currPos[1]]);
+        pos.setValueAtTime(dur, currPos);
+
+        if (chkFade.value) {
+          var opacity = layer.property("ADBE Transform Group").property("ADBE Opacity");
+          opacity.setValueAtTime(0, 0);
+          opacity.setValueAtTime(dur * 0.5, 100);
+        }
+      }
+    } catch (err) {
+      alert("Error: " + err.message);
+    } finally {
+      app.endUndoGroup();
+    }
+  };
+
+  if (win instanceof Window) {
+    win.center();
+    win.show();
+  } else {
+    win.layout.layout(true);
+  }
+})(this);</code></pre>
+          </div>
+        </div>
       </article>
 
       <!-- VectorCraft -->
@@ -503,6 +877,114 @@
           <li><strong>WASM Filters:</strong> Copy to plugins folder; open <strong>Window ▸ Plug-in Manager</strong> or <strong>Object ▸ Live Filters</strong>.</li>
           <li><strong>SVG Templates:</strong> Extract archive into templates directory and select <strong>File ▸ New From Template...</strong>.</li>
         </ol>
+
+        <div class="dev-guide-block">
+          <div class="dev-guide-header">
+            <h3 class="dev-guide-title">⚙ Plugin Developer Guide: VectorCraft</h3>
+            <span class="badge-pill">WASM ABI v1 &amp; SVG Templates</span>
+          </div>
+
+          <div class="guide-box">
+            <h4>1. Vector Object Filter Architecture (ABI v1)</h4>
+            <p>VectorCraft object filters run as sandboxed WebAssembly modules that receive the active vector document as structured JSON, traverse paths, points, fills, and strokes, and return modified vector geometry.</p>
+            <ul>
+              <li><code>vc_abi_version() -&gt; u32</code>: Returns <code>1</code>.</li>
+              <li><code>vc_manifest() -&gt; u64</code>: Returns 64-bit packed slice <code>(len &lt;&lt; 32) | (ptr &amp; 0xFFFFFFFF)</code> of the JSON manifest.</li>
+              <li><code>vc_alloc(size: u32) -&gt; u32</code>: Memory allocator for passing input document buffers.</li>
+              <li><code>vc_run(input_ptr, input_len, params_ptr, params_len) -&gt; i64</code>: Deserializes the vector document, performs geometric or color transformations, and returns a packed pointer/length to the serialized output JSON.</li>
+            </ul>
+
+            <div class="snippet-title">
+              <span>VectorCraft Object Filter (src/lib.rs)</span>
+            </div>
+            <pre><code>use serde_json::{Value, json};
+
+const MANIFEST: &amp;str = r#"{
+  "id": "org.vectorcraft.community.scale_stroke",
+  "name": "Proportional Stroke Scaler",
+  "version": "1.0.0",
+  "kind": "filter",
+  "author": "Community Developer",
+  "description": "Scales stroke weights proportionally across all nested path hierarchies.",
+  "params": {
+    "scale_factor": {"type": "number", "min": 10, "max": 500, "default": 150}
+  }
+}"#;
+
+#[no_mangle]
+pub extern "C" fn vc_abi_version() -&gt; u32 { 1 }
+
+fn pack(slice: &amp;[u8]) -&gt; u64 {
+    let ptr = slice.as_ptr() as usize as u64;
+    let len = slice.len() as u64;
+    (len &lt;&lt; 32) | (ptr &amp; 0xFFFF_FFFF)
+}
+
+#[no_mangle]
+pub extern "C" fn vc_manifest() -&gt; u64 { pack(MANIFEST.as_bytes()) }
+
+#[no_mangle]
+pub extern "C" fn vc_alloc(size: u32) -&gt; u32 {
+    let mut block = Vec::&lt;u8&gt;::with_capacity(size as usize);
+    let ptr = block.as_mut_ptr();
+    std::mem::forget(block);
+    ptr as usize as u32
+}
+
+fn scale_strokes(obj: &amp;mut Value, factor: f64) {
+    if let Value::Object(map) = obj {
+        if let Some(stroke) = map.get_mut("stroke") {
+            if let Some(w) = stroke.get_mut("width") {
+                if let Some(num) = w.as_f64() {
+                    *w = json!(num * factor);
+                }
+            }
+        }
+        if let Some(Value::Array(children)) = map.get_mut("children") {
+            for child in children {
+                scale_strokes(child, factor);
+            }
+        }
+    }
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn vc_run(input: *const u8, input_len: u32, params: *const u8, params_len: u32) -&gt; i64 {
+    let in_slice = std::slice::from_raw_parts(input, input_len as usize);
+    let param_slice = std::slice::from_raw_parts(params, params_len as usize);
+
+    let mut doc: Value = match serde_json::from_slice(in_slice) {
+        Ok(v) =&gt; v,
+        Err(_) =&gt; return -1,
+    };
+    let params_val: Value = serde_json::from_slice(param_slice).unwrap_or(Value::Null);
+    let factor = params_val.get("scale_factor").and_then(Value::as_f64).unwrap_or(150.0) / 100.0;
+
+    if let Some(objects) = doc.get_mut("objects").and_then(Value::as_array_mut) {
+        for obj in objects {
+            scale_strokes(obj, factor);
+        }
+    }
+
+    let out_bytes = match serde_json::to_vec(&amp;doc) {
+        Ok(b) =&gt; b,
+        Err(_) =&gt; return -2,
+    };
+    pack(out_bytes.leak()) as i64
+}</code></pre>
+          </div>
+
+          <div class="guide-box">
+            <h4>2. Creating SVG Template Packages (.zip)</h4>
+            <p>VectorCraft template packages bundle ready-to-edit vector layouts. Templates must use clean SVG coordinates, embedded or web fonts, and semantic group layers:</p>
+            <ul>
+              <li>Use root attributes <code>viewBox="0 0 1920 1080"</code> with explicit <code>width</code> and <code>height</code>.</li>
+              <li>Group artwork into named layers: <code>&lt;g id="Background"&gt;</code>, <code>&lt;g id="Graphics"&gt;</code>, and <code>&lt;g id="Editable-Text"&gt;</code>.</li>
+              <li>Include an accompanying <code>template.json</code> defining category, tags, and customizable color variables.</li>
+              <li>Package as a zip archive: <code>zip -r my-template-pack.zip *.svg template.json</code>.</li>
+            </ul>
+          </div>
+        </div>
       </article>
 
       <!-- FilmCraft -->
@@ -537,6 +1019,86 @@
           <li><strong>CLI Import:</strong> Run <code>filmcraft-cli --project project.fcproj exec presets.import '{"path":"presets.json"}'</code>.</li>
           <li><strong>Creative LUTs:</strong> Save <code>.cube</code> files to your LUTs folder or select <strong>Lumetri Color ▸ Creative ▸ Look LUT</strong>.</li>
         </ol>
+
+        <div class="dev-guide-block">
+          <div class="dev-guide-header">
+            <h3 class="dev-guide-title">⚙ Plugin Developer Guide: FilmCraft</h3>
+            <span class="badge-pill">JSON Presets v1 &amp; 3D LUTs</span>
+          </div>
+
+          <div class="guide-box">
+            <h4>1. Timeline Effect Presets Schema (filmcraft.effect-presets v1)</h4>
+            <p>FilmCraft presets define serializable stacks of native video grading effects and parameter adjustments. All parameters use strongly tagged JSON values (<code>Float</code>, <code>Color</code>, <code>Bool</code>):</p>
+            <div class="snippet-title">
+              <span>filmcraft-presets.json</span>
+            </div>
+            <pre><code>{
+  "format": "filmcraft.effect-presets",
+  "version": 1,
+  "presets": [
+    {
+      "name": "Teal &amp; Orange Film Emulation",
+      "description": "Complementary warm skin-tone highlights and cool cinematic shadow contrast.",
+      "effects": [
+        {
+          "effect": "lumetri",
+          "enabled": true,
+          "params": {
+            "temperature": { "Float": 8.0 },
+            "tint": { "Float": 2.0 },
+            "contrast": { "Float": 14.0 },
+            "saturation": { "Float": 92.0 },
+            "highlight_tint": { "Color": [0.92, 0.65, 0.35, 1.0] },
+            "shadow_tint": { "Color": [0.25, 0.45, 0.65, 1.0] }
+          }
+        },
+        {
+          "effect": "grain",
+          "enabled": true,
+          "params": {
+            "amount": { "Float": 4.5 },
+            "size": { "Float": 1.2 },
+            "monochrome": { "Bool": true }
+          }
+        }
+      ]
+    }
+  ]
+}</code></pre>
+          </div>
+
+          <div class="guide-box">
+            <h4>2. Procedural 3D LUT Generator (.cube)</h4>
+            <p>Use Python to mathematically generate matching 17x17x17 or 33x33x33 3D Look-Up Tables with gamma curves and color grading matrices:</p>
+            <div class="snippet-title">
+              <span>generate_lut.py</span>
+            </div>
+            <pre><code>#!/usr/bin/env python3
+"""Generate a calibrated 17-point 3D LUT in Adobe/DaVinci .cube format."""
+SIZE = 17
+
+def grade(r, g, b):
+    # Luminance calculation
+    lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
+    # Apply warm highlights and cool shadows
+    r_out = (r - 0.5) * 1.1 + 0.5 + 0.04 * lum
+    g_out = (g - 0.5) * 1.1 + 0.5
+    b_out = (b - 0.5) * 1.1 + 0.5 - 0.03 * lum
+    return tuple(max(0.0, min(1.0, c)) for c in (r_out, g_out, b_out))
+
+with open("Teal_Orange.cube", "w", encoding="utf-8") as f:
+    f.write('TITLE "Teal &amp; Orange"\n')
+    f.write(f'LUT_3D_SIZE {SIZE}\n')
+    f.write('DOMAIN_MIN 0.0 0.0 0.0\nDOMAIN_MAX 1.0 1.0 1.0\n')
+    n = SIZE - 1
+    for b in range(SIZE):
+        for g in range(SIZE):
+            for r in range(SIZE):
+                rg, gg, bg = grade(r / n, g / n, b / n)
+                f.write(f"{rg:.6f} {gg:.6f} {bg:.6f}\n")
+print("Generated Teal_Orange.cube")</code></pre>
+          </div>
+        </div>
       </article>
 
       <!-- SoundCraft -->
@@ -572,6 +1134,67 @@
           <li>Insert the plugin on any channel strip track.</li>
           <li><strong>Channel Strip Presets:</strong> Load via the track insert header menu (<strong>Load Channel Strip Preset...</strong>).</li>
         </ol>
+
+        <div class="dev-guide-block">
+          <div class="dev-guide-header">
+            <h3 class="dev-guide-title">⚙ Plugin Developer Guide: SoundCraft</h3>
+            <span class="badge-pill">CLAP / VST3 &amp; DSP Presets</span>
+          </div>
+
+          <div class="guide-box">
+            <h4>1. Native Audio DSP Plugins (CLAP &amp; VST3 in Rust)</h4>
+            <p>SoundCraft hosts standard open audio plugins using CLAP and VST3 APIs. Audio plugins process discrete audio buffers with 32-bit floating-point samples per channel:</p>
+            <div class="snippet-title">
+              <span>Real-Time Audio DSP Callback (Rust / nih-plug pattern)</span>
+            </div>
+            <pre><code>// Simple Stereo Gain &amp; Soft Saturation DSP Kernel
+pub struct SimpleSaturator {
+    pub drive_db: f32,
+    pub output_gain_db: f32,
+}
+
+impl SimpleSaturator {
+    pub fn process_block(&amp;mut self, channels: &amp;mut [&amp;mut [f32]], num_samples: usize) {
+        let drive = 10.0f32.powf(self.drive_db / 20.0);
+        let out_gain = 10.0f32.powf(self.output_gain_db / 20.0);
+
+        for ch in channels.iter_mut() {
+            for sample in ch[..num_samples].iter_mut() {
+                let x = *sample * drive;
+                // Soft cubic tanh saturation curve: f(x) = x - (x^3)/3
+                let saturated = if x &gt; 1.0 { 0.6667 } else if x &lt; -1.0 { -0.6667 } else { x - (x * x * x) / 3.0 };
+                *sample = saturated * out_gain;
+            }
+        }
+    }
+}</code></pre>
+          </div>
+
+          <div class="guide-box">
+            <h4>2. Authoring DSP Channel Strip Presets (JSON v1)</h4>
+            <p>Channel strip presets configure SoundCraft's built-in modular mix rack. Presets define an ordered chain of filtering, dynamic compression, and limiting stages:</p>
+            <div class="snippet-title">
+              <span>soundcraft-dsp-presets.json</span>
+            </div>
+            <pre><code>{
+  "format": "soundcraft.dsp-presets",
+  "version": 1,
+  "presets": [
+    {
+      "name": "Broadcast Vocal Strip",
+      "description": "Clean speech high-pass, gentle optical leveling, and air boost.",
+      "chains": [
+        { "dsp": "highpass", "freq": 80.0, "q": 0.707 },
+        { "dsp": "compressor", "threshold": -18.0, "ratio": 3.0, "attack_ms": 12.0, "release_ms": 140.0 },
+        { "dsp": "bell", "freq": 3200.0, "gain_db": 1.5, "q": 1.4 },
+        { "dsp": "highshelf", "freq": 10500.0, "gain_db": 2.0 },
+        { "dsp": "limiter", "ceiling_db": -1.0, "release_ms": 60.0 }
+      ]
+    }
+  ]
+}</code></pre>
+          </div>
+        </div>
       </article>
 
       <!-- PdfCraft -->
@@ -595,6 +1218,67 @@
           <li>Right-click field ▸ <strong>Properties ▸ Calculate ▸ Custom Script</strong> and paste calculation logic (e.g. from <code>pdfcraft-invoice-calculator.js</code>).</li>
           <li><strong>Document Scripts:</strong> Register global scripts via <strong>Tools ▸ JavaScript ▸ Document JavaScripts</strong>.</li>
         </ol>
+
+        <div class="dev-guide-block">
+          <div class="dev-guide-header">
+            <h3 class="dev-guide-title">⚙ Plugin Developer Guide: PdfCraft</h3>
+            <span class="badge-pill">Acrobat JavaScript · ISO 32000</span>
+          </div>
+
+          <div class="guide-box">
+            <h4>1. Form Calculations, Validation &amp; Formatting</h4>
+            <p>PdfCraft runs Acrobat JavaScript (ISO 32000 standard) in a secure, sandboxed Boa engine. Scripts interact with form fields, validate keystrokes, and automate document calculation workflows:</p>
+            <div class="snippet-title">
+              <span>Form Calculation &amp; Keystroke Validator (calculator.js)</span>
+            </div>
+            <pre><code>// Dynamic Invoice Total Calculator &amp; Tax Handler
+function calculateInvoiceTotal() {
+    var subtotal = 0;
+    // Iterate table line items (Qty.1..10, Price.1..10)
+    for (var i = 1; i &lt;= 10; i++) {
+        var qtyField = this.getField("Qty." + i);
+        var priceField = this.getField("Price." + i);
+        var lineField = this.getField("Total." + i);
+        if (qtyField &amp;&amp; priceField &amp;&amp; lineField) {
+            var qty = Number(qtyField.value) || 0;
+            var price = Number(priceField.value) || 0;
+            var lineTotal = qty * price;
+            lineField.value = lineTotal;
+            subtotal += lineTotal;
+        }
+    }
+    // Set Subtotal, Tax (8.5%), and Grand Total
+    var subtotalField = this.getField("Subtotal");
+    if (subtotalField) subtotalField.value = subtotal;
+
+    var taxRate = 0.085;
+    var tax = subtotal * taxRate;
+    var taxField = this.getField("Tax");
+    if (taxField) taxField.value = tax;
+
+    var grandTotalField = this.getField("GrandTotal");
+    if (grandTotalField) grandTotalField.value = subtotal + tax;
+}
+
+// Keystroke Validator: Restrict to positive numeric entries
+function validateNumericKeystroke(event) {
+    if (event.willCommit) {
+        var n = Number(event.value);
+        if (isNaN(n) || n &lt; 0) {
+            if (typeof app !== "undefined" &amp;&amp; app.alert) {
+                app.alert("Invalid input: Please enter a positive number.");
+            }
+            event.rc = false; // Reject commit
+        }
+    }
+}</code></pre>
+          </div>
+
+          <div class="guide-box">
+            <h4>2. Document-Level Batch Automation</h4>
+            <p>Global document scripts execute upon document load or form flattening. Register them in the Document Catalog under <code>/Names /JavaScript</code> or through <strong>Tools ▸ JavaScript ▸ Document JavaScripts</strong> to enable automated record extraction.</p>
+          </div>
+        </div>
       </article>
 
       <!-- DesignCraft -->
@@ -619,6 +1303,51 @@
           <li>Open directly with <strong>File ▸ New From Template...</strong> or <strong>File ▸ Open...</strong>.</li>
           <li>Load paragraph &amp; character styles from the Paragraph Styles panel flyout menu.</li>
         </ol>
+
+        <div class="dev-guide-block">
+          <div class="dev-guide-header">
+            <h3 class="dev-guide-title">⚙ Plugin Developer Guide: DesignCraft</h3>
+            <span class="badge-pill">IDML Packages &amp; Typographic Bundles</span>
+          </div>
+
+          <div class="guide-box">
+            <h4>1. Publication Templates &amp; Master Spread Architecture</h4>
+            <p>DesignCraft publication templates bundle master page layouts, column grids, and typography hierarchies. Template archives contain an IDML layout package with declarative design styles:</p>
+            <ul>
+              <li><strong>Master Spreads:</strong> Define symmetrical 2-page spreads with page margins, column gutters, and header/footer slug guides.</li>
+              <li><strong>Typographic Hierarchy:</strong> Include standardized Paragraph Styles (Display Header, Section Subhead, Body Copy, Pull Quote, Caption) locked to a 12pt/14pt baseline grid.</li>
+              <li><strong>Color Swatches:</strong> Define global CMYK process swatches for print offset compliance alongside RGB digital fallbacks.</li>
+            </ul>
+
+            <div class="snippet-title">
+              <span>Typography Style Sheet Schema (styles.json)</span>
+            </div>
+            <pre><code>{
+  "format": "designcraft.style-bundle",
+  "version": 1,
+  "paragraph_styles": [
+    {
+      "name": "Editorial / Headline",
+      "font_family": "Instrument Serif",
+      "font_weight": "Regular",
+      "font_size_pt": 48.0,
+      "leading_pt": 52.0,
+      "tracking": -20,
+      "space_after_pt": 18.0
+    },
+    {
+      "name": "Editorial / Body Text",
+      "font_family": "Inter",
+      "font_weight": "Regular",
+      "font_size_pt": 10.5,
+      "leading_pt": 15.0,
+      "align": "justified_left",
+      "hyphenation": true
+    }
+  ]
+}</code></pre>
+          </div>
+        </div>
       </article>
 
       <!-- LightCraft -->
@@ -653,6 +1382,57 @@
           <li>Click Presets panel <strong>(+) ▸ Import Presets...</strong> and select <code>.xmp</code> or preset bundle.</li>
           <li>Load 3D LUT profiles in <strong>Color Grading ▸ Profiles</strong> dropdown.</li>
         </ol>
+
+        <div class="dev-guide-block">
+          <div class="dev-guide-header">
+            <h3 class="dev-guide-title">⚙ Plugin Developer Guide: LightCraft</h3>
+            <span class="badge-pill">XMP Presets &amp; 3D LUT Profiles</span>
+          </div>
+
+          <div class="guide-box">
+            <h4>1. Non-Destructive RAW Develop Presets (.xmp)</h4>
+            <p>LightCraft develop presets use standard Camera Raw XMP metadata, storing non-destructive parametric adjustments for Bayer-pattern raw demosaicing, exposure curves, and HSL grading:</p>
+            <div class="snippet-title">
+              <span>preset.xmp</span>
+            </div>
+            <pre><code>&lt;x:xmpmeta xmlns:x="adobe:ns:meta/"&gt;
+  &lt;rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"&gt;
+    &lt;rdf:Description rdf:about=""
+        xmlns:crs="http://ns.adobe.com/camera-raw-settings/1.0/"
+        crs:Version="16.0"
+        crs:ProcessVersion="15.4"
+        crs:Exposure2012="+0.35"
+        crs:Contrast2012="+15"
+        crs:Highlights2012="-25"
+        crs:Shadows2012="+20"
+        crs:Whites2012="+10"
+        crs:Blacks2012="-12"
+        crs:Texture="+10"
+        crs:Clarity="+8"
+        crs:Dehaze="+5"
+        crs:Vibrance="+12"
+        crs:Saturation="-5"
+        crs:ParametricShadows="-8"
+        crs:ParametricDarks="+5"
+        crs:ParametricLights="+12"
+        crs:ParametricHighlights="-15"
+        crs:HueAdjustmentRed="+5"
+        crs:HueAdjustmentOrange="-3"
+        crs:SaturationAdjustmentOrange="+8"
+        crs:LuminanceAdjustmentOrange="+10"
+        crs:SplitToningShadowHue="215"
+        crs:SplitToningShadowSaturation="18"
+        crs:SplitToningHighlightHue="45"
+        crs:SplitToningHighlightSaturation="14" /&gt;
+  &lt;/rdf:RDF&gt;
+&lt;/x:xmpmeta&gt;</code></pre>
+          </div>
+
+          <div class="guide-box">
+            <h4>2. Creative Look Profiles (.cube)</h4>
+            <p>Combine your <code>.xmp</code> develop curve with a 33x33x33 <code>.cube</code> 3D LUT to create a custom camera profile that applies filmic color-space transforms before parametric tone mapping.</p>
+          </div>
+        </div>
       </article>
 
       <!-- CADCraft -->
@@ -687,6 +1467,49 @@
           <li>Run interactive macros via <strong>Tools ▸ Run Macro / Script...</strong>.</li>
           <li>Bind macros to workspace shortcut keys or custom toolbar buttons.</li>
         </ol>
+
+        <div class="dev-guide-block">
+          <div class="dev-guide-header">
+            <h3 class="dev-guide-title">⚙ Plugin Developer Guide: CADCraft</h3>
+            <span class="badge-pill">Command Scripts (.cadscr) &amp; Macros</span>
+          </div>
+
+          <div class="guide-box">
+            <h4>1. Batch Command Scripts (.cadscr)</h4>
+            <p>CADCraft scripts are deterministic command streams that feed the command interpreter directly. Use leading hyphens (e.g. <code>-LAYER</code>) to suppress interactive GUI dialogs:</p>
+            <div class="snippet-title">
+              <span>bolt_circle.cadscr (Parametric Bolt Pattern Generator)</span>
+            </div>
+            <pre><code>; CADCraft Automated Drafting Script
+; Setup Construction Layers
+-LAYER M Centerlines C 1 Centerlines LT CENTER Centerlines 
+-LAYER M Geometry C 3 Geometry 
+
+; Draw Base Pitch Circle
+-LAYER S Geometry 
+CIRCLE 100,100 80
+
+; Draw Orthogonal Centerlines
+-LAYER S Centerlines 
+LINE 10,100 190,100 
+LINE 100,10 100,190 
+
+; Draw Four 12mm Mounting Holes on 45-degree Quadrants
+-LAYER S Geometry 
+CIRCLE 156.57,156.57 6
+CIRCLE 43.43,156.57 6
+CIRCLE 43.43,43.43 6
+CIRCLE 156.57,43.43 6
+
+; Fit to Viewport
+ZOOM EXTENTS</code></pre>
+          </div>
+
+          <div class="guide-box">
+            <h4>2. Parametric Python Coordinate Generators</h4>
+            <p>Automate large-scale geometric layouts by writing lightweight Python scripts that output parameterized <code>.cadscr</code> routines for structural trusses, gear teeth profiles, or electrical schematics.</p>
+          </div>
+        </div>
       </article>
 
     </div>
@@ -732,14 +1555,76 @@
       </div>
     </section>
 
-    <!-- Developer Reference -->
-    <section class="dev-card">
-      <h3>Developer &amp; SDK Architecture</h3>
-      <p>Build native WebAssembly filters in Rust using <code>wasm32-unknown-unknown</code>:</p>
-      <pre><code>cargo build --target wasm32-unknown-unknown --release</code></pre>
-      <p>Run the local store catalog audit and unit test suite:</p>
-      <pre><code>python3 -m unittest tests/test_catalog.py
-python3 scripts/validate_catalog.py --check-artifacts</code></pre>
+    <!-- Developer Reference & Publishing Guide -->
+    <section class="dev-card" id="publishing-guide">
+      <div style="font-size: 11px; font-weight: 700; letter-spacing: .06em; color: var(--accent); margin-bottom: 6px;">CONTRIBUTING &amp; PUBLISHING</div>
+      <h3 style="font-size: 20px; font-weight: 700; text-transform: none; margin-bottom: 12px;">Publishing Extensions to the ArtCraft Store</h3>
+      <p style="font-size: 13.5px; line-height: 1.6; color: var(--muted); margin-bottom: 16px;">
+        Follow this 5-step checklist to register a new plugin, filter, tool, preset, or template package in the official ArtCraft Store catalog.
+      </p>
+
+      <div style="display: grid; gap: 14px; margin-top: 14px;">
+        <div class="guide-box">
+          <h4>Step 1: Declare Extension in <code>catalog.json</code></h4>
+          <p>Add a unique entry adhering to the ArtCraft Store schema v2. Ensure your extension ID follows the reverse-DNS format <code>org.&lt;app&gt;.&lt;author&gt;.&lt;slug&gt;</code>:</p>
+          <pre><code>{
+  "id": "org.effectcraft.community.myplugin",
+  "name": "My Plugin Name",
+  "version": "1.0.0",
+  "author": "Your Name / Organization",
+  "description": "Clear 1-sentence summary of what your extension accomplishes.",
+  "kind": "tool",
+  "abi": 1,
+  "source": "plugins/myplugin",
+  "sourceUrl": "https://github.com/akkk09/artcraft-store/tree/main/plugins/myplugin",
+  "artifact": "MyPlugin.jsx",
+  "releaseAsset": "MyPlugin.jsx",
+  "tags": ["animation", "workflow", "automation"],
+  "app": "effectcraft",
+  "compatibility": "EffectCraft ScriptUI / ExtendScript"
+}</code></pre>
+        </div>
+
+        <div class="guide-box">
+          <h4>Step 2: Add Build &amp; Staging Target in <code>build-all.sh</code></h4>
+          <p>Register your compilation or asset copy command in <code>build-all.sh</code> to stage outputs in <code>dist/</code>:</p>
+          <pre><code># For Rust / WASM filters:
+cargo build --manifest-path "plugins/myplugin/Cargo.toml" --release --target wasm32-unknown-unknown
+cp plugins/myplugin/target/wasm32-unknown-unknown/release/myplugin.wasm dist/
+
+# For ExtendScript / ScriptUI panels:
+cp plugins/myplugin/MyPlugin.jsx dist/
+
+# For ZIP template / preset archives:
+python plugins/myplugin/package.py --output dist/myplugin-toolkit.zip</code></pre>
+        </div>
+
+        <div class="guide-box">
+          <h4>Step 3: Register CI Test &amp; Release Steps</h4>
+          <p>In <code>.github/workflows/build-plugins.yml</code>, add automated testing for your algorithm and declare your release asset:</p>
+          <pre><code># Under test steps:
+- name: Test My Plugin algorithms
+  run: cargo test --manifest-path plugins/myplugin/Cargo.toml
+
+# Under release assets:
+  files: |
+    dist/MyPlugin.wasm
+    dist/MyPlugin.jsx</code></pre>
+        </div>
+
+        <div class="guide-box">
+          <h4>Step 4: Local Audit &amp; Verification Pre-flight</h4>
+          <p>Verify that your catalog entry is syntactically valid and that all declared artifacts exist in <code>dist/</code> before pushing:</p>
+          <pre><code># 1. Run full catalog &amp; artifact verification
+python3 scripts/validate_catalog.py --check-artifacts
+
+# 2. Run unit test suite
+python3 -m unittest discover tests
+
+# 3. Test plugin implementation
+cargo test --manifest-path plugins/myplugin/Cargo.toml</code></pre>
+        </div>
+      </div>
     </section>
 
     <footer>
