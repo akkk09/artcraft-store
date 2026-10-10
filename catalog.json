@@ -381,6 +381,30 @@
       "compatibility": "EffectCraft plug-in API v1"
     },
     {
+      "id": "org.effectcraft.community.lumasweep",
+      "name": "LumaSweep",
+      "version": "1.0.0",
+      "author": "ArtCraft Store community",
+      "description": "Controllable light sweep with physical bevel edge response, chromatic fringe, procedural texture, and luminance relief.",
+      "kind": "plugin",
+      "abi": 1,
+      "source": "plugins/lumasweep",
+      "sourceUrl": "https://github.com/akkk09/artcraft-store/tree/main/plugins/lumasweep",
+      "artifact": "lumasweep.wasm",
+      "releaseAsset": "lumasweep.wasm",
+      "tags": [
+        "light-sweep",
+        "highlight",
+        "bevel",
+        "specular",
+        "chromatic-fringe",
+        "glow",
+        "texture"
+      ],
+      "app": "effectcraft",
+      "compatibility": "EffectCraft plug-in API v1"
+    },
+    {
       "id": "org.effectcraft.community.easecraft",
       "name": "EaseCraft",
       "version": "0.1.0",

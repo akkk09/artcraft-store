@@ -66,6 +66,8 @@ jobs:
         run: cargo test --manifest-path plugins/geometry-fixer/Cargo.toml
       - name: Test Seamless Pattern Generator algorithms
         run: cargo test --manifest-path plugins/seamless-pattern-generator/Cargo.toml
+      - name: Test LumaSweep algorithms
+        run: cargo test --manifest-path plugins/lumasweep/Cargo.toml
       - name: Build and stage plug-ins
         run: bash build-all.sh
       - name: Audit catalog downloads and release assets
@@ -98,6 +100,7 @@ jobs:
             dist/creator-graphics-pack.zip
             dist/chromatic-fringe.wat
             dist/depthcraft.wasm
+            dist/lumasweep.wasm
             dist/EaseCraft.jsx
             dist/CaptionCraft.jsx
             dist/QuietCraft.jsx
