@@ -1,0 +1,13 @@
+[package]
+name = "vectorcraft-plugin-colliderscribe"
+version = "0.1.0"
+edition = "2021"
+description = "VectorCraft ColliderScribe Super Marquee: Advanced vector selection, enclosed detection, alternating and random picking"
+license = "MIT OR Apache-2.0"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }
+serde_json = { version = "1.0", default-features = false, features = ["alloc"] }

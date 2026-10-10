@@ -1,0 +1,13 @@
+[package]
+name = "vectorcraft-plugin-stylism"
+version = "0.1.0"
+edition = "2021"
+description = "VectorCraft Stylism plugin: Path offset, drop shadows, and multi-contour glow effects"
+license = "MIT OR Apache-2.0"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }
+serde_json = { version = "1.0", default-features = false, features = ["alloc"] }

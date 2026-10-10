@@ -1,0 +1,13 @@
+[package]
+name = "vectorcraft-plugin-randomino"
+version = "0.1.0"
+edition = "2021"
+description = "VectorCraft Randomino plugin: Generative variation tool for vector art (color, position, rotation, scale, and stacking)"
+license = "MIT OR Apache-2.0"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }
+serde_json = { version = "1.0", default-features = false, features = ["alloc"] }

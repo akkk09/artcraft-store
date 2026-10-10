@@ -76,6 +76,16 @@ jobs:
         run: cargo test --manifest-path plugins/citron/Cargo.toml
       - name: Test PasteCraft algorithms
         run: cargo test --manifest-path plugins/pastecraft/Cargo.toml
+      - name: Test Phantasm algorithms
+        run: cargo test --manifest-path plugins/vectorcraft-phantasm/Cargo.toml
+      - name: Test MirrorMe algorithms
+        run: cargo test --manifest-path plugins/vectorcraft-mirrorme/Cargo.toml
+      - name: Test Stylism algorithms
+        run: cargo test --manifest-path plugins/vectorcraft-stylism/Cargo.toml
+      - name: Test Randomino algorithms
+        run: cargo test --manifest-path plugins/vectorcraft-randomino/Cargo.toml
+      - name: Test ColliderScribe algorithms
+        run: cargo test --manifest-path plugins/vectorcraft-colliderscribe/Cargo.toml
       - name: Build and stage plug-ins
         run: bash build-all.sh
       - name: Audit catalog downloads and release assets
@@ -117,5 +127,10 @@ jobs:
             dist/Citron.jsx
             dist/PasteCraft.jsx
             dist/vectorcraft_plugin_recolor.wasm
+            dist/vectorcraft_plugin_phantasm.wasm
+            dist/vectorcraft_plugin_mirrorme.wasm
+            dist/vectorcraft_plugin_stylism.wasm
+            dist/vectorcraft_plugin_randomino.wasm
+            dist/vectorcraft_plugin_colliderscribe.wasm
             dist/soundcraft-audio-toolkit.zip
             dist/pdfcraft-invoice-calculator.js
