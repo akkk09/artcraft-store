@@ -3,23 +3,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#131313">
+  <meta name="theme-color" content="#111111">
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
-  <meta name="description" content="ArtCraft Store extension architecture and installation documentation.">
-  <title>ArtCraft Store — Documentation</title>
-  <style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="description" content="ArtCraft Store extension architecture, developer SDKs, and plug-in creation guide.">
+  <title>ArtCraft Store — Documentation &amp; SDK</title>
+    <style>
     :root {
       color-scheme: dark;
-      --bg: #131313;
-      --topbar: #101010;
-      --panel: #1a1a1a;
+      --bg: #111111;
+      --panel: #191919;
       --panel2: #242424;
-      --line: #373737;
-      --text: #f3f3f3;
+      --line: #393939;
+      --text: #f4f4f4;
       --muted: #a6a6a6;
-      --accent: #dbdbdb;
-      --accent-ink: #151515;
-      --radius: 8px;
+      --accent: #f4f4f4;
+      --accent-ink: #111111;
+      --radius: 12px;
     }
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
@@ -27,459 +29,262 @@
       margin: 0;
       background: var(--bg);
       color: var(--text);
-      font: 14px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      letter-spacing: -.01em;
+      font: 16px/1.6 "Outfit", ui-sans-serif, system-ui, sans-serif;
+      letter-spacing: -.012em;
     }
     a { color: inherit; text-decoration: none; }
-    code, pre {
-      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
-      font-size: 12.5px;
+    button, input { font: inherit; }
+    .wrap { max-width: 1320px; margin: auto; padding: 0 48px; }
+    header {
+      min-height: 88px; border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: space-between; gap: 24px;
     }
-    pre {
-      background: #0d0d0d;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      padding: 14px 18px;
-      overflow-x: auto;
-      margin: 12px 0;
+    .brand { display:flex; align-items:center; gap:12px; text-decoration:none; font-weight:700; letter-spacing:-.035em; font-size:17px; }
+    .mark {
+      display:grid; place-items:center; width:34px; height:34px; border-radius:8px;
+      background:var(--accent); color:var(--accent-ink); font-size:18px; font-weight:900;
     }
-    code:not(pre code) {
-      background: #0d0d0d;
-      border: 1px solid var(--line);
-      padding: 2px 6px;
-      border-radius: 4px;
-      color: #e6e6e6;
-    }
-    .topbar {
-      height: 56px;
-      background: var(--topbar);
-      border-bottom: 1px solid var(--line);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 24px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .topbar-left {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 700;
-      font-size: 14px;
-      letter-spacing: -.02em;
-    }
-    .brand-mark {
-      font-weight: 900;
-      font-size: 18px;
-      color: var(--accent);
-    }
-    .brand-title {
-      font-size: 13.5px;
-      font-weight: 700;
-      letter-spacing: .02em;
-    }
-    .brand-sub {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 500;
-    }
-    .nav-tabs {
-      display: flex;
-      gap: 4px;
-      margin-left: 12px;
-    }
-    .nav-tab {
-      padding: 6px 14px;
-      border-radius: 6px;
-      font-size: 12.5px;
-      font-weight: 600;
-      color: var(--muted);
-      transition: all .15s;
-    }
-    .nav-tab:hover {
-      color: var(--text);
-      background: rgba(255,255,255,0.05);
-    }
-    .nav-tab.active {
-      color: var(--accent-ink);
-      background: var(--accent);
-    }
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-    .topbar-right a:hover {
-      color: var(--text);
-    }
-    .wrap {
-      max-width: 1120px;
-      margin: 0 auto;
-      padding: 32px 24px 80px;
-    }
-    .hero {
-      margin-bottom: 28px;
-    }
+    .nav { display:flex; gap:26px; color:var(--muted); font-size:13px; }
+    .nav a { text-decoration:none; transition:color .15s; }
+    .nav a:hover { color:var(--accent); }
+    .hero { padding: clamp(76px, 11vw, 130px) 0 88px; max-width: 1080px; }
     .eyebrow {
-      font-size: 10.5px;
-      font-weight: 700;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 12px;
+      display:flex; align-items:center; gap:10px; color:var(--muted);
+      font-size:11px; font-weight:750; letter-spacing:.14em; text-transform:uppercase;
     }
+    .dot { width:7px; height:7px; border-radius:50%; background:var(--accent); }
     h1 {
-      font-size: clamp(32px, 5vw, 44px);
-      font-weight: 700;
-      letter-spacing: -.03em;
-      line-height: 1.1;
-      margin: 0 0 10px;
-      color: var(--text);
+      font-family:"Instrument Serif", Georgia, serif;
+      font-size:clamp(60px, 9vw, 118px);
+      letter-spacing:-.045em;
+      line-height:.92;
+      margin:28px 0 32px;
+      font-weight:400;
+      max-width:1040px;
     }
-    .hero p {
-      color: #b4b4b4;
-      font-size: 15px;
-      margin: 0;
-      max-width: 760px;
-      line-height: 1.55;
+    h1 em { font-style:italic; font-weight:400; color:#ffffff; }
+    .hero p { font-size:clamp(17px, 2vw, 20px); line-height:1.7; max-width:700px; color:var(--muted); margin:0; }
+    .hero-actions { display:flex; gap:12px; flex-wrap:wrap; margin-top:34px; }
+    .btn {
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      padding:13px 19px; border-radius:5px; text-decoration:none; font-weight:600;
+      font-size:13px; border:1px solid var(--line); background:transparent; color:var(--text);
+      transition:background .15s, border-color .15s, color .15s; cursor:pointer;
     }
-    .filter-section {
-      margin: 24px 0 20px;
-    }
-    .filter-label {
-      font-size: 10.5px;
-      font-weight: 700;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 8px;
-    }
-    .pill-group {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
+    .btn.primary { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+    .btn:hover { border-color:var(--accent); }
+    .btn.primary:hover { background:#ffffff; }
+    .stats { display:flex; gap:0; flex-wrap:wrap; margin-top:64px; border-top:1px solid var(--line); }
+    .stat { flex:1; min-width:150px; padding:22px 22px 0 0; margin-right:22px; }
+    .stat strong { display:block; font-size:28px; line-height:1.1; letter-spacing:-.06em; }
+    .stat span { display:block; color:var(--muted); font-size:12px; margin-top:8px; }
+    .docs-section { margin-top: 0; }
+    .section-head { display:flex; align-items:end; justify-content:space-between; gap:20px; margin-bottom:26px; }
+    .section-head h2 { font-family:"Instrument Serif", Georgia, serif; font-size:clamp(38px, 5vw, 60px); font-weight:400; letter-spacing:-.035em; line-height:1; margin:14px 0 0; }
+    .section-head p { color:var(--muted); margin:8px 0 0; font-size:14px; }
+    .filter-section { margin:20px 0; }
+    .filter-label { font-size:11px; font-weight:750; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+    .filters { display:flex; gap:8px; flex-wrap:wrap; }
     .pill {
-      background: #232323;
-      border: 1px solid var(--line);
-      color: #e3e3e3;
-      padding: 6px 13px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all .15s;
+      border:1px solid var(--line); border-radius:999px; background:transparent;
+      color:var(--muted); padding:9px 16px; cursor:pointer; font-size:12px; font-weight:500;
+      transition:all .15s; text-decoration:none; display:inline-flex; align-items:center; justify-content:center;
+      font-family:inherit;
     }
-    .pill:hover {
-      background: #363636;
-      border-color: #555;
-    }
-    .pill.active {
-      background: var(--accent);
-      color: var(--accent-ink);
-      border-color: var(--accent);
-      font-weight: 600;
-    }
-    .toast {
-      background: #1e3c1e;
-      border: 1px solid #3c783c;
-      color: #b4f0b4;
-      padding: 10px 16px;
-      border-radius: 6px;
-      font-size: 12.5px;
-      font-weight: 600;
-      margin-bottom: 20px;
-      display: none;
-    }
-    .cards-grid {
-      display: grid;
-      gap: 16px;
-      margin: 24px 0 40px;
-    }
+    .pill:hover { border-color:#777777; color:var(--text); background:#1d1d1d; }
+    .pill.active { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); font-weight:600; }
+    .cards-grid { display:flex; flex-direction:column; gap:20px; margin:28px 0 48px; }
     .doc-card {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 24px;
+      background:var(--panel); border:1px solid var(--line); border-radius:5px;
+      padding:32px; transition:border-color .18s, background .18s;
     }
-    .doc-card-head {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 12px;
-    }
+    .doc-card:hover { border-color:#777777; background:#1d1d1d; }
+    .doc-card-head { display:flex; align-items:center; gap:16px; margin-bottom:16px; flex-wrap:wrap; }
     .doc-glyph {
-      width: 44px;
-      height: 44px;
-      background: var(--accent);
-      color: var(--accent-ink);
-      font-size: 22px;
-      font-weight: 900;
-      display: grid;
-      place-items: center;
-      border-radius: 8px;
-      flex-shrink: 0;
+      width:48px; height:48px; border-radius:12px; background:var(--panel2);
+      border:1px solid var(--line); display:grid; place-items:center;
+      color:var(--accent); font-size:24px; font-weight:800; flex-shrink:0;
     }
     .doc-title-group h2 {
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: -.02em;
-      margin: 0 0 3px;
-      color: var(--text);
+      font-family:"Instrument Serif", Georgia, serif; font-size:34px; font-weight:400;
+      letter-spacing:-.025em; line-height:1; margin:0 0 6px; color:var(--text);
     }
-    .doc-arch-tag {
-      font-size: 12px;
-      color: #c8c8c8;
-      font-weight: 500;
-    }
-    .doc-desc {
-      color: #b4b4b4;
-      font-size: 13.5px;
-      line-height: 1.6;
-      margin: 0 0 16px;
-    }
+    .doc-arch-tag { font-size:11px; font-weight:750; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+    .doc-desc { color:var(--muted); font-size:15px; line-height:1.65; margin:0 0 20px; max-width:900px; }
+    .path-boxes { display:flex; flex-direction:column; gap:8px; margin-bottom:20px; }
     .path-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      background: #111;
-      border: 1px solid #2a2a2a;
-      border-radius: 6px;
-      padding: 8px 12px;
-      margin-bottom: 6px;
-      font-size: 12.5px;
+      display:flex; align-items:center; justify-content:space-between; gap:14px;
+      background:var(--bg); border:1px solid var(--line); border-radius:5px;
+      padding:10px 14px; font-size:13px;
     }
-    .path-row strong {
-      color: var(--accent);
-      min-width: 68px;
-    }
+    .path-row strong { color:var(--text); min-width:76px; font-size:12px; font-weight:600; }
     .path-row code {
-      flex: 1;
-      overflow-wrap: anywhere;
-      background: transparent;
-      border: none;
-      padding: 0;
-      color: #e6e6e6;
+      flex:1; overflow-wrap:anywhere; background:transparent; border:none;
+      padding:0; color:#eeeeee; font-family:ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size:12.5px; user-select:all;
     }
     .copy-btn {
-      background: #282828;
-      border: 1px solid var(--line);
-      color: #e3e3e3;
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all .15s;
+      background:var(--panel2); border:1px solid var(--line); color:var(--text);
+      padding:6px 12px; border-radius:4px; font-size:11.5px; font-weight:600;
+      cursor:pointer; white-space:nowrap; transition:all .15s;
     }
-    .copy-btn:hover {
-      background: var(--accent);
-      color: var(--accent-ink);
-      border-color: var(--accent);
-    }
-    .steps-list {
-      margin: 16px 0 0;
-      padding-left: 20px;
-      color: #c8c8c8;
-      font-size: 13px;
-      line-height: 1.7;
-    }
-    .steps-list li {
-      margin-bottom: 4px;
-    }
-    .dev-guide-block {
-      margin-top: 24px;
-      border-top: 1px solid var(--line);
-      padding-top: 20px;
-    }
-    .dev-guide-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-    }
+    .copy-btn:hover { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+    .steps-list { margin:18px 0 0; padding-left:22px; color:var(--muted); font-size:14px; line-height:1.75; }
+    .steps-list li { margin-bottom:6px; }
+    .steps-list code { color:var(--text); font-weight:500; }
+    .dev-guide-block { border-top:1px solid var(--line); margin-top:28px; padding-top:24px; }
+    .dev-guide-header { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:16px; flex-wrap:wrap; }
     .dev-guide-title {
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin: 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      font-family:"Instrument Serif", Georgia, serif; font-size:28px; font-weight:400;
+      letter-spacing:-.02em; color:var(--text); margin:0; display:flex; align-items:center; gap:10px;
     }
     .badge-pill {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 3px 9px;
-      border-radius: 999px;
-      background: #252525;
-      border: 1px solid #444;
-      color: #dfdfdf;
-      white-space: nowrap;
+      font-size:11px; font-weight:600; padding:5px 12px; border-radius:999px;
+      background:var(--panel2); border:1px solid var(--line); color:var(--muted); white-space:nowrap;
     }
     .guide-box {
-      background: #111;
-      border: 1px solid #282828;
-      border-radius: 6px;
-      padding: 16px;
-      margin: 12px 0 16px;
+      background:var(--bg); border:1px solid var(--line); border-radius:6px;
+      padding:22px; margin:16px 0 20px;
     }
-    .guide-box h4 {
-      margin: 0 0 8px;
-      font-size: 13.5px;
-      font-weight: 700;
-      color: #f5f5f5;
-    }
-    .guide-box p {
-      margin: 0 0 10px;
-      font-size: 13px;
-      color: #b8b8b8;
-      line-height: 1.55;
-    }
-    .guide-box ul, .guide-box ol {
-      margin: 6px 0 10px 20px;
-      padding: 0;
-      font-size: 12.5px;
-      color: #c4c4c4;
-      line-height: 1.6;
-    }
-    .guide-box li {
-      margin-bottom: 4px;
-    }
-    .snippet-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 11.5px;
-      font-weight: 600;
-      color: var(--muted);
-      margin-top: 10px;
-      margin-bottom: 4px;
-    }
+    .guide-box h4 { font-size:15px; font-weight:650; color:var(--text); margin:0 0 10px; letter-spacing:-.01em; }
+    .guide-box h5 { font-size:12px; font-weight:750; color:var(--accent); margin:16px 0 8px; text-transform:uppercase; letter-spacing:.08em; }
+    .guide-box p { color:var(--muted); font-size:14px; line-height:1.65; margin:0 0 12px; }
+    .guide-box ul, .guide-box ol { margin:8px 0 12px 22px; padding:0; font-size:13.5px; color:var(--muted); line-height:1.65; }
+    .guide-box li { margin-bottom:5px; }
+    .snippet-title { display:flex; align-items:center; justify-content:space-between; font-size:12px; font-weight:600; color:var(--muted); margin:14px 0 6px; }
     .dev-card {
-      background: #181818;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 22px;
-      margin-top: 32px;
+      background:var(--panel); border:1px solid var(--line); border-radius:5px;
+      padding:36px; margin-top:36px; transition:border-color .18s;
     }
+    .dev-card:hover { border-color:#777777; }
     .dev-card h3 {
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: .04em;
-      text-transform: uppercase;
-      color: var(--text);
-      margin: 0 0 10px;
+      font-family:"Instrument Serif", Georgia, serif; font-size:clamp(28px, 4vw, 38px);
+      font-weight:400; letter-spacing:-.025em; margin:0 0 12px; color:var(--text);
     }
-    .dev-card p {
-      color: #b4b4b4;
-      font-size: 13px;
-      margin: 0 0 8px;
+    .card {
+      background:var(--panel); border:1px solid var(--line); border-radius:5px;
+      padding:32px; transition:border-color .18s, background .18s;
+    }
+    .card:hover { border-color:#777777; background:#1d1d1d; }
+    pre {
+      background:#0d0d0d; border:1px solid var(--line); border-radius:6px;
+      padding:16px 20px; overflow-x:auto; margin:10px 0 16px; font-size:12.5px; line-height:1.55;
+    }
+    code, pre { font-family:ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; }
+    code:not(pre code) {
+      background:#242424; border:1px solid #3d3d3d; padding:2px 7px;
+      border-radius:4px; color:var(--text); font-size:12.5px;
+    }
+    .toast {
+      position:fixed; bottom:28px; right:28px; z-index:1000;
+      background:#183318; border:1px solid #3d783d; color:#a6f2a6;
+      padding:14px 22px; border-radius:8px; box-shadow:0 10px 30px rgba(0,0,0,0.6);
+      font-size:13px; font-weight:600; display:none;
     }
     footer {
-      border-top: 1px solid var(--line);
-      padding-top: 20px;
-      margin-top: 36px;
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      font-size: 11.5px;
-      color: #929292;
-      flex-wrap: wrap;
+      border-top:1px solid var(--line); padding:32px 0 44px; color:var(--muted);
+      font-size:12px; display:flex; justify-content:space-between; gap:15px; flex-wrap:wrap; margin-top:80px;
     }
-    footer a {
-      color: var(--text);
+    footer a { color:var(--text); text-decoration:none; }
+    footer a:hover { color:var(--accent); }
+    @media(max-width:700px) {
+      .wrap { padding:0 20px; }
+      header { min-height:70px; }
+      .nav { gap:14px; font-size:12px; }
+      .hero { padding:66px 0 54px; }
+      h1 { font-size:clamp(54px, 15vw, 82px); }
+      .hero p { font-size:16px; }
+      .stats { margin-top:42px; }
+      .stat { min-width:110px; margin-right:12px; padding-right:10px; }
+      .section-head { align-items:start; flex-direction:column; }
+      .path-row { flex-direction:column; align-items:flex-start; gap:8px; }
+      .copy-btn { align-self:flex-end; }
+      .doc-card, .dev-card { padding:20px; }
     }
-    @media (max-width: 700px) {
-      .topbar { padding: 0 16px; }
-      .wrap { padding: 24px 16px 60px; }
-      .topbar-right a:not(:last-child) { display: none; }
-      .path-row { flex-direction: column; align-items: flex-start; gap: 6px; }
-      .copy-btn { align-self: flex-end; }
+    @media(max-width:420px) {
+      .brand { font-size:14px; gap:8px; }
+      .mark { width:31px; height:31px; }
+      .nav { gap:10px; font-size:11px; }
+      .nav a:nth-child(2) { display:none; }
+      .stat { flex-basis:40%; }
+    }
+    @media(prefers-reduced-motion:reduce) {
+      *, *::before, *::after { transition:none!important; scroll-behavior:auto!important; }
     }
   </style>
 </head>
 <body>
-  <nav class="topbar" aria-label="Global navigation">
-    <div class="topbar-left">
-      <a class="brand" href="./">
-        <span class="brand-mark">A</span>
-        <span class="brand-title">ARTCRAFT</span>
-        <span class="brand-sub">/ STORE</span>
-      </a>
-      <div class="nav-tabs" role="tablist">
-        <a class="nav-tab" href="./">Catalog</a>
-        <a class="nav-tab active" href="./docs.html" aria-current="page">Documentation</a>
-        <a class="nav-tab" href="#plugin-creation">Create a Plug-in</a>
-      </div>
-    </div>
-    <div class="topbar-right">
-      <a href="./catalog.json">Catalog JSON</a>
-      <a href="./lut-studio/">LUT Studio ↗</a>
-      <a href="https://github.com/akkk09/artcraft-store" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
-    </div>
-  </nav>
+    <div class="wrap">
+    <header>
+      <a class="brand" href="./" aria-label="ArtCraft Store home"><span class="mark">A</span><span>ArtCraft <span style="color:var(--muted);font-weight:500">/ Extensions</span></span></a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="./#catalog">Browse</a>
+        <a href="#community-forks">Forks</a>
+        <a href="./#architectures">Architectures</a>
+        <a href="./lut-studio/">LUT Studio</a>
+        <a href="./docs.html" style="color:var(--text);font-weight:700">Docs</a>
+        <a href="#plugin-creation">Create a Plug-in</a>
+        <a href="#cards-container">Installation</a>
+        <a href="https://github.com/akkk09/artcraft-store" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+      </nav>
+    </header>
 
-  <main class="wrap">
-    <section class="hero">
-      <div class="eyebrow">● USER GUIDES · DEVELOPER SDK · ALL 09 APPS</div>
-      <h1>Extension Architecture<br>&amp; Plug-in Creation Guide.</h1>
-      <p>Step-by-step developer tutorials, SDK specifications, directory paths, and activation guides for all ArtCraft creative applications.</p>
-      <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px;">
-        <a href="#cards-container" class="copy-btn" style="padding: 8px 14px; font-size: 12px; background: #202020; text-decoration: none;">📁 App Installation Paths</a>
-        <a href="#plugin-creation" class="copy-btn" style="padding: 8px 14px; font-size: 12px; background: var(--accent); color: var(--accent-ink); text-decoration: none; border-color: var(--accent); font-weight: 700;">🛠️ Plug-in Creation SDK Guide</a>
-        <a href="#publishing-guide" class="copy-btn" style="padding: 8px 14px; font-size: 12px; background: #202020; text-decoration: none;">🚀 Publishing Checklist</a>
-        <a href="#community-forks" class="copy-btn" style="padding: 8px 14px; font-size: 12px; background: #202020; text-decoration: none;">🔀 Community Forks</a>
-      </div>
-    </section>
+    <main>
+      <section class="hero">
+        <div class="eyebrow"><span class="dot"></span> User Guides · Developer SDK · All 09 Apps</div>
+        <h1>Extension Architecture<br><em>&amp; Plug-in Creation Guide.</em></h1>
+        <p>Step-by-step developer tutorials, SDK specifications, directory paths, and activation guides for all ArtCraft creative applications.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#plugin-creation">🛠️ Create a Plug-in</a>
+          <a class="btn" href="#cards-container">📁 App Installation Paths</a>
+          <a class="btn" href="#publishing-guide">🚀 Publishing Checklist</a>
+          <a class="btn" href="#community-forks">🔀 Community Forks</a>
+          <a class="btn" href="./#catalog">← Back to Catalog</a>
+        </div>
+        <div class="stats">
+          <div class="stat"><strong>09</strong><span>creative applications</span></div>
+          <div class="stat"><strong>WASM + JSX</strong><span>extensibility SDKs</span></div>
+          <div class="stat"><strong>3 OS</strong><span>Linux, macOS &amp; Windows</span></div>
+          <div class="stat"><strong>100%</strong><span>open source &amp; sandboxed</span></div>
+        </div>
+      </section>
 
-    <div class="toast" id="toast" role="alert"></div>
+      <section class="docs-section" style="padding: 64px 0 0; border-top: 1px solid var(--line);">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">01 / Directories &amp; Activation</div>
+            <h2>Application Installation Guides.</h2>
+            <p>Filter by your ArtCraft application or operating system to inspect plugin directories and activation steps.</p>
+          </div>
+        </div>
 
-    <div class="filter-section">
-      <div class="filter-label">SELECT APPLICATION:</div>
-      <div class="pill-group" id="app-pills">
-        <button class="pill active" data-app="all">All apps</button>
-        <button class="pill" data-app="photocraft">PhotoCraft</button>
-        <button class="pill" data-app="effectcraft">EffectCraft</button>
-        <button class="pill" data-app="vectorcraft">VectorCraft</button>
-        <button class="pill" data-app="filmcraft">FilmCraft</button>
-        <button class="pill" data-app="soundcraft">SoundCraft</button>
-        <button class="pill" data-app="pdfcraft">PdfCraft</button>
-        <button class="pill" data-app="designcraft">DesignCraft</button>
-        <button class="pill" data-app="lightcraft">LightCraft</button>
-        <button class="pill" data-app="cadcraft">CADCraft</button>
-      </div>
-    </div>
+        <div class="filter-section">
+          <div class="filter-label">Filter by application:</div>
+          <div class="filters" id="app-pills" role="group" aria-label="Filter by application">
+            <button class="pill active" data-app="all">All apps</button>
+            <button class="pill" data-app="photocraft">PhotoCraft</button>
+            <button class="pill" data-app="effectcraft">EffectCraft</button>
+            <button class="pill" data-app="vectorcraft">VectorCraft</button>
+            <button class="pill" data-app="filmcraft">FilmCraft</button>
+            <button class="pill" data-app="soundcraft">SoundCraft</button>
+            <button class="pill" data-app="pdfcraft">PdfCraft</button>
+            <button class="pill" data-app="designcraft">DesignCraft</button>
+            <button class="pill" data-app="lightcraft">LightCraft</button>
+            <button class="pill" data-app="cadcraft">CADCraft</button>
+          </div>
+        </div>
 
-    <div class="filter-section">
-      <div class="filter-label">OPERATING SYSTEM:</div>
-      <div class="pill-group" id="os-pills">
-        <button class="pill active" data-os="all">All Systems</button>
-        <button class="pill" data-os="linux">Linux</button>
-        <button class="pill" data-os="macos">macOS</button>
-        <button class="pill" data-os="windows">Windows</button>
-      </div>
-    </div>
+        <div class="filter-section" style="margin-bottom: 32px;">
+          <div class="filter-label">Filter by operating system:</div>
+          <div class="filters" id="os-pills" role="group" aria-label="Filter by operating system">
+            <button class="pill active" data-os="all">All Systems</button>
+            <button class="pill" data-os="linux">Linux</button>
+            <button class="pill" data-os="macos">macOS</button>
+            <button class="pill" data-os="windows">Windows</button>
+          </div>
+        </div>
 
-    <div class="cards-grid" id="cards-container">
+        <div class="cards-grid" id="cards-container">
 
       <!-- PhotoCraft -->
       <article class="doc-card" data-app="photocraft">
@@ -1521,26 +1326,29 @@ ZOOM EXTENTS</code></pre>
 
     </div>
 
-    <!-- Community Forks & Extended Runtimes -->
-    <section class="dev-card" id="community-forks" style="margin-top: 28px;">
-      <div style="font-size: 11px; font-weight: 700; letter-spacing: .06em; color: var(--accent); margin-bottom: 6px;">COMMUNITY FORKS &amp; EXTENDED RUNTIMES</div>
-      <h3 style="font-size: 20px; font-weight: 700; text-transform: none; margin-bottom: 10px;">Modified Application Builds &amp; Custom Plugin Runtimes</h3>
-      <p style="font-size: 13.5px; line-height: 1.6; color: var(--muted); margin-bottom: 16px;">
-        Unlike standard plug-ins, community forks directly modify the underlying ArtCraft application repositories to introduce custom engine runtimes, external plugin hosting standards (such as OpenFX), or third-party project interchange.
-      </p>
+    </section>
 
-      <div style="background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; margin-top: 14px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; flex-wrap: wrap;">
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <div class="doc-glyph" style="font-size: 18px; width: 36px; height: 36px;">E</div>
+    <!-- Community Forks & Extended Runtimes -->
+    <section class="docs-section" id="community-forks" style="padding: 64px 0 0; border-top: 1px solid var(--line);">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">02 / Modified Application Builds</div>
+          <h2>Community Forks &amp; Custom Runtimes.</h2>
+          <p>Community projects that fork the core ArtCraft application repositories to add experimental engine features, external plugin standards (such as OpenFX), or project file interchange.</p>
+        </div>
+      </div>
+      <div class="doc-card" style="margin-top: 24px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 14px; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <div class="doc-glyph">E</div>
             <div>
-              <h4 style="margin: 0; font-size: 17px; font-weight: 700;">EffectCraft (OpenFX &amp; .aep Import)</h4>
-              <div style="font-size: 11.5px; color: var(--muted);">by glumbis · Unofficial Fork of EffectCraft (C++20 / Qt)</div>
+              <h3 style="font-family:'Instrument Serif',Georgia,serif; font-size: 32px; font-weight: 400; margin: 0 0 4px; letter-spacing: -.02em;">EffectCraft (OpenFX &amp; .aep Import)</h3>
+              <div style="font-size: 12px; color: var(--muted);">by glumbis · Unofficial Fork of EffectCraft (C++20 / Qt)</div>
             </div>
           </div>
-          <div style="display: flex; gap: 8px;">
-            <a href="https://github.com/glumbis/effectcraft/releases/latest" target="_blank" rel="noopener noreferrer" class="copy-btn" style="text-decoration:none; display:inline-block; padding: 6px 12px; font-size: 12px; background: var(--accent); color: var(--accent-ink); border-color: var(--accent);">Latest Release (v0.7.0-ofx.2) ↗</a>
-            <a href="https://github.com/glumbis/effectcraft" target="_blank" rel="noopener noreferrer" class="copy-btn" style="text-decoration:none; display:inline-block; padding: 6px 12px; font-size: 12px;">Source Repo ↗</a>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="https://github.com/glumbis/effectcraft/releases/latest" target="_blank" rel="noopener noreferrer" class="btn primary" style="font-size: 12px; padding: 8px 14px;">Latest Release (v0.7.0-ofx.2) ↗</a>
+            <a href="https://github.com/glumbis/effectcraft" target="_blank" rel="noopener noreferrer" class="btn" style="font-size: 12px; padding: 8px 14px;">Source Fork ↗</a>
           </div>
         </div>
         <p style="font-size: 13px; color: #c8c8c8; margin: 0 0 12px;">
@@ -1565,21 +1373,23 @@ ZOOM EXTENTS</code></pre>
     <!-- ============================================================ -->
     <!-- PLUG-IN CREATION DOCUMENTATION                                -->
     <!-- ============================================================ -->
-    <section class="dev-card" id="plugin-creation" style="margin-top: 32px; padding: 26px;">
-      <div style="font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--accent); margin-bottom: 8px;">DEVELOPER SDK · TUTORIALS &amp; API SPECIFICATIONS</div>
-      <h3 style="font-size: 24px; font-weight: 700; letter-spacing: -.02em; text-transform: none; margin: 0 0 10px; color: var(--text);">Plug-in Creation Guide</h3>
-      <p style="font-size: 13.5px; line-height: 1.65; color: var(--muted); margin-bottom: 22px;">
-        A comprehensive guide to authoring original extensions across the ArtCraft ecosystem. Learn how to create high-performance <strong>WebAssembly image filters</strong> (PhotoCraft / VectorCraft), procedural <strong>render effects</strong> (EffectCraft), responsive <strong>ScriptUI animation panels</strong> (ExtendScript), and audio/video presets from scratch.
-      </p>
+    <section class="docs-section" id="plugin-creation" style="padding: 64px 0 0; border-top: 1px solid var(--line);">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">03 / Developer SDK &amp; Guide</div>
+          <h2>Plug-in Creation Guide.</h2>
+          <p>A comprehensive developer guide to authoring original extensions across the ArtCraft ecosystem. Learn how to create high-performance <strong>WebAssembly image filters</strong> (PhotoCraft / VectorCraft), procedural <strong>render effects</strong> (EffectCraft), responsive <strong>ScriptUI animation panels</strong> (ExtendScript), and audio/video presets from scratch.</p>
+        </div>
+      </div>
 
       <!-- Quick Index Tabs / Sub-nav -->
-      <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px;">
-        <a href="#dev-wasmfibers" class="pill" style="font-size: 11.5px; padding: 6px 12px; text-decoration: none;">1. WASM Image Filters (Rust)</a>
-        <a href="#dev-effectcraft-wasm" class="pill" style="font-size: 11.5px; padding: 6px 12px; text-decoration: none;">2. EffectCraft WASM Effects</a>
-        <a href="#dev-scriptui" class="pill" style="font-size: 11.5px; padding: 6px 12px; text-decoration: none;">3. ScriptUI Panels (.jsx)</a>
-        <a href="#dev-other-apps" class="pill" style="font-size: 11.5px; padding: 6px 12px; text-decoration: none;">4. Other App Runtimes</a>
-        <a href="#dev-sandboxing" class="pill" style="font-size: 11.5px; padding: 6px 12px; text-decoration: none;">5. Sandbox &amp; Security</a>
-        <a href="#dev-testing" class="pill" style="font-size: 11.5px; padding: 6px 12px; text-decoration: none;">6. Testing &amp; Verification</a>
+      <div class="filters" style="margin: 20px 0 32px;">
+        <a href="#dev-wasmfibers" class="pill">1. WASM Image Filters (Rust)</a>
+        <a href="#dev-effectcraft-wasm" class="pill">2. EffectCraft WASM Effects</a>
+        <a href="#dev-scriptui" class="pill">3. ScriptUI Panels (.jsx)</a>
+        <a href="#dev-other-apps" class="pill">4. Other App Runtimes</a>
+        <a href="#dev-sandboxing" class="pill">5. Sandbox &amp; Security</a>
+        <a href="#dev-testing" class="pill">6. Testing &amp; Verification</a>
       </div>
 
       <!-- Part 1: WASM Image Filters -->
@@ -1853,12 +1663,14 @@ python3 scripts/validate_catalog.py --check-artifacts</code></pre>
     </section>
 
     <!-- Developer Reference & Publishing Guide -->
-    <section class="dev-card" id="publishing-guide">
-      <div style="font-size: 11px; font-weight: 700; letter-spacing: .06em; color: var(--accent); margin-bottom: 6px;">CONTRIBUTING &amp; PUBLISHING</div>
-      <h3 style="font-size: 20px; font-weight: 700; text-transform: none; margin-bottom: 12px;">Publishing Extensions to the ArtCraft Store</h3>
-      <p style="font-size: 13.5px; line-height: 1.6; color: var(--muted); margin-bottom: 16px;">
-        Follow this 5-step checklist to register a new plugin, filter, tool, preset, or template package in the official ArtCraft Store catalog.
-      </p>
+    <section class="docs-section" id="publishing-guide" style="padding: 64px 0 0; border-top: 1px solid var(--line);">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">04 / Store Catalog Publishing</div>
+          <h2>Publishing to the ArtCraft Store.</h2>
+          <p>Follow this 5-step checklist to register a new plugin, filter, tool, preset, or template package in the official ArtCraft Store catalog.</p>
+        </div>
+      </div>
 
       <div style="display: grid; gap: 14px; margin-top: 14px;">
         <div class="guide-box">
@@ -1924,18 +1736,22 @@ cargo test --manifest-path plugins/myplugin/Cargo.toml</code></pre>
       </div>
     </section>
 
+    </main>
+
     <footer>
-      <span>ARTCRAFT STORE · COMMUNITY PROJECT</span>
+      <span>Community project · Not affiliated with ArtCraft app maintainers.</span>
       <span>
-        <a href="./">Catalog</a> ·
-        <a href="./#forks">Forks</a> ·
+        <a href="./#catalog">Catalog</a> ·
+        <a href="#community-forks">Forks</a> ·
         <a href="./lut-studio/">LUT Studio</a> ·
         <a href="./catalog.json">Catalog JSON</a> ·
         <a href="https://github.com/akkk09/artcraft-store" target="_blank" rel="noopener noreferrer">Source code</a> ·
         MIT
       </span>
     </footer>
-  </main>
+  </div>
+
+  <div class="toast" id="toast" role="alert"></div>
 
   <script>
     let activeApp = "all";
