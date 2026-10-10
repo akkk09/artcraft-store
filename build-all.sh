@@ -29,5 +29,6 @@ cp plugins/pdfcraft-form-tools/pdfcraft-invoice-calculator.js dist/
 cp plugins/easecraft/EaseCraft.jsx dist/
 cp plugins/captioncraft/CaptionCraft.jsx dist/
 cp plugins/quietcraft/QuietCraft.jsx dist/
+cp plugins/pivotcraft/PivotCraft.jsx dist/
 printf 'Built plug-ins in dist/\n'
 ls -lh dist/*

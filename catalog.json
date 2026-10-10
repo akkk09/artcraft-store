@@ -499,6 +499,31 @@
       "compatibility": "EffectCraft ScriptUI / ExtendScript"
     },
     {
+      "id": "org.effectcraft.community.pivotcraft",
+      "name": "PivotCraft",
+      "version": "0.1.0",
+      "author": "ArtCraft Store community",
+      "description": "Fast, predictable anchor-point placement, layer alignment, and transform-compensated pivot tool.",
+      "kind": "tool",
+      "abi": 1,
+      "source": "plugins/pivotcraft",
+      "sourceUrl": "https://github.com/akkk09/artcraft-store/tree/main/plugins/pivotcraft",
+      "artifact": "PivotCraft.jsx",
+      "releaseAsset": "PivotCraft.jsx",
+      "tags": [
+        "anchor",
+        "pivot",
+        "alignment",
+        "transform",
+        "layer-bounds",
+        "alpha-bounds",
+        "3d",
+        "separated-dimensions"
+      ],
+      "app": "effectcraft",
+      "compatibility": "EffectCraft ScriptUI / ExtendScript"
+    },
+    {
       "id": "org.filmcraft.community.film-emulation",
       "name": "Film Emulation Presets & LUTs",
       "version": "0.1.0",

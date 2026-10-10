@@ -328,6 +328,26 @@ pub fn render_frame(
     Ok(())
 }
 
+/// Native 64-bit C ABI export for host tools and Python ctypes.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn glassify_render_c(
+    pixels: *mut [f32; 4],
+    width: usize,
+    height: usize,
+    params: *const f64,
+    nparams: usize,
+    time: f64,
+    scale: f64,
+) -> i32 {
+    let p = unsafe { std::slice::from_raw_parts(params, nparams) };
+    let px = unsafe { std::slice::from_raw_parts_mut(pixels, width * height) };
+    if render_frame(px, width, height, p, time, scale).is_ok() {
+        0
+    } else {
+        1
+    }
+}
+
 /// # Safety
 /// The host passes pointers into the buffer `ec_alloc` returned.
 #[unsafe(no_mangle)]
