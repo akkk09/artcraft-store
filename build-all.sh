@@ -2,7 +2,7 @@
 set -euo pipefail
 TARGET=wasm32-unknown-unknown
 mkdir -p dist
-for plugin in smudge-blend mixer-blend gradient-map color-toolkit detail-recovery film-emulation mosaic-pixelate vignette white-balance lut-studio geometry-fixer seamless-pattern-generator depthcraft lumasweep glassify vectorcraft-recolor vectorcraft-phantasm vectorcraft-mirrorme vectorcraft-stylism vectorcraft-randomino vectorcraft-colliderscribe; do
+for plugin in smudge-blend mixer-blend gradient-map color-toolkit detail-recovery film-emulation mosaic-pixelate vignette white-balance lut-studio geometry-fixer seamless-pattern-generator depthcraft lumasweep glassify vectorcraft-recolor vectorcraft-phantasm vectorcraft-mirrorme vectorcraft-stylism vectorcraft-randomino vectorcraft-colliderscribe vectorcraft-vectorfirstaid vectorcraft-reform vectorcraft-vectorscribe; do
   cargo build --manifest-path "plugins/$plugin/Cargo.toml" --release --target "$TARGET"
 done
 cp plugins/smudge-blend/target/$TARGET/release/photocraft_plugin_smudge_blend.wasm dist/
@@ -26,6 +26,9 @@ cp plugins/vectorcraft-mirrorme/target/$TARGET/release/vectorcraft_plugin_mirror
 cp plugins/vectorcraft-stylism/target/$TARGET/release/vectorcraft_plugin_stylism.wasm dist/
 cp plugins/vectorcraft-randomino/target/$TARGET/release/vectorcraft_plugin_randomino.wasm dist/
 cp plugins/vectorcraft-colliderscribe/target/$TARGET/release/vectorcraft_plugin_colliderscribe.wasm dist/
+cp plugins/vectorcraft-vectorfirstaid/target/$TARGET/release/vectorcraft_vectorfirstaid.wasm dist/vectorcraft_plugin_vectorfirstaid.wasm
+cp plugins/vectorcraft-reform/target/$TARGET/release/vectorcraft_reform.wasm dist/vectorcraft_plugin_reform.wasm
+cp plugins/vectorcraft-vectorscribe/target/$TARGET/release/vectorcraft_vectorscribe.wasm dist/vectorcraft_plugin_vectorscribe.wasm
 python plugins/film-emulation/package_filmcraft.py --output dist/filmcraft-film-emulation-toolkit.zip
 python plugins/creator-graphics-pack/package.py --output dist/creator-graphics-pack.zip
 python plugins/soundcraft-audio-tools/package.py --output dist/soundcraft-audio-toolkit.zip

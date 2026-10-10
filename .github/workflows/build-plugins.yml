@@ -86,6 +86,12 @@ jobs:
         run: cargo test --manifest-path plugins/vectorcraft-randomino/Cargo.toml
       - name: Test ColliderScribe algorithms
         run: cargo test --manifest-path plugins/vectorcraft-colliderscribe/Cargo.toml
+      - name: Test VectorFirstAid algorithms
+        run: cargo test --manifest-path plugins/vectorcraft-vectorfirstaid/Cargo.toml
+      - name: Test Reform algorithms
+        run: cargo test --manifest-path plugins/vectorcraft-reform/Cargo.toml
+      - name: Test VectorScribe algorithms
+        run: cargo test --manifest-path plugins/vectorcraft-vectorscribe/Cargo.toml
       - name: Build and stage plug-ins
         run: bash build-all.sh
       - name: Audit catalog downloads and release assets
@@ -132,5 +138,8 @@ jobs:
             dist/vectorcraft_plugin_stylism.wasm
             dist/vectorcraft_plugin_randomino.wasm
             dist/vectorcraft_plugin_colliderscribe.wasm
+            dist/vectorcraft_plugin_vectorfirstaid.wasm
+            dist/vectorcraft_plugin_reform.wasm
+            dist/vectorcraft_plugin_vectorscribe.wasm
             dist/soundcraft-audio-toolkit.zip
             dist/pdfcraft-invoice-calculator.js
