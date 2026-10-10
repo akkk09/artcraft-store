@@ -12,20 +12,20 @@ pub const MANIFEST: &str = r#"{
   "author": "ArtCraft Store community",
   "description": "Generative variation tool for VectorCraft: randomize position, rotation, scale, color, opacity, and stacking order with deterministic seed control.",
   "params": {
-    "seed": {"type": "integer", "default": 42},
+    "seed": {"type": "int", "min": 0, "max": 2147483647, "default": 42},
     "pos_x_jitter": {"type": "number", "min": 0.0, "max": 200.0, "default": 0.0},
     "pos_y_jitter": {"type": "number", "min": 0.0, "max": 200.0, "default": 0.0},
     "rot_min": {"type": "number", "min": -180.0, "max": 180.0, "default": 0.0},
     "rot_max": {"type": "number", "min": -180.0, "max": 180.0, "default": 0.0},
     "scale_min": {"type": "number", "min": 0.1, "max": 5.0, "default": 1.0},
     "scale_max": {"type": "number", "min": 0.1, "max": 5.0, "default": 1.0},
-    "uniform_scale": {"type": "boolean", "default": true},
+    "uniform_scale": {"type": "bool", "default": true},
     "hue_jitter": {"type": "number", "min": 0.0, "max": 180.0, "default": 0.0},
     "sat_jitter": {"type": "number", "min": 0.0, "max": 100.0, "default": 0.0},
     "lightness_jitter": {"type": "number", "min": 0.0, "max": 100.0, "default": 0.0},
     "opacity_min": {"type": "number", "min": 0.0, "max": 1.0, "default": 1.0},
     "opacity_max": {"type": "number", "min": 0.0, "max": 1.0, "default": 1.0},
-    "shuffle_stack": {"type": "boolean", "default": false}
+    "shuffle_stack": {"type": "bool", "default": false}
   }
 }"#;
 
@@ -166,27 +166,72 @@ pub fn hsl_to_rgb(h: f64, s: f64, l: f64) -> (f64, f64, f64) {
 }
 
 fn jitter_color(val: &mut Value, dh: f64, ds: f64, dl: f64) {
-    if let Value::Array(arr) = val {
-        if arr.len() >= 3 {
-            let r = arr[0].as_f64().unwrap_or(0.0).clamp(0.0, 1.0);
-            let g = arr[1].as_f64().unwrap_or(0.0).clamp(0.0, 1.0);
-            let b = arr[2].as_f64().unwrap_or(0.0).clamp(0.0, 1.0);
-
-            let (h, s, l) = rgb_to_hsl(r, g, b);
-            let nh = (h + dh) % 360.0;
-            let ns = (s + ds / 100.0).clamp(0.0, 1.0);
-            let nl = (l + dl / 100.0).clamp(0.0, 1.0);
-
-            let (nr, ng, nb) = hsl_to_rgb(nh, ns, nl);
-            arr[0] = json!(nr);
-            arr[1] = json!(ng);
-            arr[2] = json!(nb);
+    match val {
+        Value::Object(map) => {
+            if let Some(model) = map.get("model").and_then(|m| m.as_str()) {
+                if model == "rgb" {
+                    let r = map.get("r").and_then(|v| v.as_f64()).unwrap_or(0.0);
+                    let g = map.get("g").and_then(|v| v.as_f64()).unwrap_or(0.0);
+                    let b = map.get("b").and_then(|v| v.as_f64()).unwrap_or(0.0);
+                    let (h, s, l) = rgb_to_hsl(r, g, b);
+                    let nh = (h + dh) % 360.0;
+                    let ns = (s + ds / 100.0).clamp(0.0, 1.0);
+                    let nl = (l + dl / 100.0).clamp(0.0, 1.0);
+                    let (nr, ng, nb) = hsl_to_rgb(nh, ns, nl);
+                    map.insert("r".to_string(), json!(nr));
+                    map.insert("g".to_string(), json!(ng));
+                    map.insert("b".to_string(), json!(nb));
+                }
+            } else if let Some(c) = map.get_mut("color") {
+                jitter_color(c, dh, ds, dl);
+            }
         }
+        Value::Array(arr) => {
+            if arr.len() >= 3 {
+                let r = arr[0].as_f64().unwrap_or(0.0).clamp(0.0, 1.0);
+                let g = arr[1].as_f64().unwrap_or(0.0).clamp(0.0, 1.0);
+                let b = arr[2].as_f64().unwrap_or(0.0).clamp(0.0, 1.0);
+
+                let (h, s, l) = rgb_to_hsl(r, g, b);
+                let nh = (h + dh) % 360.0;
+                let ns = (s + ds / 100.0).clamp(0.0, 1.0);
+                let nl = (l + dl / 100.0).clamp(0.0, 1.0);
+
+                let (nr, ng, nb) = hsl_to_rgb(nh, ns, nl);
+                arr[0] = json!(nr);
+                arr[1] = json!(ng);
+                arr[2] = json!(nb);
+            }
+        }
+        _ => {}
     }
 }
 
 /// Computes the bounding box center (cx, cy) of an object
 fn get_object_centroid(obj: &Value) -> (f64, f64) {
+    if let Some(path_val) = obj.get("path") {
+        if let Some(subpaths) = path_val.get("subpaths").and_then(|s| s.as_array()) {
+            let mut sum_x = 0.0;
+            let mut sum_y = 0.0;
+            let mut count = 0;
+            for subpath in subpaths {
+                if let Some(anchors) = subpath.get("anchors").and_then(|a| a.as_array()) {
+                    for anc in anchors {
+                        if let Some(p) = anc.get("p").and_then(|v| v.as_array()) {
+                            if p.len() >= 2 {
+                                sum_x += p[0].as_f64().unwrap_or(0.0);
+                                sum_y += p[1].as_f64().unwrap_or(0.0);
+                                count += 1;
+                            }
+                        }
+                    }
+                }
+            }
+            if count > 0 {
+                return (sum_x / count as f64, sum_y / count as f64);
+            }
+        }
+    }
     if let Some(pts) = obj.get("points").and_then(|p| p.as_array()) {
         if !pts.is_empty() {
             let mut sum_x = 0.0;
@@ -231,26 +276,47 @@ pub fn transform_single_object(obj: &mut Value, params: &RandominoParams, rng: &
         params.scale_min
     };
 
-    // 2. Transform points
+    let transform_xy = |px: f64, py: f64| -> (f64, f64) {
+        let scaled_x = (px - cx) * sx;
+        let scaled_y = (py - cy) * sy;
+        let rot_x = scaled_x * cos_t - scaled_y * sin_t;
+        let rot_y = scaled_x * sin_t + scaled_y * cos_t;
+        (rot_x + cx + dx, rot_y + cy + dy)
+    };
+
+    // 2. Transform points & subpath anchors
     if let Value::Object(map) = obj {
+        if let Some(path_val) = map.get_mut("path") {
+            if let Some(subpaths) = path_val.get_mut("subpaths").and_then(|s| s.as_array_mut()) {
+                for subpath in subpaths {
+                    if let Some(anchors) = subpath.get_mut("anchors").and_then(|a| a.as_array_mut()) {
+                        for anchor in anchors {
+                            for key in &["p", "in", "out"] {
+                                if let Some(Value::Array(arr)) = anchor.get_mut(*key) {
+                                    if arr.len() >= 2 {
+                                        let px = arr[0].as_f64().unwrap_or(0.0);
+                                        let py = arr[1].as_f64().unwrap_or(0.0);
+                                        let (rx, ry) = transform_xy(px, py);
+                                        arr[0] = json!(rx);
+                                        arr[1] = json!(ry);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         if let Some(pts) = map.get_mut("points").and_then(|p| p.as_array_mut()) {
             for pt in pts {
                 if let Value::Array(xy) = pt {
                     if xy.len() >= 2 {
                         let px = xy[0].as_f64().unwrap_or(0.0);
                         let py = xy[1].as_f64().unwrap_or(0.0);
-
-                        // Scale relative to centroid
-                        let scaled_x = (px - cx) * sx;
-                        let scaled_y = (py - cy) * sy;
-
-                        // Rotate
-                        let rot_x = scaled_x * cos_t - scaled_y * sin_t;
-                        let rot_y = scaled_x * sin_t + scaled_y * cos_t;
-
-                        // Translate to new center
-                        xy[0] = json!(rot_x + cx + dx);
-                        xy[1] = json!(rot_y + cy + dy);
+                        let (rx, ry) = transform_xy(px, py);
+                        xy[0] = json!(rx);
+                        xy[1] = json!(ry);
                     }
                 }
             }
@@ -270,9 +336,25 @@ pub fn transform_single_object(obj: &mut Value, params: &RandominoParams, rng: &
             let ds = if params.sat_jitter > 0.0 { rng.range(-params.sat_jitter, params.sat_jitter) } else { 0.0 };
             let dl = if params.lightness_jitter > 0.0 { rng.range(-params.lightness_jitter, params.lightness_jitter) } else { 0.0 };
 
+            if let Some(fills) = map.get_mut("fills").and_then(|f| f.as_array_mut()) {
+                for fill in fills {
+                    if let Some(c) = fill.get_mut("color") {
+                        jitter_color(c, dh, ds, dl);
+                    }
+                }
+            }
             if let Some(fill) = map.get_mut("fill") {
                 if let Some(c) = fill.get_mut("color") {
                     jitter_color(c, dh, ds, dl);
+                }
+            }
+            if let Some(strokes) = map.get_mut("strokes").and_then(|s| s.as_array_mut()) {
+                for stroke in strokes {
+                    if let Some(paint) = stroke.get_mut("paint") {
+                        if let Some(c) = paint.get_mut("color") {
+                            jitter_color(c, dh, ds, dl);
+                        }
+                    }
                 }
             }
             if let Some(stroke) = map.get_mut("stroke") {

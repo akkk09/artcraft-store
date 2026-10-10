@@ -11,17 +11,17 @@ pub const MANIFEST: &str = r#"{
   "author": "ArtCraft Store community",
   "description": "Super Marquee selection and geometric query tool for VectorCraft: rectangular/elliptical marquees, enclosed artwork detection, alternating and random selections.",
   "params": {
-    "shape": {"type": "string", "enum": ["rectangle", "ellipse"], "default": "rectangle"},
-    "x": {"type": "number", "default": 0.0},
-    "y": {"type": "number", "default": 0.0},
-    "width": {"type": "number", "min": 0.0, "default": 100.0},
-    "height": {"type": "number", "min": 0.0, "default": 100.0},
-    "mode": {"type": "string", "enum": ["enclosed", "intersecting"], "default": "enclosed"},
-    "filter": {"type": "string", "enum": ["all", "alternate", "random"], "default": "all"},
-    "alternate_step": {"type": "integer", "min": 1, "max": 20, "default": 2},
+    "shape": {"type": "choice", "options": ["rectangle", "ellipse"], "default": "rectangle"},
+    "x": {"type": "number", "min": -10000.0, "max": 10000.0, "default": 0.0},
+    "y": {"type": "number", "min": -10000.0, "max": 10000.0, "default": 0.0},
+    "width": {"type": "number", "min": 0.0, "max": 10000.0, "default": 100.0},
+    "height": {"type": "number", "min": 0.0, "max": 10000.0, "default": 100.0},
+    "mode": {"type": "choice", "options": ["enclosed", "intersecting"], "default": "enclosed"},
+    "filter": {"type": "choice", "options": ["all", "alternate", "random"], "default": "all"},
+    "alternate_step": {"type": "int", "min": 1, "max": 20, "default": 2},
     "random_percent": {"type": "number", "min": 0.0, "max": 100.0, "default": 50.0},
-    "seed": {"type": "integer", "default": 42},
-    "action": {"type": "string", "enum": ["mark_selected", "isolate", "exclude"], "default": "mark_selected"}
+    "seed": {"type": "int", "min": 0, "max": 2147483647, "default": 42},
+    "action": {"type": "choice", "options": ["mark_selected", "isolate", "exclude"], "default": "mark_selected"}
   }
 }"#;
 
@@ -163,6 +163,23 @@ impl BoundingBox {
 
 pub fn extract_object_points(obj: &Value) -> Vec<(f64, f64)> {
     let mut out = Vec::new();
+    if let Some(path_val) = obj.get("path") {
+        if let Some(subpaths) = path_val.get("subpaths").and_then(|s| s.as_array()) {
+            for subpath in subpaths {
+                if let Some(anchors) = subpath.get("anchors").and_then(|a| a.as_array()) {
+                    for anc in anchors {
+                        if let Some(p) = anc.get("p").and_then(|v| v.as_array()) {
+                            if p.len() >= 2 {
+                                let x = p[0].as_f64().unwrap_or(0.0);
+                                let y = p[1].as_f64().unwrap_or(0.0);
+                                out.push((x, y));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
     if let Some(pts) = obj.get("points").and_then(|p| p.as_array()) {
         for pt in pts {
             if let Value::Array(xy) = pt {
