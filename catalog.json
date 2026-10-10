@@ -549,6 +549,33 @@
       "compatibility": "EffectCraft ScriptUI / ExtendScript"
     },
     {
+      "id": "org.effectcraft.community.pastecraft",
+      "name": "PasteCraft",
+      "version": "0.1.0",
+      "author": "ArtCraft Store community",
+      "description": "Universal clipboard asset importer, vector SVG converter, and in-place layer replacer with transform & effect preservation.",
+      "kind": "tool",
+      "abi": 1,
+      "source": "plugins/pastecraft",
+      "sourceUrl": "https://github.com/akkk09/artcraft-store/tree/main/plugins/pastecraft",
+      "artifact": "PasteCraft.jsx",
+      "releaseAsset": "PasteCraft.jsx",
+      "tags": [
+        "clipboard",
+        "paste",
+        "replace",
+        "svg",
+        "vector",
+        "shapes",
+        "images",
+        "data-uri",
+        "import",
+        "destructive-safety"
+      ],
+      "app": "effectcraft",
+      "compatibility": "EffectCraft ScriptUI / ExtendScript"
+    },
+    {
       "id": "org.filmcraft.community.film-emulation",
       "name": "Film Emulation Presets & LUTs",
       "version": "0.1.0",

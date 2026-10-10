@@ -31,5 +31,6 @@ cp plugins/captioncraft/CaptionCraft.jsx dist/
 cp plugins/quietcraft/QuietCraft.jsx dist/
 cp plugins/pivotcraft/PivotCraft.jsx dist/
 cp plugins/citron/Citron.jsx dist/
+cp plugins/pastecraft/PasteCraft.jsx dist/
 printf 'Built plug-ins in dist/\n'
 ls -lh dist/*
