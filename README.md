@@ -12,7 +12,7 @@ A shared, searchable community catalog for apps with supported extension systems
 - **LightCraft** — Non-destructive RAW develop presets and 3D LUT profiles
 - **CADCraft** — Command automation scripts and geometric drawing macros
 
-The static storefront in [`index.html`](index.html) reads [`catalog.json`](catalog.json) at runtime. Filter by app or search across names, descriptions, tags, and compatibility notes.
+The static storefront in [`index.html`](index.html) reads [`catalog.json`](catalog.json) at runtime. Filter by app or search across names, descriptions, tags, and compatibility notes. Detailed installation paths, architecture specifications, and SDK developer guides are available on the [**Documentation Page**](docs.html).
 
 This is a community-maintained catalog, not an official ArtCraft support channel. Submissions should be limited to plugins intended for listing in this store, with a source repository, license, download link, supported app/version, and clear description. Reviews are for existing catalog items only.
 

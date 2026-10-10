@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "index.html"
+      - "docs.html"
       - "web-ui/**"
       - "catalog.json"
       - "api/v1/**"
@@ -52,7 +53,7 @@ jobs:
         run: |
           mkdir -p web-dist/downloads
           cp dist/* web-dist/downloads/
-          cp catalog.json favicon.svg web-dist/
+          cp catalog.json favicon.svg docs.html web-dist/
           cp -r api lut-studio web-dist/
       - name: Configure Pages
         uses: actions/configure-pages@v5

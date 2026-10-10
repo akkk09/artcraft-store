@@ -167,21 +167,21 @@
   <div class="wrap">
     <header>
       <a class="brand" href="./" aria-label="ArtCraft Store home"><span class="mark">A</span><span>ArtCraft <span style="color:var(--muted);font-weight:500">/ Extensions</span></span></a>
-      <nav class="nav" aria-label="Main navigation"><a href="#catalog">Browse</a><a href="#architectures">Architectures</a><a href="./lut-studio/">LUT Studio</a><a href="#install">Installation</a><a href="https://github.com/akkk09/artcraft-store">GitHub ↗</a></nav>
+      <nav class="nav" aria-label="Main navigation"><a href="#catalog">Browse</a><a href="#architectures">Architectures</a><a href="./lut-studio/">LUT Studio</a><a href="./docs.html">Docs</a><a href="#install">Installation</a><a href="https://github.com/akkk09/artcraft-store" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav>
     </header>
     <main>
       <section class="hero">
         <div class="eyebrow"><span class="dot"></span> Community-built · Open source · Made for creators</div>
         <h1>Make more.<br>Make it yours.</h1>
         <p>Tools, plug-ins, scripts, and presets created by the community for ArtCraft creative applications: PhotoCraft, EffectCraft, VectorCraft, FilmCraft, SoundCraft, PdfCraft, DesignCraft, LightCraft, and CADCraft.</p>
-        <div class="hero-actions"><a class="btn primary" href="#catalog">Browse catalog <span aria-hidden="true">↓</span></a><a class="btn" href="https://github.com/akkk09/artcraft-store">Contribute on GitHub ↗</a></div>
+        <div class="hero-actions"><a class="btn primary" href="#catalog">Browse catalog <span aria-hidden="true">↓</span></a><a class="btn" href="./docs.html">Read Docs ↗</a><a class="btn" href="https://github.com/akkk09/artcraft-store" target="_blank" rel="noopener noreferrer">Contribute on GitHub ↗</a></div>
         <div class="stats"><div class="stat"><strong id="plugin-count">—</strong><span>catalogued items</span></div><div class="stat"><strong>09</strong><span>creative apps</span></div><div class="stat"><strong>Open</strong><span>community and source</span></div></div>
       </section>
       <section class="catalog" id="catalog">
         <div class="section-head"><div><div class="eyebrow">01 / The catalog</div><h2>Extensions for your workflow.</h2><p>Search by name, feature, or app. Filter the catalog by the app you use.</p></div></div>
         <div class="tools"><label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Search extensions, scripts, tools, presets…" aria-label="Search catalog"></label></div><div class="filters app-filters" role="group" aria-label="Filter by supported app"><button class="filter active" data-app-filter="all" aria-pressed="true">All apps</button><button class="filter" data-app-filter="photocraft" aria-pressed="false">PhotoCraft</button><button class="filter" data-app-filter="effectcraft" aria-pressed="false">EffectCraft</button><button class="filter" data-app-filter="vectorcraft" aria-pressed="false">VectorCraft</button><button class="filter" data-app-filter="filmcraft" aria-pressed="false">FilmCraft</button><button class="filter" data-app-filter="soundcraft" aria-pressed="false">SoundCraft</button><button class="filter" data-app-filter="pdfcraft" aria-pressed="false">PdfCraft</button><button class="filter" data-app-filter="designcraft" aria-pressed="false">DesignCraft</button><button class="filter" data-app-filter="lightcraft" aria-pressed="false">LightCraft</button><button class="filter" data-app-filter="cadcraft" aria-pressed="false">CADCraft</button></div>
         <div class="grid" id="plugin-grid" aria-live="polite"><div class="empty">Loading catalog…</div></div>
-        <div class="notice"><span class="icon" aria-hidden="true">ⓘ</span><div><strong>Check compatibility before installing</strong><p>Each ArtCraft application provides a tailored extension architecture: WebAssembly ABI modules, ScriptUI JSX panels, CLAP/VST3 audio plug-ins, Acrobat JavaScript, or native JSON preset chains. Check each card for its specific file format and host compatibility.</p></div></div>
+        <div class="notice"><span class="icon" aria-hidden="true">ⓘ</span><div><strong>Check compatibility before installing</strong><p>Each ArtCraft application provides a tailored extension architecture: WebAssembly ABI modules, ScriptUI JSX panels, CLAP/VST3 audio plug-ins, Acrobat JavaScript, or native JSON preset chains. Check each card for its specific file format and host compatibility, or consult the <a href="./docs.html" style="color:var(--text);font-weight:600">Installation Docs</a>.</p></div></div>
       </section>
       <section class="how" id="architectures"><div class="eyebrow">02 / Extension Architectures</div><h2>Extensibility across ArtCraft apps.</h2><div class="steps" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
         <article class="step"><b>PHOTOCRAFT</b><h3>WASM Filters &amp; LUTs</h3><p>Sandboxed WebAssembly pixel-manipulation modules (ABI v1) and 3D LUT cubes for non-destructive color grading, sharpening, and stylization.</p></article>
@@ -197,10 +197,10 @@
       <section class="how" id="install"><div class="eyebrow">03 / Getting started</div><h2>Make it part of your process.</h2><div class="steps">
         <article class="step"><b>01 / CHOOSE</b><h3>Select your app</h3><p>Filter by your ArtCraft application and review compatibility notes.</p></article>
         <article class="step"><b>02 / REVIEW</b><h3>Inspect the listing</h3><p>Check the version, source code, file type, and requirements before downloading.</p></article>
-        <article class="step"><b>03 / INSTALL</b><h3>Follow app-specific steps</h3><p>Download the item and follow its documented installation instructions. Drop WASM/WAT plugins into the app plugins directory, load .jsx in ScriptUI Panels, or import presets via menus.</p></article>
+        <article class="step"><b>03 / INSTALL</b><h3>Follow app-specific steps</h3><p>Download the item and follow its documented installation instructions. Drop WASM/WAT plugins into the app plugins directory, load .jsx in ScriptUI Panels, or import presets via menus. See our <a href="./docs.html" style="color:var(--accent);font-weight:600">Full Docs &amp; Directory Guide ↗</a></p></article>
       </div></section>
     </main>
-    <footer><span>Community project · Not affiliated with ArtCraft app maintainers.</span><span><a href="https://github.com/akkk09/artcraft-store">Source code</a> · <a id="catalog-json-link" href="catalog.json">Catalog JSON</a> · MIT</span></footer>
+    <footer><span>Community project · Not affiliated with ArtCraft app maintainers.</span><span><a href="./docs.html">Documentation</a> · <a href="https://github.com/akkk09/artcraft-store" target="_blank" rel="noopener noreferrer">Source code</a> · <a id="catalog-json-link" href="catalog.json">Catalog JSON</a> · MIT</span></footer>
   </div>
   <script>
     const grid = document.querySelector("#plugin-grid");
