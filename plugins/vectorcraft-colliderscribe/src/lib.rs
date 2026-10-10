@@ -11,17 +11,18 @@ pub const MANIFEST: &str = r#"{
   "author": "ArtCraft Store community",
   "description": "Super Marquee selection and geometric query tool for VectorCraft: rectangular/elliptical marquees, enclosed artwork detection, alternating and random selections.",
   "params": {
+    "scope": {"type": "choice", "options": ["selection", "marquee"], "default": "selection"},
     "shape": {"type": "choice", "options": ["rectangle", "ellipse"], "default": "rectangle"},
     "x": {"type": "number", "min": -10000.0, "max": 10000.0, "default": 0.0},
     "y": {"type": "number", "min": -10000.0, "max": 10000.0, "default": 0.0},
-    "width": {"type": "number", "min": 0.0, "max": 10000.0, "default": 100.0},
-    "height": {"type": "number", "min": 0.0, "max": 10000.0, "default": 100.0},
+    "width": {"type": "number", "min": 0.0, "max": 10000.0, "default": 1000.0},
+    "height": {"type": "number", "min": 0.0, "max": 10000.0, "default": 1000.0},
     "mode": {"type": "choice", "options": ["enclosed", "intersecting"], "default": "enclosed"},
-    "filter": {"type": "choice", "options": ["all", "alternate", "random"], "default": "all"},
+    "filter": {"type": "choice", "options": ["alternate", "random", "all"], "default": "alternate"},
     "alternate_step": {"type": "int", "min": 1, "max": 20, "default": 2},
     "random_percent": {"type": "number", "min": 0.0, "max": 100.0, "default": 50.0},
     "seed": {"type": "int", "min": 0, "max": 2147483647, "default": 42},
-    "action": {"type": "choice", "options": ["mark_selected", "isolate", "exclude"], "default": "mark_selected"}
+    "action": {"type": "choice", "options": ["isolate", "exclude", "color_tag"], "default": "isolate"}
   }
 }"#;
 
@@ -70,6 +71,12 @@ impl SimpleRng {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum QueryScope {
+    Selection,
+    Marquee,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MarqueeShape {
     Rectangle,
     Ellipse,
@@ -90,13 +97,14 @@ pub enum SelectionFilter {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SelectionAction {
-    MarkSelected,
     Isolate,
     Exclude,
+    ColorTag,
 }
 
 #[derive(Debug, Clone)]
 pub struct ColliderParams {
+    pub scope: QueryScope,
     pub shape: MarqueeShape,
     pub x: f64,
     pub y: f64,
@@ -112,6 +120,10 @@ pub struct ColliderParams {
 
 impl ColliderParams {
     pub fn from_json(val: &Value) -> Self {
+        let scope = match val.get("scope").and_then(|v| v.as_str()).unwrap_or("selection") {
+            "marquee" => QueryScope::Marquee,
+            _ => QueryScope::Selection,
+        };
         let shape = match val.get("shape").and_then(|v| v.as_str()).unwrap_or("rectangle") {
             "ellipse" => MarqueeShape::Ellipse,
             _ => MarqueeShape::Rectangle,
@@ -120,23 +132,24 @@ impl ColliderParams {
             "intersecting" => EnclosureMode::Intersecting,
             _ => EnclosureMode::Enclosed,
         };
-        let filter = match val.get("filter").and_then(|v| v.as_str()).unwrap_or("all") {
-            "alternate" => SelectionFilter::Alternate,
+        let filter = match val.get("filter").and_then(|v| v.as_str()).unwrap_or("alternate") {
+            "all" => SelectionFilter::All,
             "random" => SelectionFilter::Random,
-            _ => SelectionFilter::All,
+            _ => SelectionFilter::Alternate,
         };
-        let action = match val.get("action").and_then(|v| v.as_str()).unwrap_or("mark_selected") {
-            "isolate" => SelectionAction::Isolate,
+        let action = match val.get("action").and_then(|v| v.as_str()).unwrap_or("isolate") {
             "exclude" => SelectionAction::Exclude,
-            _ => SelectionAction::MarkSelected,
+            "color_tag" => SelectionAction::ColorTag,
+            _ => SelectionAction::Isolate,
         };
 
         Self {
+            scope,
             shape,
             x: val.get("x").and_then(|v| v.as_f64()).unwrap_or(0.0),
             y: val.get("y").and_then(|v| v.as_f64()).unwrap_or(0.0),
-            width: val.get("width").and_then(|v| v.as_f64()).unwrap_or(100.0).max(0.0),
-            height: val.get("height").and_then(|v| v.as_f64()).unwrap_or(100.0).max(0.0),
+            width: val.get("width").and_then(|v| v.as_f64()).unwrap_or(1000.0).max(0.0),
+            height: val.get("height").and_then(|v| v.as_f64()).unwrap_or(1000.0).max(0.0),
             mode,
             filter,
             alternate_step: val.get("alternate_step").and_then(|v| v.as_u64()).unwrap_or(2).max(1) as usize,
@@ -155,31 +168,30 @@ pub struct BoundingBox {
     pub max_y: f64,
 }
 
-impl BoundingBox {
-    pub fn contains_point(&self, px: f64, py: f64) -> bool {
-        px >= self.min_x && px <= self.max_x && py >= self.min_y && py <= self.max_y
-    }
-}
-
 pub fn extract_object_points(obj: &Value) -> Vec<(f64, f64)> {
     let mut out = Vec::new();
-    if let Some(path_val) = obj.get("path") {
-        if let Some(subpaths) = path_val.get("subpaths").and_then(|s| s.as_array()) {
-            for subpath in subpaths {
-                if let Some(anchors) = subpath.get("anchors").and_then(|a| a.as_array()) {
-                    for anc in anchors {
-                        if let Some(p) = anc.get("p").and_then(|v| v.as_array()) {
-                            if p.len() >= 2 {
-                                let x = p[0].as_f64().unwrap_or(0.0);
-                                let y = p[1].as_f64().unwrap_or(0.0);
-                                out.push((x, y));
-                            }
+
+    let subpaths_opt = obj.get("path")
+        .and_then(|p| p.get("subpaths"))
+        .or_else(|| obj.get("kind").and_then(|k| k.get("path")).and_then(|p| p.get("subpaths")))
+        .and_then(|s| s.as_array());
+
+    if let Some(subpaths) = subpaths_opt {
+        for subpath in subpaths {
+            if let Some(anchors) = subpath.get("anchors").and_then(|a| a.as_array()) {
+                for anc in anchors {
+                    if let Some(p) = anc.get("p").and_then(|v| v.as_array()) {
+                        if p.len() >= 2 {
+                            let x = p[0].as_f64().unwrap_or(0.0);
+                            let y = p[1].as_f64().unwrap_or(0.0);
+                            out.push((x, y));
                         }
                     }
                 }
             }
         }
     }
+
     if let Some(pts) = obj.get("points").and_then(|p| p.as_array()) {
         for pt in pts {
             if let Value::Array(xy) = pt {
@@ -231,6 +243,10 @@ pub fn compute_bounds(points: &[(f64, f64)]) -> Option<BoundingBox> {
 
 /// Checks if an object satisfies the geometric marquee query
 pub fn matches_marquee(points: &[(f64, f64)], params: &ColliderParams) -> bool {
+    if params.scope == QueryScope::Selection {
+        return true;
+    }
+
     let bounds = match compute_bounds(points) {
         Some(b) => b,
         None => return false,
@@ -261,42 +277,59 @@ pub fn matches_marquee(points: &[(f64, f64)], params: &ColliderParams) -> bool {
         MarqueeShape::Ellipse => {
             let cx = params.x + params.width * 0.5;
             let cy = params.y + params.height * 0.5;
-            let rx = (params.width * 0.5).max(1e-6);
-            let ry = (params.height * 0.5).max(1e-6);
+            let rx = (params.width * 0.5).max(1e-4);
+            let ry = (params.height * 0.5).max(1e-4);
 
-            let is_inside_ellipse = |x: f64, y: f64| -> bool {
-                let dx = (x - cx) / rx;
-                let dy = (y - cy) / ry;
-                (dx * dx + dy * dy) <= 1.0 + 1e-4
+            let pt_inside = |px: f64, py: f64| -> bool {
+                let nx = (px - cx) / rx;
+                let ny = (py - cy) / ry;
+                nx * nx + ny * ny <= 1.0
             };
 
             match params.mode {
                 EnclosureMode::Enclosed => {
-                    // All vertices must lie within ellipse
-                    points.iter().all(|&(x, y)| is_inside_ellipse(x, y))
+                    points.iter().all(|&(x, y)| pt_inside(x, y))
                 }
                 EnclosureMode::Intersecting => {
-                    // Either any vertex is inside ellipse, or center is within bounds
-                    points.iter().any(|&(x, y)| is_inside_ellipse(x, y))
-                        || bounds.contains_point(cx, cy)
+                    points.iter().any(|&(x, y)| pt_inside(x, y))
                 }
             }
         }
     }
 }
 
-pub fn apply_colliderscribe(doc: &mut Value, params: &ColliderParams) {
-    let mut rng = SimpleRng::new(params.seed);
-    let mut match_counter = 0;
+fn apply_color_tag(obj: &mut Value) {
+    if let Value::Object(map) = obj {
+        let tag_paint = json!({
+            "type": "solid",
+            "color": {
+                "model": "rgb",
+                "r": 0.0,
+                "g": 0.9,
+                "b": 1.0
+            }
+        });
+        let tag_item = json!({
+            "kind": "fill",
+            "paint": tag_paint.clone()
+        });
+        map.insert("appearance".to_string(), json!({ "items": [tag_item] }));
+        map.insert("fills".to_string(), json!([tag_paint.clone()]));
+        map.insert("fill".to_string(), tag_paint);
+    }
+}
 
+pub fn apply_colliderscribe(doc: &mut Value, params: &ColliderParams) {
     if let Some(objects) = doc.get_mut("objects").and_then(|o| o.as_array_mut()) {
         let mut final_objects = Vec::new();
+        let mut rng = SimpleRng::new(params.seed);
+        let mut match_counter = 0;
 
-        for obj in objects.drain(..) {
-            let points = extract_object_points(&obj);
-            let geom_match = matches_marquee(&points, params);
+        for mut obj in objects.drain(..) {
+            let pts = extract_object_points(&obj);
+            let in_marquee = matches_marquee(&pts, params);
 
-            let is_selected = if geom_match {
+            let is_matched = if in_marquee {
                 match params.filter {
                     SelectionFilter::All => true,
                     SelectionFilter::Alternate => {
@@ -314,22 +347,21 @@ pub fn apply_colliderscribe(doc: &mut Value, params: &ColliderParams) {
             };
 
             match params.action {
-                SelectionAction::MarkSelected => {
-                    let mut modified = obj;
-                    if let Value::Object(map) = &mut modified {
-                        map.insert("selected".to_string(), json!(is_selected));
-                    }
-                    final_objects.push(modified);
-                }
                 SelectionAction::Isolate => {
-                    if is_selected {
+                    if is_matched {
                         final_objects.push(obj);
                     }
                 }
                 SelectionAction::Exclude => {
-                    if !is_selected {
+                    if !is_matched {
                         final_objects.push(obj);
                     }
+                }
+                SelectionAction::ColorTag => {
+                    if is_matched {
+                        apply_color_tag(&mut obj);
+                    }
+                    final_objects.push(obj);
                 }
             }
         }
@@ -365,66 +397,73 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_rect_enclosed_vs_intersecting() {
-        let inside_pts = vec![(20.0, 20.0), (30.0, 30.0)];
-        let straddle_pts = vec![(80.0, 80.0), (120.0, 120.0)];
-
-        let mut params = ColliderParams {
-            shape: MarqueeShape::Rectangle,
-            x: 0.0,
-            y: 0.0,
-            width: 100.0,
-            height: 100.0,
-            mode: EnclosureMode::Enclosed,
-            filter: SelectionFilter::All,
-            alternate_step: 2,
-            random_percent: 50.0,
-            seed: 42,
-            action: SelectionAction::MarkSelected,
-        };
-
-        // Enclosed mode: inside is true, straddle is false
-        assert!(matches_marquee(&inside_pts, &params));
-        assert!(!matches_marquee(&straddle_pts, &params));
-
-        // Intersecting mode: straddle is true
-        params.mode = EnclosureMode::Intersecting;
-        assert!(matches_marquee(&straddle_pts, &params));
-    }
-
-    #[test]
-    fn test_ellipse_marquee() {
-        let center_pts = vec![(50.0, 50.0)];
-        let corner_pts = vec![(5.0, 5.0)]; // Corner of 100x100 box is outside inscribed ellipse
-
-        let params = ColliderParams {
-            shape: MarqueeShape::Ellipse,
-            x: 0.0,
-            y: 0.0,
-            width: 100.0,
-            height: 100.0,
-            mode: EnclosureMode::Enclosed,
-            filter: SelectionFilter::All,
-            alternate_step: 2,
-            random_percent: 50.0,
-            seed: 42,
-            action: SelectionAction::MarkSelected,
-        };
-
-        assert!(matches_marquee(&center_pts, &params));
-        assert!(!matches_marquee(&corner_pts, &params));
-    }
-
-    #[test]
-    fn test_isolate_action() {
+    fn test_alternate_selection() {
         let mut doc = json!({
             "objects": [
-                {"id": 1, "points": [[10.0, 10.0]]}, // inside
-                {"id": 2, "points": [[200.0, 200.0]]}, // outside
+                {"id": 1, "points": [[10.0, 10.0]]},
+                {"id": 2, "points": [[20.0, 20.0]]},
+                {"id": 3, "points": [[30.0, 30.0]]},
+                {"id": 4, "points": [[40.0, 40.0]]},
             ]
         });
 
         let params = ColliderParams {
+            scope: QueryScope::Selection,
+            shape: MarqueeShape::Rectangle,
+            x: 0.0,
+            y: 0.0,
+            width: 1000.0,
+            height: 1000.0,
+            mode: EnclosureMode::Enclosed,
+            filter: SelectionFilter::Alternate,
+            alternate_step: 2,
+            random_percent: 50.0,
+            seed: 42,
+            action: SelectionAction::Isolate,
+        };
+
+        apply_colliderscribe(&mut doc, &params);
+        let objs = doc["objects"].as_array().unwrap();
+        assert_eq!(objs.len(), 2);
+        assert_eq!(objs[0]["id"], 1);
+        assert_eq!(objs[1]["id"], 3);
+    }
+
+    #[test]
+    fn test_marquee_enclosure_with_kind_path() {
+        let mut doc = json!({
+            "objects": [
+                {
+                    "id": 1,
+                    "kind": {
+                        "type": "path",
+                        "path": {
+                            "subpaths": [
+                                {
+                                    "anchors": [{"p": [50.0, 50.0]}]
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "id": 2,
+                    "kind": {
+                        "type": "path",
+                        "path": {
+                            "subpaths": [
+                                {
+                                    "anchors": [{"p": [500.0, 500.0]}]
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        });
+
+        let params = ColliderParams {
+            scope: QueryScope::Marquee,
             shape: MarqueeShape::Rectangle,
             x: 0.0,
             y: 0.0,

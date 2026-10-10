@@ -12,7 +12,7 @@ pub const MANIFEST: &str = r#"{
   "author": "ArtCraft Store community",
   "description": "Live vector styling, path offset, drop shadows, and multi-contour glow effects for VectorCraft.",
   "params": {
-    "offset_distance": {"type": "number", "min": -200.0, "max": 200.0, "default": 0.0},
+    "offset_distance": {"type": "number", "min": -200.0, "max": 200.0, "default": 10.0},
     "join": {"type": "choice", "options": ["round", "miter", "bevel"], "default": "round"},
     "miter_limit": {"type": "number", "min": 1.0, "max": 10.0, "default": 4.0},
     "shadow_dx": {"type": "number", "min": -1000.0, "max": 1000.0, "default": 5.0},
@@ -274,33 +274,39 @@ fn val_from_points(points: &[Vec2]) -> Value {
 
 pub fn apply_offset_to_object(obj: &mut Value, d: f64, join: JoinType, miter_limit: f64) {
     if let Value::Object(map) = obj {
-        if let Some(path_val) = map.get_mut("path") {
-            if let Some(subpaths) = path_val.get_mut("subpaths").and_then(|s| s.as_array_mut()) {
-                for subpath in subpaths {
-                    let closed = subpath.get("closed").and_then(|v| v.as_bool()).unwrap_or(true);
-                    if let Some(anchors) = subpath.get_mut("anchors").and_then(|a| a.as_array_mut()) {
-                        let pts: Vec<Vec2> = anchors.iter().filter_map(|anc| {
-                            let p = anc.get("p")?.as_array()?;
-                            Some(Vec2::new(p.get(0)?.as_f64()?, p.get(1)?.as_f64()?))
-                        }).collect();
-                        if pts.len() >= 2 {
-                            let offset_pts = offset_polyline(&pts, d, join, miter_limit, closed);
-                            if offset_pts.len() == pts.len() {
-                                for (anc, new_p) in anchors.iter_mut().zip(offset_pts.iter()) {
-                                    if let Some(Value::Array(p_arr)) = anc.get_mut("p") {
-                                        p_arr[0] = json!(new_p.x);
-                                        p_arr[1] = json!(new_p.y);
-                                    }
+        let mut subpaths_target = if let Some(path_obj) = map.get_mut("path").and_then(|p| p.as_object_mut()) {
+            path_obj.get_mut("subpaths").and_then(|s| s.as_array_mut())
+        } else if let Some(kind_obj) = map.get_mut("kind").and_then(|k| k.as_object_mut()) {
+            kind_obj.get_mut("path").and_then(|p| p.get_mut("subpaths")).and_then(|s| s.as_array_mut())
+        } else {
+            None
+        };
+
+        if let Some(subpaths) = subpaths_target.as_deref_mut() {
+            for subpath in subpaths {
+                let closed = subpath.get("closed").and_then(|v| v.as_bool()).unwrap_or(true);
+                if let Some(anchors) = subpath.get_mut("anchors").and_then(|a| a.as_array_mut()) {
+                    let pts: Vec<Vec2> = anchors.iter().filter_map(|anc| {
+                        let p = anc.get("p")?.as_array()?;
+                        Some(Vec2::new(p.get(0)?.as_f64()?, p.get(1)?.as_f64()?))
+                    }).collect();
+                    if pts.len() >= 2 {
+                        let offset_pts = offset_polyline(&pts, d, join, miter_limit, closed);
+                        if offset_pts.len() == pts.len() {
+                            for (anc, new_p) in anchors.iter_mut().zip(offset_pts.iter()) {
+                                if let Some(Value::Array(p_arr)) = anc.get_mut("p") {
+                                    p_arr[0] = json!(new_p.x);
+                                    p_arr[1] = json!(new_p.y);
                                 }
-                            } else {
-                                *anchors = offset_pts.into_iter().map(|pt| {
-                                    json!({
-                                        "p": [pt.x, pt.y],
-                                        "in": [pt.x, pt.y],
-                                        "out": [pt.x, pt.y]
-                                    })
-                                }).collect();
                             }
+                        } else {
+                            *anchors = offset_pts.into_iter().map(|pt| {
+                                json!({
+                                    "p": [pt.x, pt.y],
+                                    "in": [pt.x, pt.y],
+                                    "out": [pt.x, pt.y]
+                                })
+                            }).collect();
                         }
                     }
                 }
@@ -321,18 +327,24 @@ pub fn create_drop_shadow_object(obj: &Value, dx: f64, dy: f64, opacity: f64) ->
     if let Value::Object(map) = &mut shadow {
         map.remove("id");
 
-        if let Some(path_val) = map.get_mut("path") {
-            if let Some(subpaths) = path_val.get_mut("subpaths").and_then(|s| s.as_array_mut()) {
-                for subpath in subpaths {
-                    if let Some(anchors) = subpath.get_mut("anchors").and_then(|a| a.as_array_mut()) {
-                        for anchor in anchors {
-                            for key in &["p", "in", "out"] {
-                                if let Some(Value::Array(arr)) = anchor.get_mut(*key) {
-                                    if arr.len() >= 2 {
-                                        if let (Some(x), Some(y)) = (arr[0].as_f64(), arr[1].as_f64()) {
-                                            arr[0] = json!(x + dx);
-                                            arr[1] = json!(y + dy);
-                                        }
+        let mut subpaths_target = if let Some(path_obj) = map.get_mut("path").and_then(|p| p.as_object_mut()) {
+            path_obj.get_mut("subpaths").and_then(|s| s.as_array_mut())
+        } else if let Some(kind_obj) = map.get_mut("kind").and_then(|k| k.as_object_mut()) {
+            kind_obj.get_mut("path").and_then(|p| p.get_mut("subpaths")).and_then(|s| s.as_array_mut())
+        } else {
+            None
+        };
+
+        if let Some(subpaths) = subpaths_target.as_deref_mut() {
+            for subpath in subpaths {
+                if let Some(anchors) = subpath.get_mut("anchors").and_then(|a| a.as_array_mut()) {
+                    for anchor in anchors {
+                        for key in &["p", "in", "out"] {
+                            if let Some(Value::Array(arr)) = anchor.get_mut(*key) {
+                                if arr.len() >= 2 {
+                                    if let (Some(x), Some(y)) = (arr[0].as_f64(), arr[1].as_f64()) {
+                                        arr[0] = json!(x + dx);
+                                        arr[1] = json!(y + dy);
                                     }
                                 }
                             }
@@ -369,6 +381,11 @@ pub fn create_drop_shadow_object(obj: &Value, dx: f64, dy: f64, opacity: f64) ->
             },
             "opacity": opacity
         });
+        let shadow_item = json!({
+            "kind": "fill",
+            "paint": shadow_paint.clone()
+        });
+        map.insert("appearance".to_string(), json!({ "items": [shadow_item] }));
         map.insert("fills".to_string(), json!([shadow_paint.clone()]));
         map.insert("fill".to_string(), shadow_paint);
         map.remove("strokes");
@@ -394,6 +411,11 @@ pub fn create_glow_object(obj: &Value, radius: f64, opacity: f64) -> Value {
             },
             "opacity": opacity
         });
+        let glow_item = json!({
+            "kind": "fill",
+            "paint": glow_paint.clone()
+        });
+        map.insert("appearance".to_string(), json!({ "items": [glow_item] }));
         map.insert("fills".to_string(), json!([glow_paint.clone()]));
         map.insert("fill".to_string(), glow_paint);
         map.remove("strokes");
