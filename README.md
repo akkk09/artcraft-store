@@ -5,7 +5,7 @@
 [![LUT Studio](https://img.shields.io/badge/LUT_Studio-In--Browser_Preview-d29922?style=for-the-badge)](https://akkk09.github.io/artcraft-store/lut-studio/)
 
 > 📖 **Looking for installation guides or developer docs?**  
-> Visit the [**ArtCraft Documentation (`docs.html`)**](https://akkk09.github.io/artcraft-store/docs.html) (or local [`docs.html`](docs.html)) for OS-specific installation directories (Linux, macOS, Windows), activation steps for all 9 creative apps, runtime architecture specifications, and store submission guidelines.
+> Visit the [**ArtCraft Documentation & SDK Guide (`docs.html`)**](https://akkk09.github.io/artcraft-store/docs.html) (or local [`docs.html`](docs.html)) for OS-specific installation directories (Linux, macOS, Windows), activation steps for all 9 creative apps, runtime architecture specifications, the [**Plug-in Creation Guide (`docs.html#plugin-creation`)**](https://akkk09.github.io/artcraft-store/docs.html#plugin-creation), and store submission guidelines.
 
 ---
 
