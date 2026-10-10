@@ -827,6 +827,26 @@
         "windows",
         "unofficial-fork"
       ]
+    },
+    {
+      "id": "org.filmcraft.fork.glumbis-ofx",
+      "name": "FilmCraft + OpenFX",
+      "app": "filmcraft",
+      "author": "glumbis",
+      "version": "0.5.0-ofx.1",
+      "description": "Unofficial FilmCraft fork adding native OpenFX (OFX) plug-in hosting (Boris FX Sapphire, RE:Vision RSMB, Twixtor) with timeline controls and keyframing.",
+      "url": "https://github.com/glumbis/filmcraft/releases/latest",
+      "sourceUrl": "https://github.com/glumbis/filmcraft",
+      "tags": [
+        "openfx",
+        "ofx",
+        "video-editing",
+        "sapphire",
+        "twixtor",
+        "rsmb",
+        "windows",
+        "unofficial-fork"
+      ]
     }
   ]
 }
