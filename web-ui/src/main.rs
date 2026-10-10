@@ -390,6 +390,98 @@ python3 -m unittest discover tests
 # 4. Submit Pull Request to https://github.com/akkk09/artcraft-store
 "#;
 
+const SOUNDCRAFT_DSP_SNIPPET: &str = r#"{
+  "format": "soundcraft.channel-strip",
+  "version": "1.0.0",
+  "name": "Vocal Dynamics & Air Preset",
+  "author": "ArtCraft Audio Community",
+  "plugins": [
+    {
+      "format": "clap",
+      "id": "org.clap.high-pass-filter",
+      "params": { "cutoff_hz": 80.0, "slope_db_oct": 18 }
+    },
+    {
+      "format": "vst3",
+      "id": "org.vst3.opto-compressor",
+      "params": { "threshold_db": -18.5, "ratio": 4.0, "attack_ms": 15.0, "release_ms": 120.0 }
+    },
+    {
+      "format": "clap",
+      "id": "org.clap.air-shelf-eq",
+      "params": { "frequency_hz": 12000.0, "gain_db": 3.5, "q": 0.7 }
+    }
+  ]
+}"#;
+
+const FILMCRAFT_PRESET_SNIPPET: &str = r#"{
+  "format": "filmcraft.effect-presets",
+  "version": "1.0.0",
+  "id": "org.filmcraft.presets.cinematic-glow",
+  "name": "Cinematic Anamorphic Bloom",
+  "effects": [
+    {
+      "name": "Luma Key",
+      "params": { "threshold": 0.82, "softness": 0.15 }
+    },
+    {
+      "name": "Directional Blur",
+      "params": { "direction": 90.0, "length": 45.0 }
+    },
+    {
+      "name": "Chromatic Aberration",
+      "params": { "red_shift": 1.02, "blue_shift": 0.98 }
+    },
+    {
+      "name": "Composite Blend",
+      "params": { "mode": "Screen", "opacity": 0.65 }
+    }
+  ]
+}"#;
+
+const PDFCRAFT_JS_SNIPPET: &str = r#"// PdfCraft ISO 32000 Form Calculator & Validator
+(function () {
+    var subtotalField = this.getField("Subtotal");
+    var taxRateField = this.getField("TaxRate");
+    var totalField = this.getField("GrandTotal");
+
+    if (subtotalField && taxRateField && totalField) {
+        var subtotal = Number(subtotalField.value) || 0.0;
+        var taxRate = Number(taxRateField.value) || 0.0;
+        var taxAmount = subtotal * (taxRate / 100.0);
+        var grandTotal = subtotal + taxAmount;
+
+        totalField.value = util.printf("$%.2f", grandTotal);
+    }
+})();
+"#;
+
+const CADCRAFT_SCRIPT_SNIPPET: &str = r#"; CADCraft Parametric Flange Drawing Script (.cadscr)
+; Initialize Drawing Units and Layers
+-UNITS 2 4 1 2 0 N
+-LAYER M Geometry C 7 Geometry 
+-LAYER M Centerlines C 1 Centerlines 
+
+; Draw Outer Circular Flange
+-LAYER S Geometry 
+CIRCLE 100,100 90
+CIRCLE 100,100 45
+
+; Draw Centerlines
+-LAYER S Centerlines 
+LINE 5,100 195,100 
+LINE 100,5 100,195 
+
+; Draw 4x Mounting Bolt Holes at 45-degree Quadrants
+-LAYER S Geometry 
+CIRCLE 148.5,148.5 7.5
+CIRCLE 51.5,148.5 7.5
+CIRCLE 51.5,51.5 7.5
+CIRCLE 148.5,51.5 7.5
+
+ZOOM EXTENTS
+"#;
+
 struct StoreApp {
     plugins: Vec<Plugin>,
     forks: Vec<Fork>,
@@ -690,6 +782,8 @@ impl StoreApp {
             .filter(|doc| self.docs_app == "all" || doc.id == self.docs_app)
             .collect();
 
+        let mut switch_to_track: Option<usize> = None;
+
         for doc in matching_docs {
             let doc_name = doc.name;
             let doc_glyph = doc.glyph;
@@ -768,11 +862,40 @@ impl StoreApp {
                     for (idx, step) in doc_steps.iter().enumerate() {
                         ui.label(RichText::new(format!("{}. {}", idx + 1, step)).size(13.0).color(Color32::from_rgb(200, 200, 200)));
                     }
+
+                    ui.add_space(12.0);
+                    ui.separator();
+                    ui.add_space(8.0);
+                    ui.horizontal(|ui| {
+                        ui.label(RichText::new("DEVELOPER SPECIFICATIONS:").size(10.5).strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                            let track_target = match doc.id {
+                                "photocraft" => 0,
+                                "effectcraft" => 1,
+                                "vectorcraft" => 3,
+                                "filmcraft" => 5,
+                                "soundcraft" => 4,
+                                "pdfcraft" => 6,
+                                "designcraft" => 7,
+                                "lightcraft" => 0,
+                                "cadcraft" => 7,
+                                _ => 0,
+                            };
+                            if ui.button(RichText::new("🛠️  View Developer SDK Guide & Code Template ↗").size(11.5).strong()).clicked() {
+                                switch_to_track = Some(track_target);
+                            }
+                        });
+                    });
                 });
 
             if let Some((plat, path)) = copied_path {
                 ui.ctx().copy_text(path.to_owned());
                 self.notification = Some(format!("Copied {plat} path for {doc_name} to clipboard"));
+            }
+
+            if let Some(track) = switch_to_track {
+                self.active_tab = ActiveTab::CreatePlugin;
+                self.create_track = track;
             }
 
             ui.add_space(16.0);
@@ -848,12 +971,16 @@ impl StoreApp {
         ui.add_space(6.0);
         ui.horizontal_wrapped(|ui| {
             let tracks = [
-                (0, "WASM Filters (PhotoCraft / LightCraft)"),
-                (1, "EffectCraft Video Effects & ScriptUI"),
-                (2, "VectorCraft Paths & Templates"),
-                (3, "SoundCraft & FilmCraft Presets"),
-                (4, "Sandboxing & Security Rules"),
-                (5, "Storefront Publishing Checklist"),
+                (0, "PhotoCraft & LightCraft (WASM ABI v1 & LUTs)"),
+                (1, "EffectCraft Video Effects (Render API v1)"),
+                (2, "EffectCraft ScriptUI Panels (.jsx)"),
+                (3, "VectorCraft Path Filters (wasmi) & Templates"),
+                (4, "SoundCraft Audio Plugins (CLAP / VST3 / AU)"),
+                (5, "FilmCraft Timeline Presets & 3D LUTs"),
+                (6, "PdfCraft ISO 32000 JavaScript Automation"),
+                (7, "DesignCraft & CADCraft Scripts"),
+                (8, "Sandboxing, Fuel Limits & Security Rules"),
+                (9, "Storefront Publishing Checklist"),
             ];
             for (idx, label) in tracks {
                 let selected = self.create_track == idx;
@@ -876,16 +1003,25 @@ impl StoreApp {
                     .stroke(Stroke::new(1.0_f32, Color32::from_rgb(55, 55, 55)))
                     .inner_margin(20.0)
                     .show(ui, |ui| {
-                        ui.label(RichText::new("PHOTOCRAFT & LIGHTCRAFT: WASM FILTER ABI v1").size(14.0).strong().color(Color32::from_rgb(243, 243, 243)));
+                        ui.label(RichText::new("PHOTOCRAFT & LIGHTCRAFT: WASM FILTER ABI v1 & 3D COLOR LUTS").size(14.0).strong().color(Color32::from_rgb(243, 243, 243)));
                         ui.add_space(8.0);
-                        ui.label(RichText::new("PhotoCraft and LightCraft execute sandboxed WebAssembly binaries compiled to wasm32-unknown-unknown. Plugins operate directly on RGBA pixel buffers with zero OS syscalls.")
+                        ui.label(RichText::new("PhotoCraft and LightCraft execute sandboxed WebAssembly binaries compiled to wasm32-unknown-unknown. Plugins operate directly on linear memory RGBA pixel buffers with zero operating system syscalls.")
                             .size(13.0).color(Color32::from_rgb(180, 180, 180)));
                         ui.add_space(12.0);
-                        ui.label(RichText::new("Required Export Symbols:").strong().color(Color32::from_rgb(219, 219, 219)));
-                        ui.label(RichText::new("• pc_abi_version() -> i32 (must return 1)\n• pc_manifest() -> i64 (packs manifest pointer and byte length)\n• pc_alloc(size: i32) -> i32 (heap allocator for input/output buffers)\n• pc_process(in_ptr, out_ptr, width, height, params_ptr, params_len) -> i32").monospace().size(11.5).color(Color32::from_rgb(200, 200, 200)));
+                        ui.label(RichText::new("Memory Layout & Buffer Format:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("• 32-bit interleaved RGBA [R, G, B, A] with 8-bits per channel in range 0..=255\n• Unmultiplied alpha with row-major memory order\n• Buffer byte length: width * height * 4 bytes\n• Linear memory page growth managed via core::arch::wasm32::memory_grow").size(12.0).color(Color32::from_rgb(200, 200, 200)));
+                        ui.add_space(12.0);
+                        ui.label(RichText::new("Mandatory Exported C ABI Functions:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("• pc_abi_version() -> i32: Must return integer 1\n• pc_manifest() -> i64: Returns packed pointer & length ((len << 32) | ptr) to JSON manifest\n• pc_alloc(size: i32) -> i32: Heap allocator for linear memory buffers\n• pc_process(in_ptr, out_ptr, width, height, params_ptr, params_len) -> i32: Applies filter; returns 0 on success").monospace().size(11.5).color(Color32::from_rgb(200, 200, 200)));
+                        ui.add_space(12.0);
+                        ui.label(RichText::new("Supported Parameter Manifest Types:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("• \"int\": Integer slider with min, max, default\n• \"float\": Floating-point slider with min, max, default, decimals\n• \"color\": 4-component RGBA vector [r, g, b, a] in range 0.0..1.0\n• \"checkbox\": Boolean toggle\n• \"popup\": Dropdown list with options array").size(12.0).color(Color32::from_rgb(200, 200, 200)));
+                        ui.add_space(12.0);
+                        ui.label(RichText::new("3D Look-Up Table (.cube) Specification:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("• Supported grid sizes: 17x17x17, 33x33x33, and 65x65x65 points\n• Standard Adobe/DaVinci .cube format with LUT_3D_SIZE, DOMAIN_MIN, DOMAIN_MAX\n• Real-time trilinear interpolation evaluated on GPU/CPU pixel shaders").size(12.0).color(Color32::from_rgb(200, 200, 200)));
                         ui.add_space(14.0);
                         ui.horizontal(|ui| {
-                            ui.label(RichText::new("Sample Rust Implementation:").strong().color(Color32::from_rgb(219, 219, 219)));
+                            ui.label(RichText::new("Sample Rust Filter Implementation (no_std):").strong().color(Color32::from_rgb(219, 219, 219)));
                             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                                 if ui.button(RichText::new("Copy Code").size(11.0)).clicked() {
                                     copied_snippet = Some(("PhotoCraft Filter", PHOTOCRAFT_FILTER_SNIPPET));
@@ -897,7 +1033,7 @@ impl StoreApp {
                             ui.label(RichText::new(PHOTOCRAFT_FILTER_SNIPPET).monospace().size(11.0).color(Color32::from_rgb(220, 220, 220)));
                         });
                         ui.add_space(12.0);
-                        ui.label(RichText::new("Compilation Command:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("Compilation & Audit Command:").strong().color(Color32::from_rgb(219, 219, 219)));
                         ui.label(RichText::new("cargo build --target wasm32-unknown-unknown --release").monospace().size(12.0).color(Color32::from_rgb(235, 235, 235)));
                     });
             }
@@ -907,13 +1043,22 @@ impl StoreApp {
                     .stroke(Stroke::new(1.0_f32, Color32::from_rgb(55, 55, 55)))
                     .inner_margin(20.0)
                     .show(ui, |ui| {
-                        ui.label(RichText::new("EFFECTCRAFT: RENDER EFFECTS (WASM) & SCRIPTUI PANELS (.jsx)").size(14.0).strong().color(Color32::from_rgb(243, 243, 243)));
+                        ui.label(RichText::new("EFFECTCRAFT: REAL-TIME VIDEO RENDER EFFECTS (WASM API v1)").size(14.0).strong().color(Color32::from_rgb(243, 243, 243)));
                         ui.add_space(8.0);
-                        ui.label(RichText::new("EffectCraft supports two plugin tiers:\n1. WASM Render Effects for real-time per-frame pixel processing (Color Correction, Distort, Generate).\n2. ExtendScript (.jsx) ScriptUI dockable panels for timeline automation, keyframing, and batch processing.")
+                        ui.label(RichText::new("EffectCraft render effects execute once per composition frame in the video playback and rendering pipeline. Built in Rust or WAT targeting WebAssembly, plugins operate on high-dynamic-range floating-point buffers.")
                             .size(13.0).color(Color32::from_rgb(180, 180, 180)));
+                        ui.add_space(12.0);
+                        ui.label(RichText::new("HDR Pixel Format & Buffer Layout:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("• 32-bit float RGBA [f32; 4] per pixel in range 0.0..1.0+ without clipping\n• High-precision color preservation for blurs, glows, light sweeps, and caustics\n• Reusable 8-byte aligned scratch allocation to avoid frame allocations").size(12.0).color(Color32::from_rgb(200, 200, 200)));
+                        ui.add_space(12.0);
+                        ui.label(RichText::new("Exported API v1 Functions:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("• ec_api_version() -> i32: Returns 1\n• ec_manifest_ptr() -> i32 & ec_manifest_len() -> i32: Manifest access\n• ec_alloc(bytes: i32) -> i32: Memory arena allocator\n• ec_render(width: i32, height: i32, time: f64, params_ptr: i32, in_pixels: i32, out_pixels: i32) -> i32").monospace().size(11.5).color(Color32::from_rgb(200, 200, 200)));
+                        ui.add_space(12.0);
+                        ui.label(RichText::new("Temporal Keyframing & Procedural Synthesis:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("• The time parameter provides fractional playback seconds (e.g. 2.50s at frame 60 in 24fps)\n• Procedural effects compute instantaneous phase: let phase = (time * speed) % cycle_period\n• Shader primitives: Signed Distance Fields (SDF), Sobel normal vectors, chromatic fringe dispersion").size(12.0).color(Color32::from_rgb(200, 200, 200)));
                         ui.add_space(14.0);
                         ui.horizontal(|ui| {
-                            ui.label(RichText::new("WASM Render Effect ABI v1:").strong().color(Color32::from_rgb(219, 219, 219)));
+                            ui.label(RichText::new("Sample WASM Render Effect Implementation:").strong().color(Color32::from_rgb(219, 219, 219)));
                             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                                 if ui.button(RichText::new("Copy Code").size(11.0)).clicked() {
                                     copied_snippet = Some(("EffectCraft Render Effect", EFFECTCRAFT_RENDER_SNIPPET));
@@ -924,9 +1069,27 @@ impl StoreApp {
                         Frame::new().fill(Color32::from_rgb(13, 13, 13)).inner_margin(12.0).corner_radius(egui::CornerRadius::same(6)).show(ui, |ui| {
                             ui.label(RichText::new(EFFECTCRAFT_RENDER_SNIPPET).monospace().size(11.0).color(Color32::from_rgb(220, 220, 220)));
                         });
+                    });
+            }
+            2 => {
+                Frame::new()
+                    .fill(Color32::from_rgb(26, 26, 26))
+                    .stroke(Stroke::new(1.0_f32, Color32::from_rgb(55, 55, 55)))
+                    .inner_margin(20.0)
+                    .show(ui, |ui| {
+                        ui.label(RichText::new("EFFECTCRAFT: SCRIPTUI DOCKABLE PANELS (.jsx EXTENDSCRIPT)").size(14.0).strong().color(Color32::from_rgb(243, 243, 243)));
+                        ui.add_space(8.0);
+                        ui.label(RichText::new("ExtendScript panels automate keyframing, timeline manipulation, layer batching, and custom UI controls. Panels dock seamlessly inside EffectCraft's workspace alongside Timeline and Effect Controls.")
+                            .size(13.0).color(Color32::from_rgb(180, 180, 180)));
+                        ui.add_space(12.0);
+                        ui.label(RichText::new("Host Object Model Hierarchy:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("• app.project: Active project entity\n• app.project.activeItem: Current active CompItem\n• comp.selectedLayers: Array of selected AVLayer / ShapeLayer objects\n• layer.property(\"Transform\").property(\"Position\").setValueAtTime(time, value)").size(12.0).color(Color32::from_rgb(200, 200, 200)));
+                        ui.add_space(12.0);
+                        ui.label(RichText::new("Mandatory Undo Safety Invariant:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("All script actions that modify project state must be wrapped with app.beginUndoGroup(\"Action Name\") and app.endUndoGroup(). This ensures single-step Ctrl+Z / Cmd+Z undo for creators.").size(12.0).color(Color32::from_rgb(200, 200, 200)));
                         ui.add_space(14.0);
                         ui.horizontal(|ui| {
-                            ui.label(RichText::new("ScriptUI Dockable Panel (.jsx):").strong().color(Color32::from_rgb(219, 219, 219)));
+                            ui.label(RichText::new("Sample ScriptUI Dockable Panel (.jsx):").strong().color(Color32::from_rgb(219, 219, 219)));
                             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                                 if ui.button(RichText::new("Copy Code").size(11.0)).clicked() {
                                     copied_snippet = Some(("ScriptUI Panel", SCRIPTUI_PANEL_SNIPPET));
@@ -939,19 +1102,25 @@ impl StoreApp {
                         });
                     });
             }
-            2 => {
+            3 => {
                 Frame::new()
                     .fill(Color32::from_rgb(26, 26, 26))
                     .stroke(Stroke::new(1.0_f32, Color32::from_rgb(55, 55, 55)))
                     .inner_margin(20.0)
                     .show(ui, |ui| {
-                        ui.label(RichText::new("VECTORCRAFT: OBJECT FILTERS (wasmi) & SVG TEMPLATES").size(14.0).strong().color(Color32::from_rgb(243, 243, 243)));
+                        ui.label(RichText::new("VECTORCRAFT: OBJECT FILTERS (wasmi ENGINE) & SVG TEMPLATES").size(14.0).strong().color(Color32::from_rgb(243, 243, 243)));
                         ui.add_space(8.0);
-                        ui.label(RichText::new("VectorCraft executes procedural geometry filters in an embedded wasmi interpreter with deterministic fuel limits. It also supports distribution of editable SVG template archives.")
+                        ui.label(RichText::new("VectorCraft executes procedural geometry filters in an embedded wasmi WebAssembly interpreter with instruction gas/fuel metering. It also supports editable SVG template archives.")
                             .size(13.0).color(Color32::from_rgb(180, 180, 180)));
+                        ui.add_space(12.0);
+                        ui.label(RichText::new("Geometry Pipeline & Manifest Capabilities:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("• Input: Bezier paths composed of anchor points, cubic in/out tangent control handles, and closed contour markers\n• Capabilities array: [\"path_transform\", \"bezier_subdivide\", \"color_recolor\"]\n• Gas budget: Plugins receive a deterministic fuel allocation to protect against infinite loops").size(12.0).color(Color32::from_rgb(200, 200, 200)));
+                        ui.add_space(12.0);
+                        ui.label(RichText::new("SVG Template Distribution Packages:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("• Standard .zip archives placed in templates/ directory\n• Contains template.svg with structured layer IDs, 512x512 thumbnail.png, and metadata.json\n• Loaded via File ▸ New From Template... in VectorCraft").size(12.0).color(Color32::from_rgb(200, 200, 200)));
                         ui.add_space(14.0);
                         ui.horizontal(|ui| {
-                            ui.label(RichText::new("VectorCraft Path Filter Manifest & ABI:").strong().color(Color32::from_rgb(219, 219, 219)));
+                            ui.label(RichText::new("VectorCraft Path Filter Implementation:").strong().color(Color32::from_rgb(219, 219, 219)));
                             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                                 if ui.button(RichText::new("Copy Code").size(11.0)).clicked() {
                                     copied_snippet = Some(("VectorCraft Filter", VECTORCRAFT_FILTER_SNIPPET));
@@ -964,33 +1133,146 @@ impl StoreApp {
                         });
                     });
             }
-            3 => {
-                Frame::new()
-                    .fill(Color32::from_rgb(26, 26, 26))
-                    .stroke(Stroke::new(1.0_f32, Color32::from_rgb(55, 55, 55)))
-                    .inner_margin(20.0)
-                    .show(ui, |ui| {
-                        ui.label(RichText::new("SOUNDCRAFT & FILMCRAFT: AUDIO & TIMELINE EXTENSIONS").size(14.0).strong().color(Color32::from_rgb(243, 243, 243)));
-                        ui.add_space(8.0);
-                        ui.label(RichText::new("• SoundCraft supports standard open CLAP (.clap), VST3 (.vst3), and macOS Audio Units (.component) alongside channel strip DSP presets.\n• FilmCraft supports declarative JSON effect presets (filmcraft.effect-presets v1) and industry-standard .cube 3D Look-Up Tables (17x17x17, 33x33x33, and 65x65x65 grid sizes).")
-                            .size(13.0).color(Color32::from_rgb(180, 180, 180)));
-                        ui.add_space(14.0);
-                        ui.label(RichText::new("FilmCraft CLI Preset Import:").strong().color(Color32::from_rgb(219, 219, 219)));
-                        ui.label(RichText::new("filmcraft-cli --project project.fcproj exec presets.import '{\"path\":\"presets.json\"}'").monospace().size(12.0).color(Color32::from_rgb(235, 235, 235)));
-                    });
-            }
             4 => {
                 Frame::new()
                     .fill(Color32::from_rgb(26, 26, 26))
                     .stroke(Stroke::new(1.0_f32, Color32::from_rgb(55, 55, 55)))
                     .inner_margin(20.0)
                     .show(ui, |ui| {
-                        ui.label(RichText::new("SANDBOXING & SECURITY RULES").size(14.0).strong().color(Color32::from_rgb(243, 243, 243)));
+                        ui.label(RichText::new("SOUNDCRAFT: AUDIO PLUGINS (CLAP / VST3 / AU) & DSP PRESETS").size(14.0).strong().color(Color32::from_rgb(243, 243, 243)));
                         ui.add_space(8.0);
-                        ui.label(RichText::new("To maintain stability, portability, and safety across all platforms, ArtCraft plugins run within strictly sandboxed environments:")
+                        ui.label(RichText::new("SoundCraft is a digital audio workstation loading open-standard audio plugins with sample-accurate automation. Creators can build audio effects, instruments, and channel strip DSP chains.")
                             .size(13.0).color(Color32::from_rgb(180, 180, 180)));
-                        ui.add_space(10.0);
-                        ui.label(RichText::new("1. Zero OS Syscalls: WASM plugins must not import POSIX syscalls, unconstrained filesystem access, or raw sockets.\n2. Bounded Memory: Plugins operate within linear memory limits (maximum 64MB per instance unless granted high-memory permission).\n3. Deterministic Rendering: Filters must output byte-identical pixels across Linux, macOS, and Windows.\n4. Execution Fuel: VectorCraft runs in a wasmi fuel-metered environment to prevent runaway loops.").size(12.5).color(Color32::from_rgb(200, 200, 200)));
+                        ui.add_space(12.0);
+                        ui.label(RichText::new("Supported Plugin Standards:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("• CLAP (.clap): Modern open C-ABI audio plugin standard with polyphonic modulation and thread pool support\n• VST3 (.vst3): Cross-platform industry standard plugin architecture\n• Audio Units (.component): Native macOS low-latency audio plugins").size(12.0).color(Color32::from_rgb(200, 200, 200)));
+                        ui.add_space(12.0);
+                        ui.label(RichText::new("Real-Time DSP Safety Invariants:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("• Zero heap allocation (malloc / Box::new) on the audio rendering thread\n• Lock-free synchronization between UI and DSP audio callback\n• Sample-accurate block processing with smoothed parameter ramps").size(12.0).color(Color32::from_rgb(200, 200, 200)));
+                        ui.add_space(14.0);
+                        ui.horizontal(|ui| {
+                            ui.label(RichText::new("Sample Channel Strip DSP Preset (.json):").strong().color(Color32::from_rgb(219, 219, 219)));
+                            ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                                if ui.button(RichText::new("Copy Code").size(11.0)).clicked() {
+                                    copied_snippet = Some(("SoundCraft Preset", SOUNDCRAFT_DSP_SNIPPET));
+                                }
+                            });
+                        });
+                        ui.add_space(6.0);
+                        Frame::new().fill(Color32::from_rgb(13, 13, 13)).inner_margin(12.0).corner_radius(egui::CornerRadius::same(6)).show(ui, |ui| {
+                            ui.label(RichText::new(SOUNDCRAFT_DSP_SNIPPET).monospace().size(11.0).color(Color32::from_rgb(220, 220, 220)));
+                        });
+                    });
+            }
+            5 => {
+                Frame::new()
+                    .fill(Color32::from_rgb(26, 26, 26))
+                    .stroke(Stroke::new(1.0_f32, Color32::from_rgb(55, 55, 55)))
+                    .inner_margin(20.0)
+                    .show(ui, |ui| {
+                        ui.label(RichText::new("FILMCRAFT: TIMELINE EFFECT PRESETS & 3D COLOR LUTS").size(14.0).strong().color(Color32::from_rgb(243, 243, 243)));
+                        ui.add_space(8.0);
+                        ui.label(RichText::new("FilmCraft enables modular timeline workflows through declarative JSON effect preset chains and creative 3D Look-Up Tables (.cube).")
+                            .size(13.0).color(Color32::from_rgb(180, 180, 180)));
+                        ui.add_space(12.0);
+                        ui.label(RichText::new("Declarative Effect Chain Schema:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("• filmcraft.effect-presets v1 specification\n• Multi-stage chaining: Luma Keying, Directional Blur, Chromatic Aberration, Composite Blends\n• Temporal easing: Linear, Bezier, Hold, and Exponential interpolation curves").size(12.0).color(Color32::from_rgb(200, 200, 200)));
+                        ui.add_space(12.0);
+                        ui.label(RichText::new("CLI Automation & Import:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("filmcraft-cli --project project.fcproj exec presets.import '{\"path\":\"presets.json\"}'").monospace().size(12.0).color(Color32::from_rgb(235, 235, 235)));
+                        ui.add_space(14.0);
+                        ui.horizontal(|ui| {
+                            ui.label(RichText::new("Sample FilmCraft Preset Chain (.json):").strong().color(Color32::from_rgb(219, 219, 219)));
+                            ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                                if ui.button(RichText::new("Copy Code").size(11.0)).clicked() {
+                                    copied_snippet = Some(("FilmCraft Preset", FILMCRAFT_PRESET_SNIPPET));
+                                }
+                            });
+                        });
+                        ui.add_space(6.0);
+                        Frame::new().fill(Color32::from_rgb(13, 13, 13)).inner_margin(12.0).corner_radius(egui::CornerRadius::same(6)).show(ui, |ui| {
+                            ui.label(RichText::new(FILMCRAFT_PRESET_SNIPPET).monospace().size(11.0).color(Color32::from_rgb(220, 220, 220)));
+                        });
+                    });
+            }
+            6 => {
+                Frame::new()
+                    .fill(Color32::from_rgb(26, 26, 26))
+                    .stroke(Stroke::new(1.0_f32, Color32::from_rgb(55, 55, 55)))
+                    .inner_margin(20.0)
+                    .show(ui, |ui| {
+                        ui.label(RichText::new("PDFCRAFT: FORM CALCULATIONS & DOCUMENT AUTOMATION (ISO 32000)").size(14.0).strong().color(Color32::from_rgb(243, 243, 243)));
+                        ui.add_space(8.0);
+                        ui.label(RichText::new("PdfCraft runs Acrobat JavaScript (ISO 32000 standard) inside a sandboxed Boa engine. Scripts automate document calculation, validate input keystrokes, and manage interactive fields.")
+                            .size(13.0).color(Color32::from_rgb(180, 180, 180)));
+                        ui.add_space(12.0);
+                        ui.label(RichText::new("Event Model & Form DOM:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("• event.value: Target field value during calculation or formatting\n• event.change: Key character during keystroke validation events\n• this.getField(\"FieldName\"): Access document field objects and values\n• util.printf(\"$%.2f\", total): Formats numbers into currency or decimals").size(12.0).color(Color32::from_rgb(200, 200, 200)));
+                        ui.add_space(14.0);
+                        ui.horizontal(|ui| {
+                            ui.label(RichText::new("Sample ISO 32000 Form Calculator Script:").strong().color(Color32::from_rgb(219, 219, 219)));
+                            ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                                if ui.button(RichText::new("Copy Code").size(11.0)).clicked() {
+                                    copied_snippet = Some(("PdfCraft Script", PDFCRAFT_JS_SNIPPET));
+                                }
+                            });
+                        });
+                        ui.add_space(6.0);
+                        Frame::new().fill(Color32::from_rgb(13, 13, 13)).inner_margin(12.0).corner_radius(egui::CornerRadius::same(6)).show(ui, |ui| {
+                            ui.label(RichText::new(PDFCRAFT_JS_SNIPPET).monospace().size(11.0).color(Color32::from_rgb(220, 220, 220)));
+                        });
+                    });
+            }
+            7 => {
+                Frame::new()
+                    .fill(Color32::from_rgb(26, 26, 26))
+                    .stroke(Stroke::new(1.0_f32, Color32::from_rgb(55, 55, 55)))
+                    .inner_margin(20.0)
+                    .show(ui, |ui| {
+                        ui.label(RichText::new("DESIGNCRAFT LAYOUTS & CADCRAFT PARAMETRIC MACROS").size(14.0).strong().color(Color32::from_rgb(243, 243, 243)));
+                        ui.add_space(8.0);
+                        ui.label(RichText::new("DesignCraft supports publication templates (IDML packages and typographic styles), while CADCraft executes batch command scripts (.cadscr) for precision 2D/3D drafting.")
+                            .size(13.0).color(Color32::from_rgb(180, 180, 180)));
+                        ui.add_space(12.0);
+                        ui.label(RichText::new("CADCraft Scripting Syntax (.cadscr):").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("• Headless execution: One command and argument pair per line\n• Drawing primitives: LINE, CIRCLE, ARC, PLINE, EXTRUDE\n• Layer assignment: -LAYER M <name> C <color> <name> and -LAYER S <name>\n• Viewport controls: ZOOM EXTENTS, REGEN").size(12.0).color(Color32::from_rgb(200, 200, 200)));
+                        ui.add_space(14.0);
+                        ui.horizontal(|ui| {
+                            ui.label(RichText::new("Sample CADCraft Flange Script (.cadscr):").strong().color(Color32::from_rgb(219, 219, 219)));
+                            ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                                if ui.button(RichText::new("Copy Code").size(11.0)).clicked() {
+                                    copied_snippet = Some(("CADCraft Script", CADCRAFT_SCRIPT_SNIPPET));
+                                }
+                            });
+                        });
+                        ui.add_space(6.0);
+                        Frame::new().fill(Color32::from_rgb(13, 13, 13)).inner_margin(12.0).corner_radius(egui::CornerRadius::same(6)).show(ui, |ui| {
+                            ui.label(RichText::new(CADCRAFT_SCRIPT_SNIPPET).monospace().size(11.0).color(Color32::from_rgb(220, 220, 220)));
+                        });
+                    });
+            }
+            8 => {
+                Frame::new()
+                    .fill(Color32::from_rgb(26, 26, 26))
+                    .stroke(Stroke::new(1.0_f32, Color32::from_rgb(55, 55, 55)))
+                    .inner_margin(20.0)
+                    .show(ui, |ui| {
+                        ui.label(RichText::new("SANDBOXING, FUEL LIMITS & SECURITY INVARIANTS").size(14.0).strong().color(Color32::from_rgb(243, 243, 243)));
+                        ui.add_space(8.0);
+                        ui.label(RichText::new("To maintain crash resilience, host security, and cross-platform portability across Linux, macOS, and Windows, all plugins must satisfy four core invariants:")
+                            .size(13.0).color(Color32::from_rgb(180, 180, 180)));
+                        ui.add_space(12.0);
+                        ui.label(RichText::new("1. Zero OS Syscalls:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("WASM modules must not import POSIX syscalls, unconstrained filesystem I/O, or raw TCP/UDP sockets. All state transfer is mediated via linear memory buffers.").size(12.0).color(Color32::from_rgb(200, 200, 200)));
+                        ui.add_space(8.0);
+                        ui.label(RichText::new("2. Linear Memory Bounds:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("Modules operate within isolated 64MB linear memory arenas by default. Memory expansions via memory_grow must check bounds explicitly to avoid OOM panics.").size(12.0).color(Color32::from_rgb(200, 200, 200)));
+                        ui.add_space(8.0);
+                        ui.label(RichText::new("3. Cross-Platform Determinism:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("Image and video filters must produce bit-identical results on x86_64 and ARM64. Avoid host-dependent floating-point behavior or unseeded randomness.").size(12.0).color(Color32::from_rgb(200, 200, 200)));
+                        ui.add_space(8.0);
+                        ui.label(RichText::new("4. Instruction Fuel Metering:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("VectorCraft's wasmi engine and EffectCraft interpreters decrement a CPU fuel meter per instruction. Infinite loops terminate gracefully without freezing the host UI.").size(12.0).color(Color32::from_rgb(200, 200, 200)));
                     });
             }
             _ => {
@@ -999,13 +1281,28 @@ impl StoreApp {
                     .stroke(Stroke::new(1.0_f32, Color32::from_rgb(55, 55, 55)))
                     .inner_margin(20.0)
                     .show(ui, |ui| {
-                        ui.label(RichText::new("STOREFRONT PUBLISHING CHECKLIST").size(14.0).strong().color(Color32::from_rgb(243, 243, 243)));
+                        ui.label(RichText::new("STOREFRONT PUBLISHING & VERIFICATION CHECKLIST").size(14.0).strong().color(Color32::from_rgb(243, 243, 243)));
                         ui.add_space(8.0);
-                        ui.label(RichText::new("Follow these steps to submit your new plugin or extension to the ArtCraft Store catalog:")
+                        ui.label(RichText::new("Follow this 5-step checklist to submit your extension to the official ArtCraft Store catalog:")
                             .size(13.0).color(Color32::from_rgb(180, 180, 180)));
+                        ui.add_space(12.0);
+                        ui.label(RichText::new("1. Repository Structure:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("Place plugin source code under plugins/<app>/<plugin-name>/ or link an open GitHub repository.").size(12.0).color(Color32::from_rgb(200, 200, 200)));
+                        ui.add_space(8.0);
+                        ui.label(RichText::new("2. Catalog Registration:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("Add your item to catalog.json with id, name, app, kind, version, author, description, tags, and artifact filename.").size(12.0).color(Color32::from_rgb(200, 200, 200)));
+                        ui.add_space(8.0);
+                        ui.label(RichText::new("3. Compile Release Artifacts:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("Run bash build-all.sh to compile WASM binaries and copy release packages to dist/.").size(12.0).color(Color32::from_rgb(200, 200, 200)));
+                        ui.add_space(8.0);
+                        ui.label(RichText::new("4. Run Automated Audits:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("Execute python3 scripts/validate_catalog.py --check-artifacts and python3 -m unittest discover tests.").size(12.0).color(Color32::from_rgb(200, 200, 200)));
+                        ui.add_space(8.0);
+                        ui.label(RichText::new("5. Submit Pull Request:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("Open a Pull Request on GitHub or file an issue using the Plugin Review template.").size(12.0).color(Color32::from_rgb(200, 200, 200)));
                         ui.add_space(14.0);
                         ui.horizontal(|ui| {
-                            ui.label(RichText::new("Step-by-Step Submission Instructions:").strong().color(Color32::from_rgb(219, 219, 219)));
+                            ui.label(RichText::new("Submission Checklist & Commands:").strong().color(Color32::from_rgb(219, 219, 219)));
                             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                                 if ui.button(RichText::new("Copy Checklist").size(11.0)).clicked() {
                                     copied_snippet = Some(("Publishing Checklist", PUBLISHING_CHECKLIST_SNIPPET));
