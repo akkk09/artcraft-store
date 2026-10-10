@@ -221,20 +221,22 @@
   win.orientation = "column";
   win.alignChildren = ["fill", "top"];
   win.spacing = 6;
-  win.margins = 8;
+  win.margins = [8, 8, 8, 8];
 
   // --- Row 1: Channel Selector & View Modes ---
-  var row1 = win.add("group");
+  var row1 = win.add("group", undefined, undefined, { name: "row1" });
   row1.orientation = "row";
   row1.alignChildren = ["left", "center"];
-  row1.spacing = 8;
+  row1.alignment = ["fill", "top"];
+  row1.spacing = 6;
 
   var btnRefresh = row1.add("button", undefined, "↻ Refresh", { name: "btnRefresh" });
   btnRefresh.helpTip = "Scan selected layers and properties for animation channels";
+  btnRefresh.preferredSize = [75, 24];
 
   row1.add("statictext", undefined, "Channel:");
   var dropChannels = row1.add("dropdownlist", undefined, ["(No animated channels)"], { name: "dropChannels" });
-  dropChannels.size = [160, 24];
+  dropChannels.preferredSize = [150, 24];
 
   row1.add("statictext", undefined, "View:");
   var dropView = row1.add("dropdownlist", undefined, [
@@ -244,6 +246,7 @@
     "Speed Graph"
   ], { name: "dropView" });
   dropView.selection = 0;
+  dropView.preferredSize = [140, 24];
 
   var chkBuffer = row1.add("checkbox", undefined, "Buffer Ghost", { name: "chkBuffer" });
   chkBuffer.helpTip = "Show ghosted reference snapshot of curves before edits";
@@ -254,22 +257,15 @@
   chkLattice.value = false;
 
   // --- Row 2: Interactive Curve Canvas ---
-  var canvasGroup = win.add("group");
-  canvasGroup.orientation = "column";
-  canvasGroup.alignChildren = ["fill", "fill"];
-  canvasGroup.alignment = ["fill", "fill"];
-  canvasGroup.size = [560, 220];
-
-  // Canvas container that paints with ScriptUIGraphics
-  var graphCanvas = canvasGroup.add("group", undefined, undefined, { name: "graphCanvas" });
-  graphCanvas.size = [560, 220];
+  var graphCanvas = win.add("group", undefined, undefined, { name: "graphCanvas" });
+  graphCanvas.preferredSize = [-1, 140];
   graphCanvas.alignment = ["fill", "fill"];
 
   // Custom onDraw handler for the Graph Canvas
   graphCanvas.onDraw = function () {
     var g = this.graphics;
-    var w = this.size[0] || 560;
-    var h = this.size[1] || 220;
+    var w = (this.size && (this.size[0] || this.size.width)) || 560;
+    var h = (this.size && (this.size[1] || this.size.height)) || 140;
 
     // Dark canvas background (3D DCC theme)
     var bgBrush = g.newBrush(g.BrushType.SOLID_COLOR, [0.12, 0.14, 0.18, 1.0]);
@@ -453,99 +449,120 @@
   };
 
   // --- Row 3: Tangent & Preset Toolbar ---
-  var row3 = win.add("group");
+  var row3 = win.add("group", undefined, undefined, { name: "row3" });
   row3.orientation = "row";
   row3.alignChildren = ["left", "center"];
-  row3.spacing = 6;
+  row3.alignment = ["fill", "top"];
+  row3.spacing = 4;
 
   var btnBezier = row3.add("button", undefined, "Bezier [B]", { name: "btnBezier" });
   btnBezier.helpTip = "Set cubic Bézier smooth tangents";
+  btnBezier.preferredSize = [70, 22];
 
   var btnLinear = row3.add("button", undefined, "Linear [L]", { name: "btnLinear" });
   btnLinear.helpTip = "Set linear interpolation";
+  btnLinear.preferredSize = [65, 22];
 
   var btnHold = row3.add("button", undefined, "Hold [H]", { name: "btnHold" });
   btnHold.helpTip = "Set stepped hold interpolation";
+  btnHold.preferredSize = [60, 22];
 
   var btnAutoClamp = row3.add("button", undefined, "Auto-Clamp", { name: "btnAutoClamp" });
   btnAutoClamp.helpTip = "Flatten tangents at peaks/valleys to prevent overshoot";
+  btnAutoClamp.preferredSize = [75, 22];
 
   var btnEasyEase = row3.add("button", undefined, "Easy Ease", { name: "btnEasyEase" });
   btnEasyEase.helpTip = "Standard 33% influence, 0 speed";
+  btnEasyEase.preferredSize = [70, 22];
 
   var btnPunch = row3.add("button", undefined, "Punch (75%)", { name: "btnPunch" });
   btnPunch.helpTip = "Dynamic motion punch: 75% influence";
+  btnPunch.preferredSize = [75, 22];
 
   var chkUnified = row3.add("checkbox", undefined, "Unified Tangents", { name: "chkUnified" });
   chkUnified.value = true;
   chkUnified.helpTip = "Keep In and Out tangent handles collinear";
 
   var btnCopyEase = row3.add("button", undefined, "Copy Ease", { name: "btnCopyEase" });
+  btnCopyEase.preferredSize = [68, 22];
+
   var btnPasteEase = row3.add("button", undefined, "Paste Ease", { name: "btnPasteEase" });
+  btnPasteEase.preferredSize = [68, 22];
 
   // --- Row 4: FFD Lattice Controls (visible when Lattice is checked) ---
   var pnlLattice = win.add("panel", undefined, "Lattice / FFD Cage Manipulation", { name: "pnlLattice" });
   pnlLattice.orientation = "row";
   pnlLattice.alignChildren = ["left", "center"];
-  pnlLattice.spacing = 8;
+  pnlLattice.alignment = ["fill", "top"];
+  pnlLattice.spacing = 6;
+  pnlLattice.margins = [8, 14, 8, 6];
   pnlLattice.visible = false;
 
   pnlLattice.add("statictext", undefined, "Time Scale %:");
   var txtTimeScale = pnlLattice.add("edittext", undefined, "100", { name: "txtTimeScale" });
-  txtTimeScale.size = [45, 20];
+  txtTimeScale.preferredSize = [42, 20];
 
-  pnlLattice.add("statictext", undefined, "Value Scale %:");
+  pnlLattice.add("statictext", undefined, "Val Scale %:");
   var txtValScale = pnlLattice.add("edittext", undefined, "100", { name: "txtValScale" });
-  txtValScale.size = [45, 20];
+  txtValScale.preferredSize = [42, 20];
 
-  pnlLattice.add("statictext", undefined, "Time Shift (s):");
+  pnlLattice.add("statictext", undefined, "Shift (s):");
   var txtTimeShift = pnlLattice.add("edittext", undefined, "0.0", { name: "txtTimeShift" });
-  txtTimeShift.size = [45, 20];
+  txtTimeShift.preferredSize = [42, 20];
 
   pnlLattice.add("statictext", undefined, "Anchor:");
   var dropAnchor = pnlLattice.add("dropdownlist", undefined, ["Left (Start)", "Center", "Right (End)"], { name: "dropAnchor" });
   dropAnchor.selection = 1;
+  dropAnchor.preferredSize = [105, 22];
 
   var btnApplyLattice = pnlLattice.add("button", undefined, "Apply Lattice", { name: "btnApplyLattice" });
   btnApplyLattice.helpTip = "Deform and retime keyframes within the lattice cage";
+  btnApplyLattice.preferredSize = [85, 22];
 
   // --- Row 5: Precision Keyframe Inspector ---
   var pnlInspect = win.add("panel", undefined, "Keyframe Precision Inspector", { name: "pnlInspect" });
   pnlInspect.orientation = "row";
   pnlInspect.alignChildren = ["left", "center"];
-  pnlInspect.spacing = 8;
+  pnlInspect.alignment = ["fill", "top"];
+  pnlInspect.spacing = 6;
+  pnlInspect.margins = [8, 14, 8, 6];
 
   pnlInspect.add("statictext", undefined, "Time (s):");
   var txtKeyTime = pnlInspect.add("edittext", undefined, "0.000", { name: "txtKeyTime" });
-  txtKeyTime.size = [55, 20];
+  txtKeyTime.preferredSize = [50, 20];
 
   pnlInspect.add("statictext", undefined, "Value:");
   var txtKeyValue = pnlInspect.add("edittext", undefined, "0.0", { name: "txtKeyValue" });
-  txtKeyValue.size = [60, 20];
+  txtKeyValue.preferredSize = [55, 20];
 
   pnlInspect.add("statictext", undefined, "In Inf%:");
   var txtInInf = pnlInspect.add("edittext", undefined, "33.3", { name: "txtInInf" });
-  txtInInf.size = [45, 20];
+  txtInInf.preferredSize = [38, 20];
 
   pnlInspect.add("statictext", undefined, "Out Inf%:");
   var txtOutInf = pnlInspect.add("edittext", undefined, "33.3", { name: "txtOutInf" });
-  txtOutInf.size = [45, 20];
+  txtOutInf.preferredSize = [38, 20];
 
   var btnApplyKey = pnlInspect.add("button", undefined, "Apply Key", { name: "btnApplyKey" });
   btnApplyKey.helpTip = "Apply numerical tangent and value changes to active keyframe";
+  btnApplyKey.preferredSize = [70, 22];
 
   var btnInsertKey = pnlInspect.add("button", undefined, "Insert on Curve", { name: "btnInsertKey" });
   btnInsertKey.helpTip = "Insert a keyframe at CTI without altering the curve trajectory";
+  btnInsertKey.preferredSize = [105, 22];
 
   var btnDeleteKey = pnlInspect.add("button", undefined, "Delete Key", { name: "btnDeleteKey" });
+  btnDeleteKey.preferredSize = [75, 22];
 
   // --- Row 6: Status & Feedback Bar ---
-  var rowStatus = win.add("group");
+  var rowStatus = win.add("group", undefined, undefined, { name: "rowStatus" });
   rowStatus.orientation = "row";
   rowStatus.alignChildren = ["fill", "center"];
+  rowStatus.alignment = ["fill", "bottom"];
 
   var lblStatus = rowStatus.add("statictext", undefined, "Citron Ready. Select animated layer and click Refresh.", { name: "status" });
   lblStatus.alignment = ["fill", "center"];
+  lblStatus.preferredSize = [-1, 16];
 
   // --- Event Handlers & Workflows ---
 
