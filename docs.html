@@ -1799,16 +1799,103 @@ cargo build --target wasm32-unknown-unknown --release
       <!-- Part 4: Other Apps -->
       <div class="guide-box" id="dev-other-apps" style="margin-bottom: 22px;">
         <div class="snippet-title" style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 8px;">
-          <span>4. Creating Extensions for VectorCraft, FilmCraft, SoundCraft &amp; PdfCraft</span>
-          <span class="badge-pill">SVG · 3D LUTs · CLAP / VST3 · Acrobat JS</span>
+          <span>4. Creating Extensions for VectorCraft, SoundCraft, FilmCraft, PdfCraft &amp; CADCraft</span>
+          <span class="badge-pill">SVG · wasmi · CLAP / VST3 · Timeline JSON · Acrobat JS</span>
         </div>
-        <p>Each application in the ArtCraft suite provides a dedicated extension mechanism:</p>
-        <ul>
-          <li><strong>VectorCraft (ABI v1):</strong> WASM object filters that receive SVG DOM node trees or path coordinate arrays and apply parametric geometric transformations or palette remaps.</li>
-          <li><strong>FilmCraft &amp; LightCraft (3D LUTs):</strong> Standard <code>.cube</code> files (17&times;17&times;17 or 33&times;33&times;33 RGB lookup tables) and native <code>filmcraft.effect-presets</code> XML chains.</li>
-          <li><strong>SoundCraft (Audio Plug-ins):</strong> Standard open audio plugin formats including <strong>CLAP</strong> (<code>.clap</code>), <strong>VST3</strong> (<code>.vst3</code>), and macOS <strong>Audio Units</strong> (<code>.component</code>), alongside JSON channel-strip DSP configuration bundles.</li>
-          <li><strong>PdfCraft (Acrobat JS):</strong> JavaScript scripts conforming to ISO 32000 executed inside a pure-Rust Boa sandbox for automated invoice calculations, document actions, and keystroke validators.</li>
-        </ul>
+        <p>Each application across the ArtCraft ecosystem provides specialized native extension points and APIs tailored to its creative domain:</p>
+
+        <h5 style="margin: 16px 0 6px; font-size: 12.5px; color: var(--accent); text-transform: uppercase; letter-spacing: .05em;">A. VectorCraft Object Filters (wasmi sandbox) &amp; SVG Templates</h5>
+        <p>
+          VectorCraft executes procedural geometry filters in an embedded <code>wasmi</code> interpreter with instruction fuel budgets. Modules receive Bezier curve segments, anchor points, and tangent handles, applying parametric transformations:
+        </p>
+        <pre><code>// VectorCraft Path Transform Filter (ABI v1, wasmi sandbox)
+pub const MANIFEST: &amp;str = r#"{
+  "abi": 1,
+  "id": "org.vectorcraft.plugins.jitter",
+  "name": "Path Jitter",
+  "version": "1.0.0",
+  "capabilities": ["path_transform", "bezier_subdivide"]
+}"#;
+
+#[no_mangle]
+pub extern "C" fn vc_abi_version() -&gt; i32 { 1 }
+
+#[no_mangle]
+pub extern "C" fn vc_manifest_ptr() -&gt; i32 { MANIFEST.as_ptr() as usize as i32 }
+
+#[no_mangle]
+pub extern "C" fn vc_manifest_len() -&gt; i32 { MANIFEST.len() as i32 }</code></pre>
+
+        <h5 style="margin: 16px 0 6px; font-size: 12.5px; color: var(--accent); text-transform: uppercase; letter-spacing: .05em;">B. SoundCraft Audio Plugins &amp; Channel Strip DSP Chains</h5>
+        <p>
+          SoundCraft supports open-standard <strong>CLAP</strong> (<code>.clap</code>), <strong>VST3</strong> (<code>.vst3</code>), and macOS <strong>Audio Units</strong> (<code>.component</code>). Plugins operate with zero heap allocation on the audio thread and sample-accurate automation. Channel strip presets bundle multi-insert chains:
+        </p>
+        <pre><code>{
+  "format": "soundcraft.channel-strip",
+  "version": "1.0.0",
+  "name": "Vocal Dynamics &amp; Air Preset",
+  "plugins": [
+    { "format": "clap", "id": "org.clap.high-pass-filter", "params": { "cutoff_hz": 80.0, "slope_db_oct": 18 } },
+    { "format": "vst3", "id": "org.vst3.opto-compressor", "params": { "threshold_db": -18.5, "ratio": 4.0, "attack_ms": 15.0, "release_ms": 120.0 } },
+    { "format": "clap", "id": "org.clap.air-shelf-eq", "params": { "frequency_hz": 12000.0, "gain_db": 3.5, "q": 0.7 } }
+  ]
+}</code></pre>
+
+        <h5 style="margin: 16px 0 6px; font-size: 12.5px; color: var(--accent); text-transform: uppercase; letter-spacing: .05em;">C. FilmCraft Declarative Timeline Presets (JSON v1) &amp; 3D LUTs</h5>
+        <p>
+          FilmCraft enables declarative parameter and effect chains adhering to the <code>filmcraft.effect-presets v1</code> schema. Chains support multi-stage keying, blurs, and composite modes, automatable via the CLI:
+        </p>
+        <pre><code>{
+  "format": "filmcraft.effect-presets",
+  "version": "1.0.0",
+  "id": "org.filmcraft.presets.cinematic-glow",
+  "name": "Cinematic Anamorphic Bloom",
+  "effects": [
+    { "name": "Luma Key", "params": { "threshold": 0.82, "softness": 0.15 } },
+    { "name": "Directional Blur", "params": { "direction": 90.0, "length": 45.0 } },
+    { "name": "Chromatic Aberration", "params": { "red_shift": 1.02, "blue_shift": 0.98 } },
+    { "name": "Composite Blend", "params": { "mode": "Screen", "opacity": 0.65 } }
+  ]
+}</code></pre>
+
+        <h5 style="margin: 16px 0 6px; font-size: 12.5px; color: var(--accent); text-transform: uppercase; letter-spacing: .05em;">D. PdfCraft Form Tools &amp; Document Automation (ISO 32000 JavaScript)</h5>
+        <p>
+          PdfCraft runs Acrobat JavaScript (ISO 32000 standard) in a sandboxed Boa engine. Scripts bind to form calculation hooks, keystroke validation events, and formatting handlers:
+        </p>
+        <pre><code>// Dynamic Invoice Total Calculator &amp; Tax Validator
+(function () {
+    var subtotalField = this.getField("Subtotal");
+    var taxRateField = this.getField("TaxRate");
+    var totalField = this.getField("GrandTotal");
+
+    if (subtotalField &amp;&amp; taxRateField &amp;&amp; totalField) {
+        var subtotal = Number(subtotalField.value) || 0.0;
+        var taxRate = Number(taxRateField.value) || 0.0;
+        var grandTotal = subtotal + (subtotal * (taxRate / 100.0));
+        totalField.value = util.printf("$%.2f", grandTotal);
+    }
+})();</code></pre>
+
+        <h5 style="margin: 16px 0 6px; font-size: 12.5px; color: var(--accent); text-transform: uppercase; letter-spacing: .05em;">E. CADCraft Batch Command Scripts (.cadscr)</h5>
+        <p>
+          CADCraft executes headless, line-by-line command scripts for precision 2D drafting and 3D modeling routines:
+        </p>
+        <pre><code>; CADCraft Parametric Flange Drawing Script (.cadscr)
+-UNITS 2 4 1 2 0 N
+-LAYER M Geometry C 7 Geometry 
+-LAYER M Centerlines C 1 Centerlines 
+-LAYER S Geometry 
+CIRCLE 100,100 90
+CIRCLE 100,100 45
+-LAYER S Centerlines 
+LINE 5,100 195,100 
+LINE 100,5 100,195 
+-LAYER S Geometry 
+CIRCLE 148.5,148.5 7.5
+CIRCLE 51.5,148.5 7.5
+CIRCLE 51.5,51.5 7.5
+CIRCLE 148.5,51.5 7.5
+ZOOM EXTENTS</code></pre>
       </div>
 
       <!-- Part 5: Sandbox & Security -->
