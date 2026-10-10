@@ -173,9 +173,31 @@ const APP_DOCS: &[AppDoc] = &[
 ];
 
 #[derive(Debug, Clone, Deserialize, Default)]
+struct Fork {
+    #[serde(default)]
+    name: String,
+    #[serde(default)]
+    app: String,
+    #[serde(default)]
+    author: String,
+    #[serde(default)]
+    version: String,
+    #[serde(default)]
+    description: String,
+    #[serde(default)]
+    url: String,
+    #[serde(default, rename = "sourceUrl")]
+    source_url: Option<String>,
+    #[serde(default)]
+    tags: Vec<String>,
+}
+
+#[derive(Debug, Clone, Deserialize, Default)]
 struct Catalog {
     #[serde(default)]
     plugins: Vec<Plugin>,
+    #[serde(default)]
+    forks: Vec<Fork>,
 }
 
 #[derive(Debug, Clone, Deserialize, Default)]
@@ -212,6 +234,7 @@ struct Plugin {
 
 struct StoreApp {
     plugins: Vec<Plugin>,
+    forks: Vec<Fork>,
     search: String,
     active_app: String,
     active_tab: ActiveTab,
@@ -244,6 +267,7 @@ impl StoreApp {
 
         Self {
             plugins: catalog.plugins,
+            forks: catalog.forks,
             search: String::new(),
             active_app: "all".to_owned(),
             active_tab: ActiveTab::Catalog,
@@ -370,6 +394,64 @@ impl StoreApp {
                         ui.add_space(8.0);
                         if ui.button(RichText::new("Install Guide").size(11.0)).clicked() {
                             *switch_to_docs = Some(plugin.app.clone());
+                        }
+                    });
+                });
+            });
+    }
+
+    fn fork_card(ui: &mut egui::Ui, fork: &Fork) {
+        Frame::new()
+            .fill(Color32::from_rgb(26, 26, 26))
+            .stroke(Stroke::new(1.0_f32, Color32::from_rgb(55, 55, 55)))
+            .inner_margin(16.0)
+            .show(ui, |ui| {
+                ui.set_min_width(ui.available_width());
+                ui.horizontal(|ui| {
+                    let initial = fork.name.chars().next().unwrap_or('F').to_uppercase().to_string();
+                    Frame::new()
+                        .fill(Color32::from_rgb(219, 219, 219))
+                        .inner_margin(egui::Margin::same(9))
+                        .corner_radius(egui::CornerRadius::same(8))
+                        .show(ui, |ui| {
+                            ui.label(RichText::new(initial).color(Color32::from_rgb(23, 23, 23)).strong().size(20.0));
+                        });
+                    ui.add_space(4.0);
+                    ui.vertical(|ui| {
+                        ui.label(RichText::new(Self::app_name(&fork.app)).color(Color32::from_rgb(219, 219, 219)).size(12.0).strong());
+                        ui.label(RichText::new("Community Fork / Extended Runtime").color(Color32::from_rgb(162, 162, 162)).size(11.0));
+                    });
+                    ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                        ui.label(RichText::new(if fork.version.is_empty() { "Latest" } else { &fork.version })
+                            .color(Color32::from_rgb(162, 162, 162)).size(11.0));
+                    });
+                });
+
+                ui.add_space(13.0);
+                ui.label(RichText::new(&fork.name).font(FontId::proportional(21.0)).strong().color(Color32::from_rgb(243, 243, 243)));
+                ui.add_space(5.0);
+                ui.label(RichText::new(&fork.description).size(13.0).color(Color32::from_rgb(180, 180, 180)));
+                ui.add_space(10.0);
+
+                ui.horizontal_wrapped(|ui| {
+                    for tag in fork.tags.iter().take(5) {
+                        ui.label(RichText::new(format!("· {tag}")).size(10.5).color(Color32::from_rgb(146, 146, 146)));
+                    }
+                });
+
+                ui.add_space(12.0);
+                ui.separator();
+                ui.add_space(7.0);
+                ui.horizontal(|ui| {
+                    ui.label(RichText::new(format!("by {}", if fork.author.is_empty() { "Community" } else { &fork.author }))
+                        .size(11.0).color(Color32::from_rgb(146, 146, 146)));
+                    ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                        if !fork.url.is_empty() {
+                            ui.hyperlink_to(RichText::new("Latest Release ↗").strong().color(Color32::from_rgb(219, 219, 219)), &fork.url);
+                        }
+                        if let Some(src) = &fork.source_url {
+                            ui.add_space(8.0);
+                            ui.hyperlink_to(RichText::new("Source Fork ↗").size(11.0), src);
                         }
                     });
                 });
@@ -528,6 +610,29 @@ impl StoreApp {
             }
 
             ui.add_space(16.0);
+        }
+
+        // Community Forks Section in Docs
+        if !self.forks.is_empty() && (self.docs_app == "all" || self.docs_app == "effectcraft") {
+            ui.add_space(10.0);
+            Frame::new()
+                .fill(Color32::from_rgb(26, 26, 26))
+                .stroke(Stroke::new(1.0_f32, Color32::from_rgb(55, 55, 55)))
+                .inner_margin(20.0)
+                .show(ui, |ui| {
+                    ui.label(RichText::new("COMMUNITY FORKS & EXTENDED RUNTIMES").size(10.5).strong().color(Color32::from_rgb(219, 219, 219)));
+                    ui.add_space(6.0);
+                    ui.label(RichText::new("Modified engine runtimes and external plugin hosts.").size(20.0).strong().color(Color32::from_rgb(243, 243, 243)));
+                    ui.add_space(6.0);
+                    ui.label(RichText::new("Some community projects fork the core ArtCraft repositories to extend the engine itself with external plugin standards (e.g., OpenFX) or proprietary project file parsers. These run as standalone modified builds rather than standard user plugins.")
+                        .size(13.5).color(Color32::from_rgb(180, 180, 180)));
+                    ui.add_space(14.0);
+                    for fork in &self.forks {
+                        Self::fork_card(ui, fork);
+                        ui.add_space(8.0);
+                    }
+                });
+            ui.add_space(14.0);
         }
 
         // Developer Section
@@ -691,6 +796,23 @@ impl eframe::App for StoreApp {
                             if let Some(target_app) = switch_to_docs {
                                 self.active_tab = ActiveTab::Docs;
                                 self.docs_app = target_app;
+                            }
+
+                            if !self.forks.is_empty() {
+                                ui.add_space(26.0);
+                                ui.separator();
+                                ui.add_space(20.0);
+                                ui.label(RichText::new("COMMUNITY FORKS & EXTENDED RUNTIMES").size(10.5).strong().color(Color32::from_rgb(219, 219, 219)));
+                                ui.add_space(6.0);
+                                ui.label(RichText::new("Modified builds & custom runtimes.").size(27.0).strong().color(Color32::from_rgb(243, 243, 243)));
+                                ui.add_space(6.0);
+                                ui.label(RichText::new("Community projects that fork the core application repository to add experimental engine features, external plugin standards (such as OpenFX), or project file interchange.")
+                                    .size(14.0).color(Color32::from_rgb(180, 180, 180)));
+                                ui.add_space(14.0);
+                                for fork in &self.forks {
+                                    Self::fork_card(ui, fork);
+                                    ui.add_space(10.0);
+                                }
                             }
 
                             ui.add_space(20.0);

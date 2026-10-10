@@ -167,7 +167,7 @@
   <div class="wrap">
     <header>
       <a class="brand" href="./" aria-label="ArtCraft Store home"><span class="mark">A</span><span>ArtCraft <span style="color:var(--muted);font-weight:500">/ Extensions</span></span></a>
-      <nav class="nav" aria-label="Main navigation"><a href="#catalog">Browse</a><a href="#architectures">Architectures</a><a href="./lut-studio/">LUT Studio</a><a href="./docs.html" style="color:var(--text);font-weight:700">Docs</a><a href="#install">Installation</a><a href="https://github.com/akkk09/artcraft-store" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav>
+      <nav class="nav" aria-label="Main navigation"><a href="#catalog">Browse</a><a href="#forks">Forks</a><a href="#architectures">Architectures</a><a href="./lut-studio/">LUT Studio</a><a href="./docs.html" style="color:var(--text);font-weight:700">Docs</a><a href="#install">Installation</a><a href="https://github.com/akkk09/artcraft-store" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav>
     </header>
     <main>
       <section class="hero">
@@ -183,6 +183,21 @@
         <div class="grid" id="plugin-grid" aria-live="polite"><div class="empty">Loading catalog…</div></div>
         <div class="notice"><span class="icon" aria-hidden="true">ⓘ</span><div><strong>Check compatibility before installing</strong><p>Each ArtCraft application provides a tailored extension architecture: WebAssembly ABI modules, ScriptUI JSX panels, CLAP/VST3 audio plug-ins, Acrobat JavaScript, or native JSON preset chains. Check each card for its specific file format and host compatibility, or consult the <a href="./docs.html" style="color:var(--text);font-weight:600">Installation Docs</a>.</p></div></div>
       </section>
+      <section class="how" id="forks"><div class="eyebrow">Community Forks &amp; Runtimes</div><h2>Modified builds &amp; custom hosts.</h2><p style="color:var(--muted);margin-bottom:20px;max-width:760px">Community projects that fork the core ArtCraft application repositories to add experimental engine features, external plugin standards (such as OpenFX), or project file interchange.</p><div class="steps" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">
+        <article class="step" style="border:1px solid #444;background:#1a1a1a">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <b>EFFECTCRAFT FORK</b>
+            <span style="font-size:11px;color:var(--muted)">v0.7.0-ofx.2</span>
+          </div>
+          <h3>EffectCraft (OpenFX &amp; .aep Import)</h3>
+          <p>Community fork by <strong>glumbis</strong> adding native OpenFX (OFX) plug-in hosting (Boris FX Sapphire, RE:Vision RSMB/Twixtor) and Adobe After Effects project (<code>.aep</code>) import.</p>
+          <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+            <a class="btn primary" style="font-size:12px;padding:6px 12px" href="https://github.com/glumbis/effectcraft/releases/latest" target="_blank" rel="noopener noreferrer">Latest Release ↗</a>
+            <a class="btn" style="font-size:12px;padding:6px 12px" href="https://github.com/glumbis/effectcraft" target="_blank" rel="noopener noreferrer">Source Fork ↗</a>
+            <a class="btn" style="font-size:12px;padding:6px 12px" href="./docs.html?app=effectcraft">Setup Docs →</a>
+          </div>
+        </article>
+      </div></section>
       <section class="how" id="architectures"><div class="eyebrow">02 / Extension Architectures</div><h2>Extensibility across ArtCraft apps.</h2><div class="steps" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
         <article class="step"><b>PHOTOCRAFT</b><h3>WASM Filters &amp; LUTs</h3><p>Sandboxed WebAssembly pixel-manipulation modules (ABI v1) and 3D LUT cubes for non-destructive color grading, sharpening, and stylization.</p></article>
         <article class="step"><b>EFFECTCRAFT</b><h3>WASM Effects &amp; ScriptUI</h3><p>Sandboxed WebAssembly effect plugins (API v1) for rendering, paired with dockable ScriptUI / ExtendScript (.jsx) panels for animation, easing, and captioning.</p></article>
@@ -200,7 +215,7 @@
         <article class="step"><b>03 / INSTALL</b><h3>Follow app-specific steps</h3><p>Download the item and follow its documented installation instructions. Drop WASM/WAT plugins into the app plugins directory, load .jsx in ScriptUI Panels, or import presets via menus. See our <a href="./docs.html" style="color:var(--accent);font-weight:600">Full Docs &amp; Directory Guide ↗</a></p></article>
       </div></section>
     </main>
-    <footer><span>Community project · Not affiliated with ArtCraft app maintainers.</span><span><a href="./docs.html">Documentation</a> · <a href="https://github.com/akkk09/artcraft-store" target="_blank" rel="noopener noreferrer">Source code</a> · <a id="catalog-json-link" href="catalog.json">Catalog JSON</a> · MIT</span></footer>
+    <footer><span>Community project · Not affiliated with ArtCraft app maintainers.</span><span><a href="./docs.html">Documentation</a> · <a href="#forks">Forks</a> · <a href="https://github.com/akkk09/artcraft-store" target="_blank" rel="noopener noreferrer">Source code</a> · <a id="catalog-json-link" href="catalog.json">Catalog JSON</a> · MIT</span></footer>
   </div>
   <script>
     const grid = document.querySelector("#plugin-grid");

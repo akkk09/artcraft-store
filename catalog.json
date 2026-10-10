@@ -564,5 +564,24 @@
       "app": "pdfcraft",
       "compatibility": "Acrobat JavaScript (ISO 32000 / Boa)"
     }
+  ],
+  "forks": [
+    {
+      "id": "org.effectcraft.fork.glumbis-ofx",
+      "name": "EffectCraft (OpenFX & .aep Import)",
+      "app": "effectcraft",
+      "author": "glumbis",
+      "version": "0.7.0-ofx.2",
+      "description": "Unofficial EffectCraft fork adding native OpenFX (OFX) plug-in hosting and After Effects project (.aep) import.",
+      "url": "https://github.com/glumbis/effectcraft/releases/latest",
+      "sourceUrl": "https://github.com/glumbis/effectcraft",
+      "tags": [
+        "openfx",
+        "ofx",
+        "aep-import",
+        "windows",
+        "unofficial-fork"
+      ]
+    }
   ]
 }
