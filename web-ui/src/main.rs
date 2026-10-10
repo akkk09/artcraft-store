@@ -81,6 +81,13 @@ impl StoreApp {
         match app {
             "photocraft" => "PhotoCraft",
             "effectcraft" => "EffectCraft",
+            "vectorcraft" => "VectorCraft",
+            "filmcraft" => "FilmCraft",
+            "soundcraft" => "SoundCraft",
+            "pdfcraft" => "PdfCraft",
+            "designcraft" => "DesignCraft",
+            "lightcraft" => "LightCraft",
+            "cadcraft" => "CADCraft",
             _ => "ArtCraft",
         }
     }
@@ -201,14 +208,14 @@ impl eframe::App for StoreApp {
                     ui.add_space(15.0);
                     ui.label(RichText::new("Tools for your\ncreative flow.").size(48.0).strong().color(Color32::from_rgb(243, 243, 243)));
                     ui.add_space(10.0);
-                    ui.label(RichText::new("Small, focused extensions for PhotoCraft and EffectCraft, built by the community.")
+                    ui.label(RichText::new("Small, focused extensions for ArtCraft creative applications, built by the community.")
                         .size(15.0).color(Color32::from_rgb(180, 180, 180)));
                     ui.add_space(18.0);
                     ui.horizontal_wrapped(|ui| {
                         ui.label(RichText::new(format!("{:02}", self.plugins.len())).size(20.0).strong().color(Color32::from_rgb(219, 219, 219)));
                         ui.label(RichText::new("catalog items").size(12.0).color(Color32::from_rgb(146, 146, 146)));
                         ui.add_space(18.0);
-                        ui.label(RichText::new("02").size(20.0).strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("09").size(20.0).strong().color(Color32::from_rgb(219, 219, 219)));
                         ui.label(RichText::new("creative apps").size(12.0).color(Color32::from_rgb(146, 146, 146)));
                         ui.add_space(18.0);
                         ui.label(RichText::new("MIT").size(20.0).strong().color(Color32::from_rgb(219, 219, 219)));
@@ -232,6 +239,13 @@ impl eframe::App for StoreApp {
                             ("all", "All apps"),
                             ("photocraft", "PhotoCraft"),
                             ("effectcraft", "EffectCraft"),
+                            ("vectorcraft", "VectorCraft"),
+                            ("filmcraft", "FilmCraft"),
+                            ("soundcraft", "SoundCraft"),
+                            ("pdfcraft", "PdfCraft"),
+                            ("designcraft", "DesignCraft"),
+                            ("lightcraft", "LightCraft"),
+                            ("cadcraft", "CADCraft"),
                         ] {
                             let selected = self.active_app == key;
                             if ui.selectable_label(selected, RichText::new(label).size(12.0)).clicked() {

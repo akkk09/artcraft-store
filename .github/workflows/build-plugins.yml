@@ -101,3 +101,6 @@ jobs:
             dist/EaseCraft.jsx
             dist/CaptionCraft.jsx
             dist/QuietCraft.jsx
+            dist/vectorcraft_plugin_recolor.wasm
+            dist/soundcraft-audio-toolkit.zip
+            dist/pdfcraft-invoice-calculator.js

@@ -36,7 +36,7 @@ Common plugin fields:
 | Field | Meaning | Consumer guidance |
 |---|---|---|
 | `id` | Listing identifier | Use for lookup; treat as an opaque string. |
-| `app` | Target ArtCraft app ID | Known IDs: `photocraft`, `effectcraft`. |
+| `app` | Target ArtCraft app ID | Known IDs: `photocraft`, `effectcraft`, `vectorcraft`, `filmcraft`, `soundcraft`, `pdfcraft`, `designcraft`, `lightcraft`, `cadcraft`. |
 | `name` | Display name | Treat as untrusted display text. |
 | `version` | Listing/plugin version | Do not assume it follows a particular versioning scheme unless your installer defines one. |
 | `author` | Author/maintainer label | Informational metadata, not identity verification. |

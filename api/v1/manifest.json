@@ -2,7 +2,7 @@
   "name": "ArtCraft Store API",
   "apiVersion": "v1",
   "type": "static-json",
-  "description": "A public, read-only catalog API for PhotoCraft and EffectCraft plug-ins.",
+  "description": "A public, read-only catalog API for ArtCraft creative applications.",
   "catalog": "../../catalog.json",
   "clientModule": "./client.js",
   "endpoints": {
@@ -22,7 +22,14 @@
   "compatibility": {
     "apps": [
       "photocraft",
-      "effectcraft"
+      "effectcraft",
+      "vectorcraft",
+      "filmcraft",
+      "soundcraft",
+      "pdfcraft",
+      "designcraft",
+      "lightcraft",
+      "cadcraft"
     ],
     "unknownFields": "Clients should ignore fields they do not understand."
   }

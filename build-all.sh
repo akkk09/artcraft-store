@@ -2,7 +2,7 @@
 set -euo pipefail
 TARGET=wasm32-unknown-unknown
 mkdir -p dist
-for plugin in smudge-blend mixer-blend gradient-map color-toolkit detail-recovery film-emulation mosaic-pixelate vignette white-balance lut-studio geometry-fixer seamless-pattern-generator depthcraft; do
+for plugin in smudge-blend mixer-blend gradient-map color-toolkit detail-recovery film-emulation mosaic-pixelate vignette white-balance lut-studio geometry-fixer seamless-pattern-generator depthcraft vectorcraft-recolor; do
   cargo build --manifest-path "plugins/$plugin/Cargo.toml" --release --target "$TARGET"
 done
 cp plugins/smudge-blend/target/$TARGET/release/photocraft_plugin_smudge_blend.wasm dist/
@@ -18,9 +18,12 @@ cp plugins/lut-studio/target/$TARGET/release/photocraft_plugin_lut_studio.wasm d
 cp plugins/geometry-fixer/target/$TARGET/release/photocraft_plugin_geometry_fixer.wasm dist/
 cp plugins/seamless-pattern-generator/target/$TARGET/release/photocraft_plugin_seamless_pattern_generator.wasm dist/
 cp plugins/depthcraft/target/$TARGET/release/depthcraft.wasm dist/ 2>/dev/null || cp plugins/depthcraft/depthcraft.wasm dist/
+cp plugins/vectorcraft-recolor/target/$TARGET/release/vectorcraft_plugin_recolor.wasm dist/
 python plugins/film-emulation/package_filmcraft.py --output dist/filmcraft-film-emulation-toolkit.zip
 python plugins/creator-graphics-pack/package.py --output dist/creator-graphics-pack.zip
+python plugins/soundcraft-audio-tools/package.py --output dist/soundcraft-audio-toolkit.zip
 cp plugins/chromatic-fringe/chromatic-fringe.wat dist/
+cp plugins/pdfcraft-form-tools/pdfcraft-invoice-calculator.js dist/
 cp plugins/easecraft/EaseCraft.jsx dist/
 cp plugins/captioncraft/CaptionCraft.jsx dist/
 cp plugins/quietcraft/QuietCraft.jsx dist/

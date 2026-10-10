@@ -17,15 +17,19 @@ class CatalogValidationTests(unittest.TestCase):
         self.assertEqual(validate_catalog(self.catalog, ROOT), [])
 
     def test_catalog_declares_only_supported_extension_hosts(self):
-        self.assertEqual({app["id"] for app in self.catalog["apps"]}, {"photocraft", "effectcraft"})
-        self.assertTrue(all(plugin["app"] in {"photocraft", "effectcraft"} for plugin in self.catalog["plugins"]))
+        supported = {
+            "photocraft", "effectcraft", "vectorcraft", "filmcraft", "soundcraft",
+            "pdfcraft", "designcraft", "lightcraft", "cadcraft",
+        }
+        self.assertEqual({app["id"] for app in self.catalog["apps"]}, supported)
+        self.assertTrue(all(plugin["app"] in supported for plugin in self.catalog["plugins"]))
         chromatic_fringe = next(plugin for plugin in self.catalog["plugins"] if plugin["id"] == "org.effectcraft.trokute.chromatic-fringe")
         self.assertEqual(chromatic_fringe["app"], "effectcraft")
         self.assertEqual(chromatic_fringe["artifact"], "chromatic-fringe.wat")
 
     def test_unsupported_app_listing_is_rejected(self):
         catalog = json.loads(json.dumps(self.catalog))
-        catalog["plugins"][0]["app"] = "filmcraft"
+        catalog["plugins"][0]["app"] = "unsupportedcraft"
         errors = validate_catalog(catalog, ROOT)
         self.assertTrue(any("not a supported app id" in error for error in errors))
 

@@ -9,7 +9,17 @@ import re
 from pathlib import Path
 from urllib.parse import urlparse
 
-APP_IDS = {"photocraft", "effectcraft"}
+APP_IDS = {
+    "photocraft",
+    "effectcraft",
+    "vectorcraft",
+    "filmcraft",
+    "soundcraft",
+    "pdfcraft",
+    "designcraft",
+    "lightcraft",
+    "cadcraft",
+}
 PLUGIN_ID_RE = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
 VERSION_RE = re.compile(
     r"^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$"

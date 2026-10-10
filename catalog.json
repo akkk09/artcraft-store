@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "name": "ArtCraft Store",
-  "description": "Community extensions for PhotoCraft and EffectCraft.",
+  "description": "Community extensions for ArtCraft creative applications.",
   "apps": [
     {
       "id": "photocraft",
@@ -18,6 +18,68 @@
       "extensionTypes": [
         "plugin",
         "tool"
+      ]
+    },
+    {
+      "id": "vectorcraft",
+      "name": "VectorCraft",
+      "extensionTypes": [
+        "plugin",
+        "filter",
+        "template",
+        "tool"
+      ]
+    },
+    {
+      "id": "filmcraft",
+      "name": "FilmCraft",
+      "extensionTypes": [
+        "preset",
+        "lut",
+        "template"
+      ]
+    },
+    {
+      "id": "soundcraft",
+      "name": "SoundCraft",
+      "extensionTypes": [
+        "plugin",
+        "dsp",
+        "preset"
+      ]
+    },
+    {
+      "id": "pdfcraft",
+      "name": "PdfCraft",
+      "extensionTypes": [
+        "script",
+        "action",
+        "tool"
+      ]
+    },
+    {
+      "id": "designcraft",
+      "name": "DesignCraft",
+      "extensionTypes": [
+        "template",
+        "tool",
+        "filter"
+      ]
+    },
+    {
+      "id": "lightcraft",
+      "name": "LightCraft",
+      "extensionTypes": [
+        "preset",
+        "lut"
+      ]
+    },
+    {
+      "id": "cadcraft",
+      "name": "CADCraft",
+      "extensionTypes": [
+        "script",
+        "macro"
       ]
     }
   ],
@@ -385,6 +447,122 @@
       ],
       "app": "effectcraft",
       "compatibility": "EffectCraft ScriptUI / ExtendScript"
+    },
+    {
+      "id": "org.filmcraft.community.film-emulation",
+      "name": "Film Emulation Presets & LUTs",
+      "version": "0.1.0",
+      "author": "ArtCraft Store community",
+      "description": "Five native FilmCraft effect presets (Lumetri color + monochrome grain) and matching 17-cube 3D LUTs.",
+      "kind": "preset",
+      "abi": 1,
+      "source": "plugins/film-emulation",
+      "sourceUrl": "https://github.com/akkk09/artcraft-store/tree/main/plugins/film-emulation",
+      "artifact": "filmcraft-film-emulation-toolkit.zip",
+      "releaseAsset": "filmcraft-film-emulation-toolkit.zip",
+      "tags": [
+        "film",
+        "presets",
+        "lumetri",
+        "grain",
+        "lut",
+        "color-grading"
+      ],
+      "app": "filmcraft",
+      "compatibility": "FilmCraft effect-presets v1 & .cube"
+    },
+    {
+      "id": "org.vectorcraft.community.creator-graphics-pack",
+      "name": "Creator Graphics Pack",
+      "version": "0.1.0",
+      "author": "ArtCraft Store community",
+      "description": "Six editable SVG layout templates: video thumbnails, channel banners, end screens, lower thirds, and social posts.",
+      "kind": "template",
+      "abi": 1,
+      "source": "plugins/creator-graphics-pack",
+      "sourceUrl": "https://github.com/akkk09/artcraft-store/tree/main/plugins/creator-graphics-pack",
+      "artifact": "creator-graphics-pack.zip",
+      "releaseAsset": "creator-graphics-pack.zip",
+      "tags": [
+        "vector",
+        "templates",
+        "svg",
+        "social",
+        "youtube",
+        "graphics"
+      ],
+      "app": "vectorcraft",
+      "compatibility": "VectorCraft & SVG editors"
+    },
+    {
+      "id": "org.vectorcraft.community.recolor",
+      "name": "Vector Recolor & Tone",
+      "version": "0.1.0",
+      "author": "ArtCraft Store community",
+      "description": "Adjusts color tint, luminance and saturation across selected vector paths and shapes.",
+      "kind": "filter",
+      "abi": 1,
+      "source": "plugins/vectorcraft-recolor",
+      "sourceUrl": "https://github.com/akkk09/artcraft-store/tree/main/plugins/vectorcraft-recolor",
+      "artifact": "vectorcraft_plugin_recolor.wasm",
+      "releaseAsset": "vectorcraft_plugin_recolor.wasm",
+      "tags": [
+        "vector",
+        "recolor",
+        "saturation",
+        "tint",
+        "wasmi",
+        "object-filter"
+      ],
+      "app": "vectorcraft",
+      "compatibility": "VectorCraft plug-in ABI v1"
+    },
+    {
+      "id": "org.soundcraft.community.audio-toolkit",
+      "name": "SoundCraft Audio Toolkit",
+      "version": "0.1.0",
+      "author": "ArtCraft Store community",
+      "description": "Channel strip presets, broadcast voice chains, and peak limiter profiles for SoundCraft mix automation.",
+      "kind": "preset",
+      "abi": 1,
+      "source": "plugins/soundcraft-audio-tools",
+      "sourceUrl": "https://github.com/akkk09/artcraft-store/tree/main/plugins/soundcraft-audio-tools",
+      "artifact": "soundcraft-audio-toolkit.zip",
+      "releaseAsset": "soundcraft-audio-toolkit.zip",
+      "tags": [
+        "audio",
+        "clap",
+        "vst3",
+        "dsp",
+        "mixing",
+        "daw",
+        "presets"
+      ],
+      "app": "soundcraft",
+      "compatibility": "SoundCraft mix engine & CLAP/VST3"
+    },
+    {
+      "id": "org.pdfcraft.community.invoice-calculator",
+      "name": "Form Calculator & Validator",
+      "version": "0.1.0",
+      "author": "ArtCraft Store community",
+      "description": "Acrobat JavaScript field calculations, tax/total handlers, and keystroke validators for interactive PDF forms.",
+      "kind": "script",
+      "abi": 1,
+      "source": "plugins/pdfcraft-form-tools",
+      "sourceUrl": "https://github.com/akkk09/artcraft-store/tree/main/plugins/pdfcraft-form-tools",
+      "artifact": "pdfcraft-invoice-calculator.js",
+      "releaseAsset": "pdfcraft-invoice-calculator.js",
+      "tags": [
+        "pdf",
+        "javascript",
+        "forms",
+        "calculation",
+        "validation",
+        "invoice"
+      ],
+      "app": "pdfcraft",
+      "compatibility": "Acrobat JavaScript (ISO 32000 / Boa)"
     }
   ]
 }

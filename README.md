@@ -2,8 +2,15 @@
 
 A shared, searchable community catalog for apps with supported extension systems:
 
-- **PhotoCraft** — plug-ins, filters, and tools
-- **EffectCraft** — plug-ins
+- **PhotoCraft** — WebAssembly image filters, retouching tools, and 3D LUTs (ABI v1)
+- **EffectCraft** — WebAssembly effect plug-ins (API v1) and ScriptUI / ExtendScript animation panels (`.jsx`)
+- **VectorCraft** — WebAssembly object filters, procedural live effects (ABI v1), and SVG template packs
+- **FilmCraft** — Native timeline effect presets (`filmcraft.effect-presets` v1) and 3D LUT packs (`.cube`)
+- **SoundCraft** — CLAP (`.clap`), VST3 (`.vst3`), and Audio Units (`.component`) audio plugins and DSP presets
+- **PdfCraft** — Acrobat JavaScript (ISO 32000 in Boa sandbox, `.js`) form calculations and action automation
+- **DesignCraft** — Publication layout templates, text filters, and typographic styles
+- **LightCraft** — Non-destructive RAW develop presets and 3D LUT profiles
+- **CADCraft** — Command automation scripts and geometric drawing macros
 
 The static storefront in [`index.html`](index.html) reads [`catalog.json`](catalog.json) at runtime. Filter by app or search across names, descriptions, tags, and compatibility notes.
 
@@ -79,7 +86,7 @@ This API is intentionally static and read-only. It does not install plugins, gua
 
 ## Adding an item
 
-Add an entry to `catalog.json` under `plugins`. Supported fields include `id`, `app`, `name`, `version`, `author`, `description`, `kind`, `tags`, `compatibility`, `sourceUrl`, `downloadUrl`, `artifact`, and `releaseAsset`. The `app` value should be `photocraft` or `effectcraft`. Only list an app when the extension targets a supported plug-in or scripting interface. Use `sourceUrl` and `downloadUrl` for extensions hosted outside this repository. The storefront supports app-specific formats; it does not assume every item is a WASM file.
+Add an entry to `catalog.json` under `plugins`. Supported fields include `id`, `app`, `name`, `version`, `author`, `description`, `kind`, `tags`, `compatibility`, `sourceUrl`, `downloadUrl`, `artifact`, and `releaseAsset`. The `app` value should match a supported ArtCraft app ID (`photocraft`, `effectcraft`, `vectorcraft`, `filmcraft`, `soundcraft`, `pdfcraft`, `designcraft`, `lightcraft`, `cadcraft`). Only list an app when the extension targets a supported plug-in or scripting interface. Use `sourceUrl` and `downloadUrl` for extensions hosted outside this repository. The storefront supports app-specific formats; it does not assume every item is a WASM file.
 
 Do not add a listing until its source, license, download, and target-app compatibility have been checked.
 
@@ -100,9 +107,9 @@ Do not add a listing until its source, license, download, and target-app compati
 | **Geometry Fixer** | Filter (ABI v1) | Straightens rotation, adjusts horizontal/vertical perspective, and controls zoom on a fixed canvas. |
 | **Seamless Pattern Generator** | Filter (ABI v1) | Reduces texture tiling seams by blending opposing edges with a smooth falloff. |
 
-The build workflow compiles the PhotoCraft Rust/WASM plug-ins and stages the submitted EffectCraft `chromatic-fringe.wat` extension. The browser-based LUT Studio is available at `https://akkk09.github.io/artcraft-store/lut-studio/`. The catalog supports PhotoCraft plug-ins and EffectCraft plug-ins. Chromatic Fringe is the first EffectCraft listing.
+The browser-based LUT Studio is available at `https://akkk09.github.io/artcraft-store/lut-studio/`.
 
-## EffectCraft plug-ins
+## EffectCraft plug-ins & tools
 
 | Plug-in | Type | What it does |
 |---|---|---|
@@ -116,16 +123,47 @@ In EffectCraft:
 - Native / WASM effect plug-ins (**DepthCraft**, **Chromatic Fringe**) can be loaded via **Effect → Load Effect Plug-in** or placed in `~/.config/effectcraft/plugins/`.
 - ScriptUI panels (**EaseCraft**, **CaptionCraft**, **QuietCraft**) are installed to `~/.config/effectcraft/Scripts/ScriptUI Panels/` and opened from the **Window** menu.
 
-## Build PhotoCraft plug-ins locally
+## VectorCraft plug-ins & templates
 
-Requirements: Rust stable and `rustup`.
+| Plug-in | Type | What it does |
+|---|---|---|
+| **Vector Recolor & Tone** | Filter (ABI v1) | Sandboxed WASM object filter adjusting vector color tint, luminance, and saturation (`vectorcraft_plugin_recolor.wasm`). |
+| **Creator Graphics Pack** | Template | Six editable SVG layout templates for video thumbnails, banners, lower thirds, and social graphics (`creator-graphics-pack.zip`). |
+
+## FilmCraft effect presets & LUTs
+
+| Plug-in | Type | What it does |
+|---|---|---|
+| **Film Emulation Presets & LUTs** | Preset & LUT pack | Five native FilmCraft effect presets combining Lumetri color with monochrome grain, plus matching 17-cube 3D LUTs (`filmcraft-film-emulation-toolkit.zip`). |
+
+Import via FilmCraft's `presets.import` CLI or **Lumetri Color ▸ Creative ▸ Look LUT**.
+
+## SoundCraft audio toolkits
+
+| Plug-in | Type | What it does |
+|---|---|---|
+| **SoundCraft Audio Toolkit** | Presets & DSP config | Channel strip presets (Broadcast Voice Strip, Podcast Master Limiter, Acoustic Warmth) for SoundCraft mix automation (`soundcraft-audio-toolkit.zip`). |
+
+SoundCraft also hosts standard third-party **CLAP** (`.clap`), **VST3** (`.vst3`), and macOS **Audio Units** (`.component`) audio plug-ins directly in the channel strip.
+
+## PdfCraft JavaScript form tools
+
+| Plug-in | Type | What it does |
+|---|---|---|
+| **Form Calculator & Validator** | Script (Acrobat JS) | Dynamic invoice field calculation, currency formatting, and keystroke validators for interactive PDF forms (`pdfcraft-invoice-calculator.js`). |
+
+Compatible with PdfCraft's pure-Rust Boa JavaScript runtime.
+
+## Building plug-ins locally
+
+Requirements: Rust stable, Python 3, and `rustup`.
 
 ```sh
 rustup target add wasm32-unknown-unknown
 bash build-all.sh
 ```
 
-PhotoCraft WASM modules and the EffectCraft `.wat` extension are copied to `dist/`. Legacy asset-bundle build steps may remain, but those bundles are not listed as supported app extensions in the catalog.
+WASM modules, ScriptUI JSX panels, SVG packages, and preset archives are compiled and staged to `dist/`.
 
 ## License
 
