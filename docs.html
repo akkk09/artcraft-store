@@ -428,6 +428,7 @@
       <div class="nav-tabs" role="tablist">
         <a class="nav-tab" href="./">Catalog</a>
         <a class="nav-tab active" href="./docs.html" aria-current="page">Documentation</a>
+        <a class="nav-tab" href="#plugin-creation">Create a Plug-in</a>
       </div>
     </div>
     <div class="topbar-right">
@@ -439,9 +440,15 @@
 
   <main class="wrap">
     <section class="hero">
-      <div class="eyebrow">● USER GUIDES · SDK ARCHITECTURE · ALL 09 APPS</div>
-      <h1>Extension Architecture<br>&amp; Installation Guides.</h1>
-      <p>Step-by-step setup guides, directory paths, and developer architecture references for all ArtCraft creative applications.</p>
+      <div class="eyebrow">● USER GUIDES · DEVELOPER SDK · ALL 09 APPS</div>
+      <h1>Extension Architecture<br>&amp; Plug-in Creation Guide.</h1>
+      <p>Step-by-step developer tutorials, SDK specifications, directory paths, and activation guides for all ArtCraft creative applications.</p>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px;">
+        <a href="#cards-container" class="copy-btn" style="padding: 8px 14px; font-size: 12px; background: #202020; text-decoration: none;">📁 App Installation Paths</a>
+        <a href="#plugin-creation" class="copy-btn" style="padding: 8px 14px; font-size: 12px; background: var(--accent); color: var(--accent-ink); text-decoration: none; border-color: var(--accent); font-weight: 700;">🛠️ Plug-in Creation SDK Guide</a>
+        <a href="#publishing-guide" class="copy-btn" style="padding: 8px 14px; font-size: 12px; background: #202020; text-decoration: none;">🚀 Publishing Checklist</a>
+        <a href="#community-forks" class="copy-btn" style="padding: 8px 14px; font-size: 12px; background: #202020; text-decoration: none;">🔀 Community Forks</a>
+      </div>
     </section>
 
     <div class="toast" id="toast" role="alert"></div>
@@ -1552,6 +1559,296 @@ ZOOM EXTENTS</code></pre>
           <li>Installed OpenFX bundles in <code>C:\Program Files\Common Files\OFX\Plugins\</code> appear in the <strong>Effects</strong> panel under their respective vendor categories.</li>
           <li>Import After Effects compositions via <strong>File ▸ Import ▸ After Effects Project (.aep)...</strong>.</li>
         </ol>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- PLUG-IN CREATION DOCUMENTATION                                -->
+    <!-- ============================================================ -->
+    <section class="dev-card" id="plugin-creation" style="margin-top: 32px; padding: 26px;">
+      <div style="font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--accent); margin-bottom: 8px;">DEVELOPER SDK · TUTORIALS &amp; API SPECIFICATIONS</div>
+      <h3 style="font-size: 24px; font-weight: 700; letter-spacing: -.02em; text-transform: none; margin: 0 0 10px; color: var(--text);">Plug-in Creation Guide</h3>
+      <p style="font-size: 13.5px; line-height: 1.65; color: var(--muted); margin-bottom: 22px;">
+        A comprehensive guide to authoring original extensions across the ArtCraft ecosystem. Learn how to create high-performance <strong>WebAssembly image filters</strong> (PhotoCraft / VectorCraft), procedural <strong>render effects</strong> (EffectCraft), responsive <strong>ScriptUI animation panels</strong> (ExtendScript), and audio/video presets from scratch.
+      </p>
+
+      <!-- Quick Index Tabs / Sub-nav -->
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px;">
+        <a href="#dev-wasmfibers" class="pill" style="font-size: 11.5px; padding: 6px 12px; text-decoration: none;">1. WASM Image Filters (Rust)</a>
+        <a href="#dev-effectcraft-wasm" class="pill" style="font-size: 11.5px; padding: 6px 12px; text-decoration: none;">2. EffectCraft WASM Effects</a>
+        <a href="#dev-scriptui" class="pill" style="font-size: 11.5px; padding: 6px 12px; text-decoration: none;">3. ScriptUI Panels (.jsx)</a>
+        <a href="#dev-other-apps" class="pill" style="font-size: 11.5px; padding: 6px 12px; text-decoration: none;">4. Other App Runtimes</a>
+        <a href="#dev-sandboxing" class="pill" style="font-size: 11.5px; padding: 6px 12px; text-decoration: none;">5. Sandbox &amp; Security</a>
+        <a href="#dev-testing" class="pill" style="font-size: 11.5px; padding: 6px 12px; text-decoration: none;">6. Testing &amp; Verification</a>
+      </div>
+
+      <!-- Part 1: WASM Image Filters -->
+      <div class="guide-box" id="dev-wasmfibers" style="margin-bottom: 22px;">
+        <div class="snippet-title" style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 8px;">
+          <span>1. Building a WebAssembly Image Filter (PhotoCraft ABI v1)</span>
+          <span class="badge-pill">Rust · wasm32-unknown-unknown</span>
+        </div>
+        <p>
+          PhotoCraft executes sandboxed WebAssembly bytecode modules. The host allocates image memory in the module's linear memory arena, passes a pointer to the interleaved RGBA8 pixel buffer along with image dimensions and user parameters, and executes the filter without performing any operating system syscalls.
+        </p>
+
+        <h5 style="margin: 14px 0 6px; font-size: 12.5px; color: var(--accent); text-transform: uppercase; letter-spacing: .05em;">Step 1: Configure Cargo.toml</h5>
+        <p>Create a new library crate targeting <code>wasm32-unknown-unknown</code> with <code>crate-type = ["cdylib"]</code>:</p>
+        <pre><code>[package]
+name = "photocraft_plugin_myfilter"
+version = "1.0.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"</code></pre>
+
+        <h5 style="margin: 14px 0 6px; font-size: 12.5px; color: var(--accent); text-transform: uppercase; letter-spacing: .05em;">Step 2: Implement Memory Allocation &amp; Pixel Processing in src/lib.rs</h5>
+        <p>
+          Export <code>alloc</code> and <code>dealloc</code> to allow the host to manage linear memory, then export your filter entry point (e.g. <code>filter_image</code>):
+        </p>
+        <pre><code>// Interleaved RGBA8 pixel format: 4 bytes per pixel [R, G, B, A] in row-major order.
+#[no_mangle]
+pub extern "C" fn alloc(size: usize) -> *mut u8 {
+    let mut buf = Vec::with_capacity(size);
+    let ptr = buf.as_mut_ptr();
+    std::mem::forget(buf);
+    ptr
+}
+
+#[no_mangle]
+pub extern "C" fn dealloc(ptr: *mut u8, size: usize) {
+    unsafe {
+        drop(Vec::from_raw_parts(ptr, size, size));
+    }
+}
+
+/// Applies an exposure and contrast adjustment while preserving original alpha.
+#[no_mangle]
+pub extern "C" fn filter_image(
+    ptr: *mut u8,
+    len: usize,
+    width: u32,
+    height: u32,
+    exposure: f32, // Parameter 1: Exposure offset (-2.0 .. +2.0)
+    contrast: f32, // Parameter 2: Contrast slope (0.0 .. 2.0)
+) -> i32 {
+    // 1. Validate buffer safety bounds
+    let expected = (width as usize) * (height as usize) * 4;
+    if ptr.is_null() || len < expected {
+        return -1; // Error code: invalid buffer bounds
+    }
+
+    let pixels = unsafe { std::slice::from_raw_parts_mut(ptr, expected) };
+    let exp_factor = 2.0f32.powf(exposure);
+
+    // 2. Process pixels in chunks of 4 (RGBA)
+    for chunk in pixels.chunks_exact_mut(4) {
+        let r = chunk[0] as f32 / 255.0;
+        let g = chunk[1] as f32 / 255.0;
+        let b = chunk[2] as f32 / 255.0;
+        let a = chunk[3]; // Preserve original alpha intact
+
+        // Adjust exposure and contrast around mid-gray (0.5)
+        let r_out = ((r * exp_factor) - 0.5) * contrast + 0.5;
+        let g_out = ((g * exp_factor) - 0.5) * contrast + 0.5;
+        let b_out = ((b * exp_factor) - 0.5) * contrast + 0.5;
+
+        // Clamp to 0..255 and write back
+        chunk[0] = (r_out.clamp(0.0, 1.0) * 255.0 + 0.5) as u8;
+        chunk[1] = (g_out.clamp(0.0, 1.0) * 255.0 + 0.5) as u8;
+        chunk[2] = (b_out.clamp(0.0, 1.0) * 255.0 + 0.5) as u8;
+        chunk[3] = a;
+    }
+
+    0 // Success
+}</code></pre>
+
+        <h5 style="margin: 14px 0 6px; font-size: 12.5px; color: var(--accent); text-transform: uppercase; letter-spacing: .05em;">Step 3: Compile to WebAssembly</h5>
+        <pre><code>rustup target add wasm32-unknown-unknown
+cargo build --target wasm32-unknown-unknown --release
+
+# The compiled output will be generated at:
+# target/wasm32-unknown-unknown/release/photocraft_plugin_myfilter.wasm</code></pre>
+      </div>
+
+      <!-- Part 2: EffectCraft WASM Effects -->
+      <div class="guide-box" id="dev-effectcraft-wasm" style="margin-bottom: 22px;">
+        <div class="snippet-title" style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 8px;">
+          <span>2. Building an EffectCraft Render Effect Plug-in (API v1)</span>
+          <span class="badge-pill">Temporal Rendering · Snell Refraction &amp; Bevels</span>
+        </div>
+        <p>
+          EffectCraft effect plug-ins (such as <strong>Glassify</strong> and <strong>LumaSweep</strong>) operate in an animated temporal pipeline. Unlike static image filters, the host supplies timeline <code>time</code> (in seconds), <code>frame</code> index, frame rate, and layer coordinate bounds.
+        </p>
+
+        <h5 style="margin: 14px 0 6px; font-size: 12.5px; color: var(--accent); text-transform: uppercase; letter-spacing: .05em;">Key Principles for EffectCraft Render Effects:</h5>
+        <ul>
+          <li><strong>Resolution &amp; Aspect Independence:</strong> Map pixel coordinates <code>(x, y)</code> to normalized texture coordinates <code>(u, v) = (x / width, y / height)</code> to ensure identical sweep angles and refraction scales at 1/2, 1/4, or Full preview resolutions.</li>
+          <li><strong>Alpha Channel Protection:</strong> Text and logo layers require non-destructive transparency preservation. Multiply synthetic highlights, specular glints, and refractive dispersion by the source layer's alpha mask.</li>
+          <li><strong>Surface Normal &amp; Bevel Generation:</strong> Compute surface gradient normals from luminance or alpha borders:
+            <br><code>nx = (lum(x+1, y) - lum(x-1, y)) * depth; ny = (lum(x, y+1) - lum(x, y-1)) * depth;</code>
+          </li>
+          <li><strong>Refraction &amp; Snell's Law:</strong> Compute optical displacement using the refractive index ratio ($\eta_1 / \eta_2$):
+            <br><code>offset_x = nx * (1.0 - 1.0 / ior) * thickness;</code>
+          </li>
+          <li><strong>Dual C ABI &amp; WASM Export:</strong> Exporting both a WebAssembly entry point and a native 64-bit C ABI function (<code>extern "C" fn render_effect(...)</code>) enables native host execution and standalone CLI benchmarking.</li>
+        </ul>
+      </div>
+
+      <!-- Part 3: ScriptUI Panels -->
+      <div class="guide-box" id="dev-scriptui" style="margin-bottom: 22px;">
+        <div class="snippet-title" style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 8px;">
+          <span>3. Building a Dockable ScriptUI Animation Panel (.jsx)</span>
+          <span class="badge-pill">EffectCraft ExtendScript · Window &amp; Canvas DOM</span>
+        </div>
+        <p>
+          ScriptUI panels (such as <strong>Citron</strong>, <strong>EaseCraft</strong>, and <strong>PivotCraft</strong>) provide dockable GUI workspaces inside EffectCraft's panel manager. They are written in ExtendScript (JavaScript ES3) and interact with composition, layer, and keyframe hierarchies.
+        </p>
+
+        <h5 style="margin: 14px 0 6px; font-size: 12.5px; color: var(--accent); text-transform: uppercase; letter-spacing: .05em;">Panel Boilerplate Template:</h5>
+        <pre><code>(function myPanel(thisObj) {
+  // 1. Detect if executing inside a dockable Panel tab or a floating Window
+  var win = (thisObj instanceof Panel)
+    ? thisObj
+    : new Window("palette", "My Animation Tool", undefined, { resizeable: true });
+
+  win.orientation = "column";
+  win.alignChildren = ["fill", "top"];
+  win.spacing = 6;
+  win.margins = [8, 8, 8, 8];
+
+  // 2. Toolbar Row (pass name in 4th argument: { name: "..." })
+  var toolbar = win.add("group", undefined, undefined, { name: "toolbar" });
+  toolbar.orientation = "row";
+  toolbar.alignChildren = ["left", "center"];
+  toolbar.alignment = ["fill", "top"];
+  toolbar.spacing = 6;
+
+  var btnApply = toolbar.add("button", undefined, "Apply", { name: "btnApply" });
+  btnApply.preferredSize = [75, 24]; // ALWAYS use preferredSize!
+
+  // 3. Custom Vector Canvas using ScriptUIGraphics
+  var canvas = win.add("group", undefined, undefined, { name: "canvas" });
+  canvas.preferredSize = [-1, 140];
+  canvas.alignment = ["fill", "fill"];
+
+  canvas.onDraw = function () {
+    var g = this.graphics;
+    // Resolve dynamic width to adapt to wide timeline docks
+    var w = (this.size && (this.size[0] || this.size.width)) || 400;
+    var h = (this.size && (this.size[1] || this.size.height)) || 140;
+
+    // Paint dark theme canvas background
+    var bg = g.newBrush(g.BrushType.SOLID_COLOR, [0.12, 0.14, 0.18, 1.0]);
+    g.rectPath(0, 0, w, h);
+    g.fillPath(bg);
+
+    // Draw dynamic curve or grid
+    var pen = g.newPen(g.PenType.SOLID_COLOR, [0.25, 0.85, 0.35, 1.0], 2);
+    g.newPath();
+    g.moveTo(20, h - 20);
+    g.lineTo(w - 20, 20);
+    g.strokePath(pen);
+  };
+
+  // 4. Action Handlers with Single-Step Undo
+  btnApply.onClick = function () {
+    var comp = app.project.activeItem;
+    if (!comp || !(comp instanceof CompItem)) {
+      alert("Please open an active composition.");
+      return;
+    }
+
+    // Wrap multiple property edits in an atomic undo step
+    app.beginUndoGroup("My Tool: Set Opacity");
+    var layers = comp.selectedLayers;
+    for (var i = 0; i < layers.length; i++) {
+      var opac = layers[i].property("ADBE Transform Group").property("ADBE Opacity");
+      opac.setValueAtTime(comp.time, 100);
+    }
+    app.endUndoGroup();
+
+    canvas.notify("onDraw"); // Request redraw
+  };
+
+  // 5. Layout and Display
+  if (win instanceof Window) {
+    win.center();
+    win.show();
+  } else {
+    win.layout.layout(true);
+  }
+})(this);</code></pre>
+
+        <div style="background: #201a14; border: 1px solid #7d4e1d; border-radius: 6px; padding: 14px; margin-top: 14px;">
+          <h6 style="color: #f7a242; margin: 0 0 6px; font-size: 13px; font-weight: 700;">⚠️ Critical Layout Rule: Never Use <code>control.size = [w, h]</code></h6>
+          <p style="margin: 0; font-size: 12.5px; color: #dfb288; line-height: 1.55;">
+            In ScriptUI, assigning <code>control.size = [w, h]</code> sets explicit fixed bounds at <code>[0, 0]</code> before automatic layout has executed. This forces the layout engine to skip cursor progression and causes all subsequent controls, text fields, and buttons to stack directly on top of each other at coordinates (0, 0).
+            <br><br>
+            <strong>Best Practice:</strong> Always use <code>control.preferredSize = [w, h]</code> and <code>control.alignment = ["fill", "top"]</code>. This guarantees proper flex-box calculation, container expansion, and non-overlapping responsive flow across any docked window dimensions.
+          </p>
+        </div>
+      </div>
+
+      <!-- Part 4: Other Apps -->
+      <div class="guide-box" id="dev-other-apps" style="margin-bottom: 22px;">
+        <div class="snippet-title" style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 8px;">
+          <span>4. Creating Extensions for VectorCraft, FilmCraft, SoundCraft &amp; PdfCraft</span>
+          <span class="badge-pill">SVG · 3D LUTs · CLAP / VST3 · Acrobat JS</span>
+        </div>
+        <p>Each application in the ArtCraft suite provides a dedicated extension mechanism:</p>
+        <ul>
+          <li><strong>VectorCraft (ABI v1):</strong> WASM object filters that receive SVG DOM node trees or path coordinate arrays and apply parametric geometric transformations or palette remaps.</li>
+          <li><strong>FilmCraft &amp; LightCraft (3D LUTs):</strong> Standard <code>.cube</code> files (17&times;17&times;17 or 33&times;33&times;33 RGB lookup tables) and native <code>filmcraft.effect-presets</code> XML chains.</li>
+          <li><strong>SoundCraft (Audio Plug-ins):</strong> Standard open audio plugin formats including <strong>CLAP</strong> (<code>.clap</code>), <strong>VST3</strong> (<code>.vst3</code>), and macOS <strong>Audio Units</strong> (<code>.component</code>), alongside JSON channel-strip DSP configuration bundles.</li>
+          <li><strong>PdfCraft (Acrobat JS):</strong> JavaScript scripts conforming to ISO 32000 executed inside a pure-Rust Boa sandbox for automated invoice calculations, document actions, and keystroke validators.</li>
+        </ul>
+      </div>
+
+      <!-- Part 5: Sandbox & Security -->
+      <div class="guide-box" id="dev-sandboxing" style="margin-bottom: 22px;">
+        <div class="snippet-title" style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 8px;">
+          <span>5. Sandbox Rules &amp; Safe Execution Standards</span>
+          <span class="badge-pill">Memory Arena · Zero Syscalls</span>
+        </div>
+        <p>
+          All ArtCraft WebAssembly plugins execute inside an isolated linear memory arena. To ensure security and pass catalog review:
+        </p>
+        <ul>
+          <li><strong>Zero Host Imports:</strong> WASM modules must not declare external imports for filesystem access (<code>open</code>, <code>read</code>, <code>write</code>), networking (<code>socket</code>, <code>fetch</code>), or environment variables. Verify using:
+            <br><code>wasm-objdump -x your_plugin.wasm | grep -i import</code> (must be clean).
+          </li>
+          <li><strong>Bounds Validation:</strong> Always verify that <code>len &gt;= width * height * 4</code> before dereferencing raw pointers to prevent out-of-bounds memory panics.</li>
+          <li><strong>ScriptUI File Security:</strong> ExtendScript code requiring filesystem access must respect host security gates and prompt user authorization via standard dialogs (<code>File.openDialog()</code>).</li>
+        </ul>
+      </div>
+
+      <!-- Part 6: Testing & CI -->
+      <div class="guide-box" id="dev-testing" style="margin-bottom: 12px;">
+        <div class="snippet-title" style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 8px;">
+          <span>6. Automated Testing &amp; Verification Pre-flight</span>
+          <span class="badge-pill">Unit Tests · CI Audit</span>
+        </div>
+        <p>
+          Before packaging your plug-in for store submission, add unit tests in a <code>tests/</code> directory to verify algorithmic correctness:
+        </p>
+        <pre><code>// tests/algorithm_tests.rs
+#[test]
+fn test_filter_clamps_color_values() {
+    let mut buffer = vec![255u8; 16]; // 2x2 test image
+    let res = filter_image(buffer.as_mut_ptr(), buffer.len(), 2, 2, 1.5, 1.2);
+    assert_eq!(res, 0);
+    assert_eq!(buffer[3], 255); // Alpha channel must be preserved
+}</code></pre>
+        <p>Run your tests locally and run the store audit validator before submitting:</p>
+        <pre><code>cargo test --manifest-path plugins/myplugin/Cargo.toml
+python3 scripts/validate_catalog.py --check-artifacts</code></pre>
       </div>
     </section>
 
