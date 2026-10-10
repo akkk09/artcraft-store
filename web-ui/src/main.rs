@@ -61,7 +61,7 @@ const APP_DOCS: &[AppDoc] = &[
         steps: &[
             "Render Plugins (.wasm, .wat): Place in plugins folder or load via Effect ▸ Load Effect Plug-in...",
             "ScriptUI Panels (.jsx): Copy into Scripts/ScriptUI Panels/ and restart EffectCraft.",
-            "Open your panel from the Window menu (e.g. Window ▸ QuietCraft.jsx, EaseCraft.jsx).",
+            "Open your panel from the Window menu (e.g. Window ▸ PivotCraft.jsx, QuietCraft.jsx, EaseCraft.jsx).",
             "Dock the panel anywhere in your workspace alongside Effect Controls and Timeline.",
         ],
     },
