@@ -9,6 +9,7 @@ const REVIEW_URL: &str = "https://github.com/akkk09/artcraft-store/issues/new?te
 enum ActiveTab {
     Catalog,
     Docs,
+    CreatePlugin,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -232,6 +233,163 @@ struct Plugin {
     release_asset: Option<String>,
 }
 
+const PHOTOCRAFT_FILTER_SNIPPET: &str = r##"// PhotoCraft WASM Filter (ABI v1)
+#![no_std]
+
+static MANIFEST: &[u8] = br#"{
+  "id": "org.photocraft.sample.invert",
+  "name": "Sample Invert",
+  "version": "1.0.0",
+  "kind": "filter",
+  "params": {
+    "intensity": { "type": "int", "min": 0, "max": 100, "default": 100 }
+  }
+}"#;
+
+#[no_mangle]
+pub extern "C" fn pc_abi_version() -> i32 { 1 }
+
+#[no_mangle]
+pub extern "C" fn pc_manifest() -> i64 {
+    ((MANIFEST.len() as i64) << 32) | (MANIFEST.as_ptr() as u32 as i64)
+}
+
+static mut HEAP_NEXT: usize = 65536;
+
+#[no_mangle]
+pub extern "C" fn pc_alloc(size: i32) -> i32 {
+    let start = unsafe { (HEAP_NEXT + 7) & !7usize };
+    unsafe { HEAP_NEXT = start + size as usize; }
+    start as i32
+}
+
+#[no_mangle]
+pub extern "C" fn pc_process(
+    in_ptr: i32,
+    out_ptr: i32,
+    width: i32,
+    height: i32,
+    _params_ptr: i32,
+    _params_len: i32,
+) -> i32 {
+    let total_bytes = (width as usize) * (height as usize) * 4;
+    let src = unsafe { core::slice::from_raw_parts(in_ptr as *const u8, total_bytes) };
+    let dst = unsafe { core::slice::from_raw_parts_mut(out_ptr as *mut u8, total_bytes) };
+    for i in (0..total_bytes).step_by(4) {
+        dst[i] = 255 - src[i];         // R
+        dst[i + 1] = 255 - src[i + 1]; // G
+        dst[i + 2] = 255 - src[i + 2]; // B
+        dst[i + 3] = src[i + 3];       // A
+    }
+    0
+}
+"##;
+
+const EFFECTCRAFT_RENDER_SNIPPET: &str = r##"// EffectCraft Render Effect (API v1)
+pub const MANIFEST: &str = r#"{
+  "api": 1,
+  "id": "org.effectcraft.plugins.sample",
+  "name": "Sample Tint",
+  "category": "Color Correction",
+  "version": "1.0.0",
+  "params": [
+    {"id": "gain", "name": "Gain", "type": "slider", "default": 1.0, "min": 0.0, "max": 4.0}
+  ]
+}"#;
+
+#[no_mangle]
+pub extern "C" fn ec_api_version() -> i32 { 1 }
+
+#[no_mangle]
+pub extern "C" fn ec_manifest_ptr() -> i32 { MANIFEST.as_ptr() as usize as i32 }
+
+#[no_mangle]
+pub extern "C" fn ec_manifest_len() -> i32 { MANIFEST.len() as i32 }
+
+static mut RENDER_BUF: [u8; 1024 * 1024 * 16] = [0; 1024 * 1024 * 16];
+
+#[no_mangle]
+pub extern "C" fn ec_alloc(bytes: i32) -> i32 {
+    unsafe { RENDER_BUF.as_mut_ptr() as usize as i32 }
+}
+"##;
+
+const SCRIPTUI_PANEL_SNIPPET: &str = r#"// EffectCraft ScriptUI Dockable Panel (.jsx ExtendScript)
+(function (thisObj) {
+    function buildUI(thisObj) {
+        var win = (thisObj instanceof Panel)
+            ? thisObj
+            : new Window("palette", "MyTool", undefined, { resizeable: true });
+
+        win.orientation = "column";
+        win.alignChildren = ["fill", "top"];
+        win.margins = 16;
+        win.spacing = 10;
+
+        var title = win.add("statictext", undefined, "My Tool Automation");
+        var btnAction = win.add("button", undefined, "Execute Script Action");
+
+        btnAction.onClick = function () {
+            app.beginUndoGroup("My Tool Execution");
+            var comp = app.project.activeItem;
+            if (comp && comp instanceof CompItem) {
+                for (var i = 1; i <= comp.selectedLayers.length; i++) {
+                    var layer = comp.selectedLayers[i - 1];
+                    // Custom keyframe, transform, or effect logic here
+                }
+            }
+            app.endUndoGroup();
+        };
+
+        win.layout.layout(true);
+        return win;
+    }
+    buildUI(thisObj);
+})(this);
+"#;
+
+const VECTORCRAFT_FILTER_SNIPPET: &str = r##"// VectorCraft Path Transform Filter (ABI v1, wasmi sandbox)
+pub const MANIFEST: &str = r#"{
+  "abi": 1,
+  "id": "org.vectorcraft.plugins.jitter",
+  "name": "Path Jitter",
+  "version": "1.0.0",
+  "capabilities": ["path_transform", "bezier_subdivide"]
+}"#;
+
+#[no_mangle]
+pub extern "C" fn vc_abi_version() -> i32 { 1 }
+
+#[no_mangle]
+pub extern "C" fn vc_manifest_ptr() -> i32 { MANIFEST.as_ptr() as usize as i32 }
+
+#[no_mangle]
+pub extern "C" fn vc_manifest_len() -> i32 { MANIFEST.len() as i32 }
+"##;
+
+const PUBLISHING_CHECKLIST_SNIPPET: &str = r#"# ArtCraft Storefront Submission Checklist
+# 1. Place plugin source under: plugins/<app>/<plugin-name>/
+# 2. Add catalog entry in catalog.json:
+{
+  "id": "my-plugin",
+  "name": "My Plugin",
+  "app": "photocraft",
+  "kind": "WASM Filter (ABI v1)",
+  "version": "1.0.0",
+  "author": "Your Name",
+  "description": "Short summary of what your plugin does.",
+  "tags": ["filter", "effects", "creative"],
+  "artifact": "photocraft-my-plugin-v1.0.0.wasm"
+}
+
+# 3. Test compilation and validate:
+bash build-all.sh
+python3 scripts/validate_catalog.py --check-artifacts
+python3 -m unittest discover tests
+
+# 4. Submit Pull Request to https://github.com/akkk09/artcraft-store
+"#;
+
 struct StoreApp {
     plugins: Vec<Plugin>,
     forks: Vec<Fork>,
@@ -240,6 +398,7 @@ struct StoreApp {
     active_tab: ActiveTab,
     docs_app: String,
     docs_platform: TargetPlatform,
+    create_track: usize,
     notification: Option<String>,
 }
 
@@ -273,6 +432,7 @@ impl StoreApp {
             active_tab: ActiveTab::Catalog,
             docs_app: "all".to_owned(),
             docs_platform: TargetPlatform::All,
+            create_track: 0,
             notification: None,
         }
     }
@@ -466,7 +626,13 @@ impl StoreApp {
         ui.add_space(8.0);
         ui.label(RichText::new("Step-by-step setup guides, directory paths, and developer architecture references for all ArtCraft creative applications.")
             .size(15.0).color(Color32::from_rgb(180, 180, 180)));
-        ui.add_space(18.0);
+        ui.add_space(14.0);
+        ui.horizontal(|ui| {
+            if ui.button(RichText::new("🛠️  Build your own extension: Open Plug-in Creation SDK Guide ↗").strong().size(12.5)).clicked() {
+                self.active_tab = ActiveTab::CreatePlugin;
+            }
+        });
+        ui.add_space(14.0);
 
         if let Some(msg) = &self.notification {
             Frame::new()
@@ -655,6 +821,212 @@ impl StoreApp {
 
         ui.add_space(20.0);
     }
+
+    fn render_create_plugin(&mut self, ui: &mut egui::Ui) {
+        ui.label(RichText::new("● DEVELOPER SDK   ·   WASM ABI   ·   EXTENDSCRIPT   ·   ALL 09 APPS")
+            .size(10.5).strong().color(Color32::from_rgb(219, 219, 219)));
+        ui.add_space(14.0);
+        ui.label(RichText::new("Plug-in Creation Guide\n& Developer SDK.").size(42.0).strong().color(Color32::from_rgb(243, 243, 243)));
+        ui.add_space(8.0);
+        ui.label(RichText::new("Step-by-step developer tutorials, ABI specifications, code templates, and store publishing guidelines.")
+            .size(15.0).color(Color32::from_rgb(180, 180, 180)));
+        ui.add_space(18.0);
+
+        if let Some(msg) = &self.notification {
+            Frame::new()
+                .fill(Color32::from_rgb(30, 60, 30))
+                .stroke(Stroke::new(1.0_f32, Color32::from_rgb(60, 120, 60)))
+                .inner_margin(10.0)
+                .show(ui, |ui| {
+                    ui.label(RichText::new(format!("✓ {msg}")).color(Color32::from_rgb(180, 240, 180)).size(12.0).strong());
+                });
+            ui.add_space(12.0);
+        }
+
+        // Sub-topic Track Pills
+        ui.label(RichText::new("DEVELOPER GUIDE TRACK:").size(10.5).strong().color(Color32::from_rgb(219, 219, 219)));
+        ui.add_space(6.0);
+        ui.horizontal_wrapped(|ui| {
+            let tracks = [
+                (0, "WASM Filters (PhotoCraft / LightCraft)"),
+                (1, "EffectCraft Video Effects & ScriptUI"),
+                (2, "VectorCraft Paths & Templates"),
+                (3, "SoundCraft & FilmCraft Presets"),
+                (4, "Sandboxing & Security Rules"),
+                (5, "Storefront Publishing Checklist"),
+            ];
+            for (idx, label) in tracks {
+                let selected = self.create_track == idx;
+                if Self::pill_button(ui, selected, label).clicked() {
+                    self.create_track = idx;
+                }
+            }
+        });
+
+        ui.add_space(20.0);
+        ui.separator();
+        ui.add_space(16.0);
+
+        let mut copied_snippet: Option<(&'static str, &'static str)> = None;
+
+        match self.create_track {
+            0 => {
+                Frame::new()
+                    .fill(Color32::from_rgb(26, 26, 26))
+                    .stroke(Stroke::new(1.0_f32, Color32::from_rgb(55, 55, 55)))
+                    .inner_margin(20.0)
+                    .show(ui, |ui| {
+                        ui.label(RichText::new("PHOTOCRAFT & LIGHTCRAFT: WASM FILTER ABI v1").size(14.0).strong().color(Color32::from_rgb(243, 243, 243)));
+                        ui.add_space(8.0);
+                        ui.label(RichText::new("PhotoCraft and LightCraft execute sandboxed WebAssembly binaries compiled to wasm32-unknown-unknown. Plugins operate directly on RGBA pixel buffers with zero OS syscalls.")
+                            .size(13.0).color(Color32::from_rgb(180, 180, 180)));
+                        ui.add_space(12.0);
+                        ui.label(RichText::new("Required Export Symbols:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("• pc_abi_version() -> i32 (must return 1)\n• pc_manifest() -> i64 (packs manifest pointer and byte length)\n• pc_alloc(size: i32) -> i32 (heap allocator for input/output buffers)\n• pc_process(in_ptr, out_ptr, width, height, params_ptr, params_len) -> i32").monospace().size(11.5).color(Color32::from_rgb(200, 200, 200)));
+                        ui.add_space(14.0);
+                        ui.horizontal(|ui| {
+                            ui.label(RichText::new("Sample Rust Implementation:").strong().color(Color32::from_rgb(219, 219, 219)));
+                            ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                                if ui.button(RichText::new("Copy Code").size(11.0)).clicked() {
+                                    copied_snippet = Some(("PhotoCraft Filter", PHOTOCRAFT_FILTER_SNIPPET));
+                                }
+                            });
+                        });
+                        ui.add_space(6.0);
+                        Frame::new().fill(Color32::from_rgb(13, 13, 13)).inner_margin(12.0).corner_radius(egui::CornerRadius::same(6)).show(ui, |ui| {
+                            ui.label(RichText::new(PHOTOCRAFT_FILTER_SNIPPET).monospace().size(11.0).color(Color32::from_rgb(220, 220, 220)));
+                        });
+                        ui.add_space(12.0);
+                        ui.label(RichText::new("Compilation Command:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("cargo build --target wasm32-unknown-unknown --release").monospace().size(12.0).color(Color32::from_rgb(235, 235, 235)));
+                    });
+            }
+            1 => {
+                Frame::new()
+                    .fill(Color32::from_rgb(26, 26, 26))
+                    .stroke(Stroke::new(1.0_f32, Color32::from_rgb(55, 55, 55)))
+                    .inner_margin(20.0)
+                    .show(ui, |ui| {
+                        ui.label(RichText::new("EFFECTCRAFT: RENDER EFFECTS (WASM) & SCRIPTUI PANELS (.jsx)").size(14.0).strong().color(Color32::from_rgb(243, 243, 243)));
+                        ui.add_space(8.0);
+                        ui.label(RichText::new("EffectCraft supports two plugin tiers:\n1. WASM Render Effects for real-time per-frame pixel processing (Color Correction, Distort, Generate).\n2. ExtendScript (.jsx) ScriptUI dockable panels for timeline automation, keyframing, and batch processing.")
+                            .size(13.0).color(Color32::from_rgb(180, 180, 180)));
+                        ui.add_space(14.0);
+                        ui.horizontal(|ui| {
+                            ui.label(RichText::new("WASM Render Effect ABI v1:").strong().color(Color32::from_rgb(219, 219, 219)));
+                            ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                                if ui.button(RichText::new("Copy Code").size(11.0)).clicked() {
+                                    copied_snippet = Some(("EffectCraft Render Effect", EFFECTCRAFT_RENDER_SNIPPET));
+                                }
+                            });
+                        });
+                        ui.add_space(6.0);
+                        Frame::new().fill(Color32::from_rgb(13, 13, 13)).inner_margin(12.0).corner_radius(egui::CornerRadius::same(6)).show(ui, |ui| {
+                            ui.label(RichText::new(EFFECTCRAFT_RENDER_SNIPPET).monospace().size(11.0).color(Color32::from_rgb(220, 220, 220)));
+                        });
+                        ui.add_space(14.0);
+                        ui.horizontal(|ui| {
+                            ui.label(RichText::new("ScriptUI Dockable Panel (.jsx):").strong().color(Color32::from_rgb(219, 219, 219)));
+                            ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                                if ui.button(RichText::new("Copy Code").size(11.0)).clicked() {
+                                    copied_snippet = Some(("ScriptUI Panel", SCRIPTUI_PANEL_SNIPPET));
+                                }
+                            });
+                        });
+                        ui.add_space(6.0);
+                        Frame::new().fill(Color32::from_rgb(13, 13, 13)).inner_margin(12.0).corner_radius(egui::CornerRadius::same(6)).show(ui, |ui| {
+                            ui.label(RichText::new(SCRIPTUI_PANEL_SNIPPET).monospace().size(11.0).color(Color32::from_rgb(220, 220, 220)));
+                        });
+                    });
+            }
+            2 => {
+                Frame::new()
+                    .fill(Color32::from_rgb(26, 26, 26))
+                    .stroke(Stroke::new(1.0_f32, Color32::from_rgb(55, 55, 55)))
+                    .inner_margin(20.0)
+                    .show(ui, |ui| {
+                        ui.label(RichText::new("VECTORCRAFT: OBJECT FILTERS (wasmi) & SVG TEMPLATES").size(14.0).strong().color(Color32::from_rgb(243, 243, 243)));
+                        ui.add_space(8.0);
+                        ui.label(RichText::new("VectorCraft executes procedural geometry filters in an embedded wasmi interpreter with deterministic fuel limits. It also supports distribution of editable SVG template archives.")
+                            .size(13.0).color(Color32::from_rgb(180, 180, 180)));
+                        ui.add_space(14.0);
+                        ui.horizontal(|ui| {
+                            ui.label(RichText::new("VectorCraft Path Filter Manifest & ABI:").strong().color(Color32::from_rgb(219, 219, 219)));
+                            ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                                if ui.button(RichText::new("Copy Code").size(11.0)).clicked() {
+                                    copied_snippet = Some(("VectorCraft Filter", VECTORCRAFT_FILTER_SNIPPET));
+                                }
+                            });
+                        });
+                        ui.add_space(6.0);
+                        Frame::new().fill(Color32::from_rgb(13, 13, 13)).inner_margin(12.0).corner_radius(egui::CornerRadius::same(6)).show(ui, |ui| {
+                            ui.label(RichText::new(VECTORCRAFT_FILTER_SNIPPET).monospace().size(11.0).color(Color32::from_rgb(220, 220, 220)));
+                        });
+                    });
+            }
+            3 => {
+                Frame::new()
+                    .fill(Color32::from_rgb(26, 26, 26))
+                    .stroke(Stroke::new(1.0_f32, Color32::from_rgb(55, 55, 55)))
+                    .inner_margin(20.0)
+                    .show(ui, |ui| {
+                        ui.label(RichText::new("SOUNDCRAFT & FILMCRAFT: AUDIO & TIMELINE EXTENSIONS").size(14.0).strong().color(Color32::from_rgb(243, 243, 243)));
+                        ui.add_space(8.0);
+                        ui.label(RichText::new("• SoundCraft supports standard open CLAP (.clap), VST3 (.vst3), and macOS Audio Units (.component) alongside channel strip DSP presets.\n• FilmCraft supports declarative JSON effect presets (filmcraft.effect-presets v1) and industry-standard .cube 3D Look-Up Tables (17x17x17, 33x33x33, and 65x65x65 grid sizes).")
+                            .size(13.0).color(Color32::from_rgb(180, 180, 180)));
+                        ui.add_space(14.0);
+                        ui.label(RichText::new("FilmCraft CLI Preset Import:").strong().color(Color32::from_rgb(219, 219, 219)));
+                        ui.label(RichText::new("filmcraft-cli --project project.fcproj exec presets.import '{\"path\":\"presets.json\"}'").monospace().size(12.0).color(Color32::from_rgb(235, 235, 235)));
+                    });
+            }
+            4 => {
+                Frame::new()
+                    .fill(Color32::from_rgb(26, 26, 26))
+                    .stroke(Stroke::new(1.0_f32, Color32::from_rgb(55, 55, 55)))
+                    .inner_margin(20.0)
+                    .show(ui, |ui| {
+                        ui.label(RichText::new("SANDBOXING & SECURITY RULES").size(14.0).strong().color(Color32::from_rgb(243, 243, 243)));
+                        ui.add_space(8.0);
+                        ui.label(RichText::new("To maintain stability, portability, and safety across all platforms, ArtCraft plugins run within strictly sandboxed environments:")
+                            .size(13.0).color(Color32::from_rgb(180, 180, 180)));
+                        ui.add_space(10.0);
+                        ui.label(RichText::new("1. Zero OS Syscalls: WASM plugins must not import POSIX syscalls, unconstrained filesystem access, or raw sockets.\n2. Bounded Memory: Plugins operate within linear memory limits (maximum 64MB per instance unless granted high-memory permission).\n3. Deterministic Rendering: Filters must output byte-identical pixels across Linux, macOS, and Windows.\n4. Execution Fuel: VectorCraft runs in a wasmi fuel-metered environment to prevent runaway loops.").size(12.5).color(Color32::from_rgb(200, 200, 200)));
+                    });
+            }
+            _ => {
+                Frame::new()
+                    .fill(Color32::from_rgb(26, 26, 26))
+                    .stroke(Stroke::new(1.0_f32, Color32::from_rgb(55, 55, 55)))
+                    .inner_margin(20.0)
+                    .show(ui, |ui| {
+                        ui.label(RichText::new("STOREFRONT PUBLISHING CHECKLIST").size(14.0).strong().color(Color32::from_rgb(243, 243, 243)));
+                        ui.add_space(8.0);
+                        ui.label(RichText::new("Follow these steps to submit your new plugin or extension to the ArtCraft Store catalog:")
+                            .size(13.0).color(Color32::from_rgb(180, 180, 180)));
+                        ui.add_space(14.0);
+                        ui.horizontal(|ui| {
+                            ui.label(RichText::new("Step-by-Step Submission Instructions:").strong().color(Color32::from_rgb(219, 219, 219)));
+                            ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                                if ui.button(RichText::new("Copy Checklist").size(11.0)).clicked() {
+                                    copied_snippet = Some(("Publishing Checklist", PUBLISHING_CHECKLIST_SNIPPET));
+                                }
+                            });
+                        });
+                        ui.add_space(6.0);
+                        Frame::new().fill(Color32::from_rgb(13, 13, 13)).inner_margin(12.0).corner_radius(egui::CornerRadius::same(6)).show(ui, |ui| {
+                            ui.label(RichText::new(PUBLISHING_CHECKLIST_SNIPPET).monospace().size(11.0).color(Color32::from_rgb(220, 220, 220)));
+                        });
+                    });
+            }
+        }
+
+        if let Some((label, snippet)) = copied_snippet {
+            ui.ctx().copy_text(snippet.to_owned());
+            self.notification = Some(format!("Copied {label} snippet to clipboard"));
+        }
+
+        ui.add_space(20.0);
+    }
 }
 
 impl eframe::App for StoreApp {
@@ -678,6 +1050,11 @@ impl eframe::App for StoreApp {
                     if Self::tab_button(ui, is_docs, "Documentation").clicked() {
                         self.active_tab = ActiveTab::Docs;
                     }
+                    ui.add_space(4.0);
+                    let is_create = self.active_tab == ActiveTab::CreatePlugin;
+                    if Self::tab_button(ui, is_create, "Create a Plug-in").clicked() {
+                        self.active_tab = ActiveTab::CreatePlugin;
+                    }
 
                     ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                         ui.hyperlink_to(RichText::new("GitHub ↗").size(12.0).color(Color32::from_rgb(219, 219, 219)), REPO_URL);
@@ -699,6 +1076,9 @@ impl eframe::App for StoreApp {
                         ActiveTab::Docs => {
                             self.render_docs(ui);
                         }
+                        ActiveTab::CreatePlugin => {
+                            self.render_create_plugin(ui);
+                        }
                         ActiveTab::Catalog => {
                             ui.label(RichText::new("● COMMUNITY BUILT   ·   OPEN SOURCE   ·   MADE FOR CREATORS")
                                 .size(10.5).strong().color(Color32::from_rgb(219, 219, 219)));
@@ -711,6 +1091,10 @@ impl eframe::App for StoreApp {
                             ui.horizontal(|ui| {
                                 if ui.button(RichText::new("📖  Installation & Architecture Docs").size(12.5).strong()).clicked() {
                                     self.active_tab = ActiveTab::Docs;
+                                }
+                                ui.add_space(8.0);
+                                if ui.button(RichText::new("🛠️  Create a Plug-in").size(12.5).strong()).clicked() {
+                                    self.active_tab = ActiveTab::CreatePlugin;
                                 }
                             });
                             ui.add_space(18.0);
