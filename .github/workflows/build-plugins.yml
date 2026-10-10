@@ -68,6 +68,8 @@ jobs:
         run: cargo test --manifest-path plugins/seamless-pattern-generator/Cargo.toml
       - name: Test LumaSweep algorithms
         run: cargo test --manifest-path plugins/lumasweep/Cargo.toml
+      - name: Test Glassify algorithms
+        run: cargo test --manifest-path plugins/glassify/Cargo.toml
       - name: Build and stage plug-ins
         run: bash build-all.sh
       - name: Audit catalog downloads and release assets
@@ -101,6 +103,7 @@ jobs:
             dist/chromatic-fringe.wat
             dist/depthcraft.wasm
             dist/lumasweep.wasm
+            dist/glassify.wasm
             dist/EaseCraft.jsx
             dist/CaptionCraft.jsx
             dist/QuietCraft.jsx

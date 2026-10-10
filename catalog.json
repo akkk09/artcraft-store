@@ -405,6 +405,32 @@
       "compatibility": "EffectCraft plug-in API v1"
     },
     {
+      "id": "org.effectcraft.community.glassify",
+      "name": "Glassify",
+      "version": "1.0.0",
+      "author": "ArtCraft Store community",
+      "description": "Optical glass rendering with Snell refraction, chromatic dispersion, frosted blur, and procedural liquid/caustic distortion.",
+      "kind": "plugin",
+      "abi": 1,
+      "source": "plugins/glassify",
+      "sourceUrl": "https://github.com/akkk09/artcraft-store/tree/main/plugins/glassify",
+      "artifact": "glassify.wasm",
+      "releaseAsset": "glassify.wasm",
+      "tags": [
+        "glass",
+        "refraction",
+        "dispersion",
+        "frosted",
+        "blur",
+        "liquid",
+        "caustics",
+        "fresnel",
+        "distort"
+      ],
+      "app": "effectcraft",
+      "compatibility": "EffectCraft plug-in API v1"
+    },
+    {
       "id": "org.effectcraft.community.easecraft",
       "name": "EaseCraft",
       "version": "0.1.0",

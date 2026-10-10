@@ -125,12 +125,13 @@ The browser-based LUT Studio is available at `https://akkk09.github.io/artcraft-
 | **Chromatic Fringe** | Plugin (API v1) | Offsets red and blue color channels in opposite directions (`chromatic-fringe.wat`). |
 | **DepthCraft** | Plugin (API v1 / WASM) | Monocular depth estimation, edge-preserving bilateral filtering, and atmospheric fog generator (`depthcraft.wasm`). |
 | **LumaSweep** | Plugin (API v1 / WASM) | Controllable light sweep with physical bevel edge response, chromatic fringe, procedural texture, and luminance relief (`lumasweep.wasm`). |
+| **Glassify** | Plugin (API v1 / WASM) | Optical glass rendering with Snell refraction, chromatic dispersion, frosted blur, and procedural liquid/caustic distortion (`glassify.wasm`). |
 | **EaseCraft** | Tool (ScriptUI / ExtendScript) | Visual cubic Bézier curve editor, transition presets, and keyframe easing tool (`EaseCraft.jsx`). |
 | **CaptionCraft** | Tool (ScriptUI / ExtendScript) | Caption authoring, SRT/VTT subtitle import/export, and typography layout tool (`CaptionCraft.jsx`). |
 | **QuietCraft** | Tool (ScriptUI / ExtendScript) | Automated audio silence detection, noise-floor thresholding, and speech derushing tool (`QuietCraft.jsx`). |
 
 In EffectCraft:
-- Native / WASM effect plug-ins (**LumaSweep**, **DepthCraft**, **Chromatic Fringe**) can be loaded via **Effect → Load Effect Plug-in** or placed in `~/.config/effectcraft/plugins/`.
+- Native / WASM effect plug-ins (**Glassify**, **LumaSweep**, **DepthCraft**, **Chromatic Fringe**) can be loaded via **Effect → Load Effect Plug-in** or placed in `~/.config/effectcraft/plugins/`.
 - ScriptUI panels (**EaseCraft**, **CaptionCraft**, **QuietCraft**) are installed to `~/.config/effectcraft/Scripts/ScriptUI Panels/` and opened from the **Window** menu.
 
 ## VectorCraft plug-ins & templates
