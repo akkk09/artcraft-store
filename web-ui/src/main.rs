@@ -232,9 +232,10 @@ impl StoreApp {
         visuals.widgets.inactive.bg_fill = Color32::from_rgb(35, 35, 35);
         visuals.widgets.inactive.fg_stroke = Stroke::new(1.0_f32, Color32::from_rgb(227, 227, 227));
         visuals.widgets.hovered.bg_fill = Color32::from_rgb(54, 54, 54);
-        visuals.widgets.active.bg_fill = Color32::from_rgb(219, 219, 219);
-        visuals.selection.bg_fill = Color32::from_rgb(219, 219, 219);
-        visuals.selection.stroke = Stroke::new(1.0_f32, Color32::from_rgb(21, 21, 21));
+        visuals.widgets.active.bg_fill = Color32::from_rgb(222, 222, 222);
+        visuals.widgets.active.fg_stroke = Stroke::new(1.0_f32, Color32::from_rgb(17, 17, 17));
+        visuals.selection.bg_fill = Color32::from_rgb(222, 222, 222);
+        visuals.selection.stroke = Stroke::new(1.0_f32, Color32::from_rgb(17, 17, 17));
         cc.egui_ctx.set_visuals(visuals);
 
         // Embed the validated catalog so the first render does not wait on a network request.
@@ -250,6 +251,24 @@ impl StoreApp {
             docs_platform: TargetPlatform::All,
             notification: None,
         }
+    }
+
+    fn tab_button(ui: &mut egui::Ui, selected: bool, text: &str) -> egui::Response {
+        let text_color = if selected {
+            Color32::from_rgb(17, 17, 17)
+        } else {
+            Color32::from_rgb(195, 195, 195)
+        };
+        ui.selectable_label(selected, RichText::new(text).size(12.5).strong().color(text_color))
+    }
+
+    fn pill_button(ui: &mut egui::Ui, selected: bool, text: &str) -> egui::Response {
+        let text_color = if selected {
+            Color32::from_rgb(17, 17, 17)
+        } else {
+            Color32::from_rgb(205, 205, 205)
+        };
+        ui.selectable_label(selected, RichText::new(text).size(12.0).color(text_color))
     }
 
     fn app_name(app: &str) -> &'static str {
@@ -383,12 +402,12 @@ impl StoreApp {
         ui.add_space(6.0);
         ui.horizontal_wrapped(|ui| {
             let all_selected = self.docs_app == "all";
-            if ui.selectable_label(all_selected, RichText::new("All apps").size(12.0)).clicked() {
+            if Self::pill_button(ui, all_selected, "All apps").clicked() {
                 self.docs_app = "all".to_owned();
             }
             for doc in APP_DOCS {
                 let selected = self.docs_app == doc.id;
-                if ui.selectable_label(selected, RichText::new(doc.name).size(12.0)).clicked() {
+                if Self::pill_button(ui, selected, doc.name).clicked() {
                     self.docs_app = doc.id.to_owned();
                 }
             }
@@ -407,7 +426,7 @@ impl StoreApp {
                 (TargetPlatform::Windows, "Windows"),
             ] {
                 let selected = self.docs_platform == platform;
-                if ui.selectable_label(selected, RichText::new(label).size(12.0)).clicked() {
+                if Self::pill_button(ui, selected, label).clicked() {
                     self.docs_platform = platform;
                 }
             }
@@ -546,12 +565,12 @@ impl eframe::App for StoreApp {
 
                     // Modular Tab Switcher
                     let is_catalog = self.active_tab == ActiveTab::Catalog;
-                    if ui.selectable_label(is_catalog, RichText::new("Catalog").size(12.5).strong()).clicked() {
+                    if Self::tab_button(ui, is_catalog, "Catalog").clicked() {
                         self.active_tab = ActiveTab::Catalog;
                     }
                     ui.add_space(4.0);
                     let is_docs = self.active_tab == ActiveTab::Docs;
-                    if ui.selectable_label(is_docs, RichText::new("Documentation").size(12.5).strong()).clicked() {
+                    if Self::tab_button(ui, is_docs, "Documentation").clicked() {
                         self.active_tab = ActiveTab::Docs;
                     }
 
@@ -627,7 +646,7 @@ impl eframe::App for StoreApp {
                                     ("cadcraft", "CADCraft"),
                                 ] {
                                     let selected = self.active_app == key;
-                                    if ui.selectable_label(selected, RichText::new(label).size(12.0)).clicked() {
+                                    if Self::pill_button(ui, selected, label).clicked() {
                                         self.active_app = key.to_owned();
                                     }
                                 }
