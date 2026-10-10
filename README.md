@@ -1,5 +1,14 @@
 # ArtCraft Store
 
+[![Storefront](https://img.shields.io/badge/Storefront-Live-2ea043?style=for-the-badge)](https://akkk09.github.io/artcraft-store/)
+[![Documentation](https://img.shields.io/badge/Documentation-Installation_%26_Developer_Guide-0969da?style=for-the-badge)](https://akkk09.github.io/artcraft-store/docs.html)
+[![LUT Studio](https://img.shields.io/badge/LUT_Studio-In--Browser_Preview-d29922?style=for-the-badge)](https://akkk09.github.io/artcraft-store/lut-studio/)
+
+> 📖 **Looking for installation guides or developer docs?**  
+> Visit the [**ArtCraft Documentation (`docs.html`)**](https://akkk09.github.io/artcraft-store/docs.html) (or local [`docs.html`](docs.html)) for OS-specific installation directories (Linux, macOS, Windows), activation steps for all 9 creative apps, runtime architecture specifications, and store submission guidelines.
+
+---
+
 A shared, searchable community catalog for apps with supported extension systems:
 
 - **PhotoCraft** — WebAssembly image filters, retouching tools, and 3D LUTs (ABI v1)
@@ -12,7 +21,7 @@ A shared, searchable community catalog for apps with supported extension systems
 - **LightCraft** — Non-destructive RAW develop presets and 3D LUT profiles
 - **CADCraft** — Command automation scripts and geometric drawing macros
 
-The static storefront in [`index.html`](index.html) reads [`catalog.json`](catalog.json) at runtime. Filter by app or search across names, descriptions, tags, and compatibility notes. Detailed installation paths, architecture specifications, and SDK developer guides are available on the [**Documentation Page**](docs.html).
+The static storefront in [`index.html`](index.html) reads [`catalog.json`](catalog.json) at runtime. Filter by app or search across names, descriptions, tags, and compatibility notes. Detailed installation paths, architecture specifications, and SDK developer guides are available on the [**Documentation Page**](https://akkk09.github.io/artcraft-store/docs.html) ([`docs.html`](docs.html)).
 
 This is a community-maintained catalog, not an official ArtCraft support channel. Submissions should be limited to plugins intended for listing in this store, with a source repository, license, download link, supported app/version, and clear description. Reviews are for existing catalog items only.
 
