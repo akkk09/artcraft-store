@@ -72,6 +72,8 @@ jobs:
         run: cargo test --manifest-path plugins/glassify/Cargo.toml
       - name: Test PivotCraft algorithms
         run: cargo test --manifest-path plugins/pivotcraft/Cargo.toml
+      - name: Test Citron algorithms
+        run: cargo test --manifest-path plugins/citron/Cargo.toml
       - name: Build and stage plug-ins
         run: bash build-all.sh
       - name: Audit catalog downloads and release assets
@@ -110,6 +112,7 @@ jobs:
             dist/CaptionCraft.jsx
             dist/QuietCraft.jsx
             dist/PivotCraft.jsx
+            dist/Citron.jsx
             dist/vectorcraft_plugin_recolor.wasm
             dist/soundcraft-audio-toolkit.zip
             dist/pdfcraft-invoice-calculator.js

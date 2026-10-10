@@ -130,10 +130,11 @@ The browser-based LUT Studio is available at `https://akkk09.github.io/artcraft-
 | **CaptionCraft** | Tool (ScriptUI / ExtendScript) | Caption authoring, SRT/VTT subtitle import/export, and typography layout tool (`CaptionCraft.jsx`). |
 | **QuietCraft** | Tool (ScriptUI / ExtendScript) | Automated audio silence detection, noise-floor thresholding, and speech derushing tool (`QuietCraft.jsx`). |
 | **PivotCraft** | Tool (ScriptUI / ExtendScript) | Fast, predictable anchor-point placement, layer alignment, and transform-compensated pivot tool (`PivotCraft.jsx`). |
+| **Citron** | Tool (ScriptUI / ExtendScript) | Maya/Blender-inspired multi-channel curve workspace, FFD lattice cage tool, and graph editor (`Citron.jsx`). |
 
 In EffectCraft:
 - Native / WASM effect plug-ins (**Glassify**, **LumaSweep**, **DepthCraft**, **Chromatic Fringe**) can be loaded via **Effect → Load Effect Plug-in** or placed in `~/.config/effectcraft/plugins/`.
-- ScriptUI panels (**EaseCraft**, **CaptionCraft**, **QuietCraft**, **PivotCraft**) are installed to `~/.config/effectcraft/Scripts/ScriptUI Panels/` and opened from the **Window** menu.
+- ScriptUI panels (**Citron**, **EaseCraft**, **CaptionCraft**, **QuietCraft**, **PivotCraft**) are installed to `~/.config/effectcraft/Scripts/ScriptUI Panels/` and opened from the **Window** menu.
 
 ## VectorCraft plug-ins & templates
 

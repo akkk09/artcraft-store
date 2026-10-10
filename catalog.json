@@ -453,6 +453,31 @@
       "compatibility": "EffectCraft ScriptUI / ExtendScript"
     },
     {
+      "id": "org.effectcraft.community.citron",
+      "name": "Citron",
+      "version": "1.0.0",
+      "author": "ArtCraft Store community",
+      "description": "Maya/Blender-inspired multi-channel graph editor, FFD lattice cage tool, and curve workspace.",
+      "kind": "tool",
+      "abi": 1,
+      "source": "plugins/citron",
+      "sourceUrl": "https://github.com/akkk09/artcraft-store/tree/main/plugins/citron",
+      "artifact": "Citron.jsx",
+      "releaseAsset": "Citron.jsx",
+      "tags": [
+        "graph-editor",
+        "curves",
+        "lattice",
+        "ffd",
+        "multi-channel",
+        "animation",
+        "keyframes",
+        "easing"
+      ],
+      "app": "effectcraft",
+      "compatibility": "EffectCraft ScriptUI / ExtendScript"
+    },
+    {
       "id": "org.effectcraft.community.captioncraft",
       "name": "CaptionCraft",
       "version": "0.1.0",
