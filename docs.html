@@ -3,26 +3,22 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#111111">
+  <meta name="theme-color" content="#131313">
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <meta name="description" content="Comprehensive documentation for installing, building, and publishing ArtCraft extensions and plug-ins across all 9 creative apps.">
-  <title>Documentation — ArtCraft Store</title>
+  <meta name="description" content="ArtCraft Store extension architecture and installation documentation.">
+  <title>ArtCraft Store — Documentation</title>
   <style>
     :root {
       color-scheme: dark;
-      --bg: #111111;
-      --panel: #191919;
+      --bg: #131313;
+      --topbar: #101010;
+      --panel: #1a1a1a;
       --panel2: #242424;
-      --line: #393939;
-      --text: #f4f4f4;
+      --line: #373737;
+      --text: #f3f3f3;
       --muted: #a6a6a6;
-      --accent: #f4f4f4;
-      --accent-ink: #111111;
-      --code-bg: #0d0d0d;
-      --tag-bg: #292929;
+      --accent: #dbdbdb;
+      --accent-ink: #151515;
       --radius: 8px;
     }
     * { box-sizing: border-box; }
@@ -31,919 +27,757 @@
       margin: 0;
       background: var(--bg);
       color: var(--text);
-      font: 16px/1.65 "Outfit", ui-sans-serif, system-ui, sans-serif;
-      letter-spacing: -.012em;
+      font: 14px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      letter-spacing: -.01em;
     }
-    a { color: inherit; text-decoration-color: #666; transition: color .15s; }
-    a:hover { color: var(--accent); }
+    a { color: inherit; text-decoration: none; }
     code, pre {
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
-      font-size: 13px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 12.5px;
     }
     pre {
-      background: var(--code-bg);
+      background: #0d0d0d;
       border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 16px 20px;
+      border-radius: 6px;
+      padding: 14px 18px;
       overflow-x: auto;
-      margin: 16px 0;
-      line-height: 1.5;
+      margin: 12px 0;
     }
     code:not(pre code) {
-      background: var(--code-bg);
+      background: #0d0d0d;
       border: 1px solid var(--line);
       padding: 2px 6px;
       border-radius: 4px;
-      font-size: 12.5px;
       color: #e6e6e6;
     }
-    .wrap { max-width: 1320px; margin: auto; padding: 0 48px; }
-    header {
-      min-height: 88px; border-bottom: 1px solid var(--line);
-      display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    .topbar {
+      height: 56px;
+      background: var(--topbar);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-    .brand { display:flex; align-items:center; gap:12px; text-decoration:none; font-weight:700; letter-spacing:-.035em; font-size:17px; }
-    .mark {
-      display:grid; place-items:center; width:34px; height:34px; border-radius:8px;
-      background:var(--accent); color:var(--accent-ink); font-size:18px; font-weight:900;
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
     }
-    .nav { display:flex; gap:26px; color:var(--muted); font-size:13px; }
-    .nav a { text-decoration:none; }
-    .nav a.active { color: var(--text); font-weight: 600; }
-    .nav a:hover { color:var(--accent); }
-
-    /* Hero */
-    .docs-hero { padding: clamp(60px, 8vw, 110px) 0 60px; max-width: 1040px; }
-    .eyebrow {
-      display:flex; align-items:center; gap:10px; color:var(--muted);
-      font-size:11px; font-weight:750; letter-spacing:.14em; text-transform:uppercase;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: -.02em;
     }
-    .dot { width:7px; height:7px; border-radius:50%; background:var(--accent); }
-    h1 {
-      font-family: "Instrument Serif", Georgia, serif;
-      font-size: clamp(52px, 8vw, 104px);
-      letter-spacing: -.045em; line-height: .92;
-      margin: 24px 0 24px; font-weight: 400;
+    .brand-mark {
+      font-weight: 900;
+      font-size: 18px;
+      color: var(--accent);
     }
-    .docs-hero p { font-size: clamp(17px, 2vw, 20px); line-height: 1.65; max-width: 760px; color: var(--muted); margin: 0; }
-
-    /* Quick Jump Bar */
-    .quick-jump {
-      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 36px;
-      padding-bottom: 30px; border-bottom: 1px solid var(--line);
+    .brand-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      letter-spacing: .02em;
     }
-    .jump-pill {
-      font-size: 12px; font-weight: 600; padding: 8px 16px; border-radius: 999px;
-      border: 1px solid var(--line); text-decoration: none; color: var(--muted);
-      background: var(--panel); transition: all .15s; display: inline-flex; align-items: center; gap: 6px;
+    .brand-sub {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
     }
-    .jump-pill:hover { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
-
-    /* Layout */
-    .docs-layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 48px; margin: 48px 0 100px; }
-    .toc-sticky { position: sticky; top: 32px; height: fit-content; max-height: calc(100vh - 64px); overflow-y: auto; }
-    .toc-sticky h4 { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 14px; }
-    .toc-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; font-size: 13px; }
-    .toc-list a { color: var(--muted); text-decoration: none; display: block; border-left: 2px solid transparent; padding-left: 10px; }
-    .toc-list a:hover { color: var(--accent); border-left-color: var(--line); }
-    .toc-sublist { list-style: none; padding-left: 14px; margin: 6px 0 0; display: grid; gap: 6px; font-size: 12px; }
-
-    .content-area { min-width: 0; }
-    .content-section { margin-bottom: 84px; scroll-margin-top: 32px; }
-    .content-section h2 {
-      font-family: "Instrument Serif", Georgia, serif;
-      font-size: clamp(34px, 4vw, 54px);
-      font-weight: 400; letter-spacing: -.035em;
-      line-height: 1.05; margin: 12px 0 20px;
+    .nav-tabs {
+      display: flex;
+      gap: 4px;
+      margin-left: 12px;
     }
-    .content-section h3 {
-      font-family: "Instrument Serif", Georgia, serif;
-      font-size: clamp(24px, 3vw, 34px);
-      font-weight: 400; letter-spacing: -.02em;
-      margin: 40px 0 14px;
-    }
-    .content-section p { color: #d0d0d0; line-height: 1.7; margin: 0 0 16px; }
-
-    /* OS Switcher */
-    .os-bar {
-      display: flex; align-items: center; justify-content: space-between; gap: 14px;
-      margin: 24px 0 20px; padding: 12px 18px; background: var(--panel); border: 1px solid var(--line);
-      border-radius: var(--radius); flex-wrap: wrap;
-    }
-    .os-bar-label { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-    .os-toggles { display: flex; gap: 6px; }
-    .os-btn {
-      background: transparent; border: 1px solid var(--line); color: var(--muted);
-      border-radius: 999px; padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
+    .nav-tab {
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--muted);
       transition: all .15s;
     }
-    .os-btn.active, .os-btn:hover { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
-
-    /* App Cards in Docs */
-    .app-doc {
-      background: var(--panel); border: 1px solid var(--line);
-      border-radius: var(--radius); padding: 32px; margin-bottom: 24px;
+    .nav-tab:hover {
+      color: var(--text);
+      background: rgba(255,255,255,0.05);
     }
-    .app-doc-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
-    .app-doc-title { display: flex; align-items: center; gap: 14px; }
-    .app-glyph {
-      width: 44px; height: 44px; border-radius: 10px; background: var(--panel2);
-      border: 1px solid var(--line); display: grid; place-items: center;
-      color: var(--accent); font-size: 22px; font-weight: 700;
+    .nav-tab.active {
+      color: var(--accent-ink);
+      background: var(--accent);
     }
-    .app-doc-title h3 { margin: 0; font-size: 28px; }
-    .badge {
-      display: inline-flex; align-items: center; gap: 6px; font-size: 11px;
-      padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line);
-      background: var(--bg); color: var(--muted);
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 12px;
+      color: var(--muted);
     }
-
-    /* Path tables */
-    .path-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
-    .path-table th, .path-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--line); }
-    .path-table th { background: var(--panel2); color: var(--muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
-    .path-table td { vertical-align: top; }
-    .path-snippet { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .topbar-right a:hover {
+      color: var(--text);
+    }
+    .wrap {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+    .hero {
+      margin-bottom: 28px;
+    }
+    .eyebrow {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-size: clamp(32px, 5vw, 44px);
+      font-weight: 700;
+      letter-spacing: -.03em;
+      line-height: 1.1;
+      margin: 0 0 10px;
+      color: var(--text);
+    }
+    .hero p {
+      color: #b4b4b4;
+      font-size: 15px;
+      margin: 0;
+      max-width: 760px;
+      line-height: 1.55;
+    }
+    .filter-section {
+      margin: 24px 0 20px;
+    }
+    .filter-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .pill-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .pill {
+      background: #232323;
+      border: 1px solid var(--line);
+      color: #e3e3e3;
+      padding: 6px 13px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .pill:hover {
+      background: #363636;
+      border-color: #555;
+    }
+    .pill.active {
+      background: var(--accent);
+      color: var(--accent-ink);
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+    .toast {
+      background: #1e3c1e;
+      border: 1px solid #3c783c;
+      color: #b4f0b4;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: none;
+    }
+    .cards-grid {
+      display: grid;
+      gap: 16px;
+      margin: 24px 0 40px;
+    }
+    .doc-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .doc-card-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+    .doc-glyph {
+      width: 44px;
+      height: 44px;
+      background: var(--accent);
+      color: var(--accent-ink);
+      font-size: 22px;
+      font-weight: 900;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+    .doc-title-group h2 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      margin: 0 0 3px;
+      color: var(--text);
+    }
+    .doc-arch-tag {
+      font-size: 12px;
+      color: #c8c8c8;
+      font-weight: 500;
+    }
+    .doc-desc {
+      color: #b4b4b4;
+      font-size: 13.5px;
+      line-height: 1.6;
+      margin: 0 0 16px;
+    }
+    .path-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: #111;
+      border: 1px solid #2a2a2a;
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-bottom: 6px;
+      font-size: 12.5px;
+    }
+    .path-row strong {
+      color: var(--accent);
+      min-width: 68px;
+    }
+    .path-row code {
+      flex: 1;
+      overflow-wrap: anywhere;
+      background: transparent;
+      border: none;
+      padding: 0;
+      color: #e6e6e6;
+    }
     .copy-btn {
-      background: var(--panel2); border: 1px solid var(--line); color: var(--text);
-      font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 4px;
-      cursor: pointer; white-space: nowrap; transition: background .15s, color .15s;
+      background: #282828;
+      border: 1px solid var(--line);
+      color: #e3e3e3;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all .15s;
     }
-    .copy-btn:hover { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
-    .copy-btn.copied { background: #1f883d; color: #fff; border-color: #1f883d; }
-
-    /* Code block wrapper with copy button */
-    .code-wrap { position: relative; margin: 16px 0; }
-    .code-wrap pre { margin: 0; }
-    .code-wrap .copy-code-btn {
-      position: absolute; top: 10px; right: 10px;
-      background: var(--panel2); border: 1px solid var(--line); color: var(--muted);
-      font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 4px;
-      cursor: pointer; transition: all .15s;
+    .copy-btn:hover {
+      background: var(--accent);
+      color: var(--accent-ink);
+      border-color: var(--accent);
     }
-    .code-wrap .copy-code-btn:hover { color: var(--text); border-color: #777; }
-    .code-wrap .copy-code-btn.copied { background: #1f883d; color: #fff; border-color: #1f883d; }
-
-    /* Callout notice boxes */
-    .callout {
-      border: 1px solid var(--line); border-left: 3px solid var(--accent);
-      background: var(--panel); border-radius: var(--radius);
-      padding: 16px 20px; margin: 20px 0; display: flex; gap: 14px;
+    .steps-list {
+      margin: 16px 0 0;
+      padding-left: 20px;
+      color: #c8c8c8;
+      font-size: 13px;
+      line-height: 1.7;
     }
-    .callout.tip { border-left-color: #2ea043; }
-    .callout.warn { border-left-color: #d29922; }
-    .callout-icon { font-size: 18px; line-height: 1.2; }
-    .callout-content { font-size: 13.5px; color: #d0d0d0; }
-    .callout-content strong { color: var(--text); display: block; margin-bottom: 4px; }
-    .callout-content p { margin: 0; }
-
-    /* Comparison Table */
-    .matrix-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 13px; }
-    .matrix-table th, .matrix-table td { padding: 12px 14px; text-align: left; border: 1px solid var(--line); }
-    .matrix-table th { background: var(--panel2); color: var(--text); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
-    .matrix-table td { background: var(--panel); }
-
-    /* FAQ accordion */
-    details.faq-item {
-      border: 1px solid var(--line); background: var(--panel);
-      border-radius: var(--radius); padding: 16px 20px; margin-bottom: 12px;
+    .steps-list li {
+      margin-bottom: 4px;
     }
-    details.faq-item summary {
-      cursor: pointer; font-weight: 600; font-size: 15px; color: var(--text);
-      user-select: none; list-style: none; display: flex; align-items: center; justify-content: space-between;
+    .dev-card {
+      background: #181818;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 22px;
+      margin-top: 32px;
     }
-    details.faq-item summary::-webkit-details-marker { display: none; }
-    details.faq-item summary::after { content: "＋"; font-size: 16px; color: var(--muted); }
-    details[open].faq-item summary::after { content: "−"; }
-    details.faq-item .faq-body { margin-top: 14px; font-size: 14px; color: #ccc; line-height: 1.65; border-top: 1px solid var(--line); padding-top: 14px; }
-
+    .dev-card h3 {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin: 0 0 10px;
+    }
+    .dev-card p {
+      color: #b4b4b4;
+      font-size: 13px;
+      margin: 0 0 8px;
+    }
     footer {
-      border-top: 1px solid var(--line); padding: 28px 0 38px; color: var(--muted);
-      font-size: 12px; display: flex; justify-content: space-between; gap: 15px; flex-wrap: wrap;
+      border-top: 1px solid var(--line);
+      padding-top: 20px;
+      margin-top: 36px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      font-size: 11.5px;
+      color: #929292;
+      flex-wrap: wrap;
     }
-    footer a { color: var(--text); text-decoration: none; }
-    footer a:hover { color: var(--accent); }
-
-    @media (max-width: 900px) {
-      .wrap { padding: 0 20px; }
-      .docs-layout { grid-template-columns: 1fr; }
-      .toc-sticky { display: none; }
-      .app-doc { padding: 22px; }
+    footer a {
+      color: var(--text);
+    }
+    @media (max-width: 700px) {
+      .topbar { padding: 0 16px; }
+      .wrap { padding: 24px 16px 60px; }
+      .topbar-right a:not(:last-child) { display: none; }
+      .path-row { flex-direction: column; align-items: flex-start; gap: 6px; }
+      .copy-btn { align-self: flex-end; }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <a class="brand" href="./" aria-label="ArtCraft Store home">
-        <span class="mark">A</span>
-        <span>ArtCraft <span style="color:var(--muted);font-weight:500">/ Docs</span></span>
+  <nav class="topbar" aria-label="Global navigation">
+    <div class="topbar-left">
+      <a class="brand" href="./">
+        <span class="brand-mark">A</span>
+        <span class="brand-title">ARTCRAFT</span>
+        <span class="brand-sub">/ STORE</span>
       </a>
-      <nav class="nav" aria-label="Main navigation">
-        <a href="./#catalog">Catalog</a>
-        <a href="./#architectures">Architectures</a>
-        <a href="./lut-studio/">LUT Studio</a>
-        <a href="./docs.html" class="active">Docs</a>
-        <a href="https://github.com/akkk09/artcraft-store" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
-      </nav>
-    </header>
-
-    <main>
-      <section class="docs-hero">
-        <div class="eyebrow"><span class="dot"></span> User Guides · Developer SDK · Store Submission</div>
-        <h1>Documentation &amp;<br>Plugin Architecture.</h1>
-        <p>Everything you need to install community extensions across the 9 ArtCraft creative applications, or build, test, and publish your own plug-ins to the open ArtCraft Store catalog.</p>
-
-        <div class="quick-jump" role="navigation" aria-label="Quick jump sections">
-          <a class="jump-pill" href="#install-apps">📦 Installation by App</a>
-          <a class="jump-pill" href="#architectures">⚙️ Extension Architectures</a>
-          <a class="jump-pill" href="#developer-guide">🛠️ Developer Guide &amp; SDK</a>
-          <a class="jump-pill" href="#submission-guide">🚀 Submitting to Store</a>
-          <a class="jump-pill" href="#faq">❓ Troubleshooting &amp; FAQ</a>
-        </div>
-      </section>
-
-      <div class="docs-layout">
-        <!-- Sticky Sidebar Navigation -->
-        <aside class="toc-sticky" aria-label="Table of contents">
-          <h4>Documentation</h4>
-          <ul class="toc-list">
-            <li>
-              <a href="#install-apps">1. Installation by App</a>
-              <ul class="toc-sublist">
-                <li><a href="#doc-photocraft">PhotoCraft (WASM/LUT)</a></li>
-                <li><a href="#doc-effectcraft">EffectCraft (WASM/JSX)</a></li>
-                <li><a href="#doc-vectorcraft">VectorCraft (WASM/SVG)</a></li>
-                <li><a href="#doc-filmcraft">FilmCraft (Presets/LUT)</a></li>
-                <li><a href="#doc-soundcraft">SoundCraft (CLAP/VST3)</a></li>
-                <li><a href="#doc-pdfcraft">PdfCraft (Acrobat JS)</a></li>
-                <li><a href="#doc-designcraft">DesignCraft (Templates)</a></li>
-                <li><a href="#doc-lightcraft">LightCraft (RAW/LUT)</a></li>
-                <li><a href="#doc-cadcraft">CADCraft (Macros)</a></li>
-              </ul>
-            </li>
-            <li><a href="#architectures">2. Extension Architectures</a></li>
-            <li><a href="#developer-guide">3. Developer Guide</a></li>
-            <li><a href="#submission-guide">4. Publishing to Store</a></li>
-            <li><a href="#faq">5. Troubleshooting &amp; FAQ</a></li>
-          </ul>
-        </aside>
-
-        <!-- Main Content Area -->
-        <div class="content-area">
-
-          <!-- Section 1: Installation by App -->
-          <section class="content-section" id="install-apps">
-            <div class="eyebrow">Part 01 / User Guide</div>
-            <h2>Installing Extensions by App</h2>
-            <p>Each ArtCraft application uses an extensible architecture suited to its domain. Follow the instructions below for your specific application and operating system.</p>
-
-            <!-- Global OS Preference Filter -->
-            <div class="os-bar" role="toolbar" aria-label="Operating system selector">
-              <span class="os-bar-label">Select Your Operating System:</span>
-              <div class="os-toggles">
-                <button class="os-btn active" data-os="all">All Systems</button>
-                <button class="os-btn" data-os="linux">Linux</button>
-                <button class="os-btn" data-os="macos">macOS</button>
-                <button class="os-btn" data-os="windows">Windows</button>
-              </div>
-            </div>
-
-            <!-- 1. PhotoCraft -->
-            <article class="app-doc" id="doc-photocraft">
-              <div class="app-doc-head">
-                <div class="app-doc-title">
-                  <div class="app-glyph">P</div>
-                  <div>
-                    <h3>PhotoCraft</h3>
-                    <span class="badge">WASM Filters (ABI v1) &amp; 3D LUTs</span>
-                  </div>
-                </div>
-              </div>
-              <p>PhotoCraft executes WebAssembly pixel-manipulation modules (compiled to <code>wasm32-unknown-unknown</code>) in a secure memory-isolated sandbox, as well as 3D color cubes (<code>.cube</code>).</p>
-              
-              <table class="path-table">
-                <thead>
-                  <tr><th>OS</th><th>Plugin Directory (`.wasm`)</th><th>Action</th></tr>
-                </thead>
-                <tbody>
-                  <tr class="os-row" data-os-row="linux">
-                    <td><strong>Linux</strong></td>
-                    <td><code>~/.config/photocraft/plugins/</code></td>
-                    <td><button class="copy-btn" data-copy="~/.config/photocraft/plugins/">Copy</button></td>
-                  </tr>
-                  <tr class="os-row" data-os-row="macos">
-                    <td><strong>macOS</strong></td>
-                    <td><code>~/Library/Application Support/PhotoCraft/Plugins/</code></td>
-                    <td><button class="copy-btn" data-copy="~/Library/Application Support/PhotoCraft/Plugins/">Copy</button></td>
-                  </tr>
-                  <tr class="os-row" data-os-row="windows">
-                    <td><strong>Windows</strong></td>
-                    <td><code>%APPDATA%\PhotoCraft\Plugins\</code></td>
-                    <td><button class="copy-btn" data-copy="%APPDATA%\PhotoCraft\Plugins\">Copy</button></td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <h4>How to Activate:</h4>
-              <ol>
-                <li>Download the <code>.wasm</code> binary (e.g. <code>photocraft_plugin_smudge.wasm</code> or <code>vignette.wasm</code>).</li>
-                <li>Copy the file into your platform's <code>plugins/</code> directory listed above.</li>
-                <li>Launch PhotoCraft (or click <strong>Filters ▸ Rescan Plug-in Directory</strong>).</li>
-                <li>Access your filter from the top <strong>Filter</strong> menu under its registered category.</li>
-                <li><em>For 3D LUTs:</em> Open <strong>Image ▸ Adjustments ▸ Apply 3D LUT...</strong> and select your <code>.cube</code> file, or use our browser-based <a href="./lut-studio/">LUT Studio</a> to tune and export preview frames.</li>
-              </ol>
-            </article>
-
-            <!-- 2. EffectCraft -->
-            <article class="app-doc" id="doc-effectcraft">
-              <div class="app-doc-head">
-                <div class="app-doc-title">
-                  <div class="app-glyph">E</div>
-                  <div>
-                    <h3>EffectCraft</h3>
-                    <span class="badge">WASM Render Plugins (API v1) &amp; ScriptUI Panels (.jsx)</span>
-                  </div>
-                </div>
-              </div>
-              <p>EffectCraft supports two distinct extension categories: high-performance render plugins (compiled WASM / WAT) that operate on video buffers, and dockable ScriptUI / ExtendScript UI panels (<code>.jsx</code>) for timeline manipulation and keyframing.</p>
-
-              <table class="path-table">
-                <thead>
-                  <tr><th>Type</th><th>Platform Directory</th><th>Action</th></tr>
-                </thead>
-                <tbody>
-                  <tr class="os-row" data-os-row="linux">
-                    <td><strong>Linux WASM</strong></td>
-                    <td><code>~/.config/effectcraft/plugins/</code></td>
-                    <td><button class="copy-btn" data-copy="~/.config/effectcraft/plugins/">Copy</button></td>
-                  </tr>
-                  <tr class="os-row" data-os-row="linux">
-                    <td><strong>Linux ScriptUI</strong></td>
-                    <td><code>~/.config/effectcraft/Scripts/ScriptUI Panels/</code></td>
-                    <td><button class="copy-btn" data-copy="~/.config/effectcraft/Scripts/ScriptUI Panels/">Copy</button></td>
-                  </tr>
-                  <tr class="os-row" data-os-row="macos">
-                    <td><strong>macOS WASM</strong></td>
-                    <td><code>~/Library/Application Support/EffectCraft/Plug-ins/</code></td>
-                    <td><button class="copy-btn" data-copy="~/Library/Application Support/EffectCraft/Plug-ins/">Copy</button></td>
-                  </tr>
-                  <tr class="os-row" data-os-row="macos">
-                    <td><strong>macOS ScriptUI</strong></td>
-                    <td><code>~/Library/Application Support/EffectCraft/Scripts/ScriptUI Panels/</code></td>
-                    <td><button class="copy-btn" data-copy="~/Library/Application Support/EffectCraft/Scripts/ScriptUI Panels/">Copy</button></td>
-                  </tr>
-                  <tr class="os-row" data-os-row="windows">
-                    <td><strong>Windows WASM</strong></td>
-                    <td><code>%APPDATA%\EffectCraft\Plug-ins\</code></td>
-                    <td><button class="copy-btn" data-copy="%APPDATA%\EffectCraft\Plug-ins\">Copy</button></td>
-                  </tr>
-                  <tr class="os-row" data-os-row="windows">
-                    <td><strong>Windows ScriptUI</strong></td>
-                    <td><code>%APPDATA%\EffectCraft\Scripts\ScriptUI Panels\</code></td>
-                    <td><button class="copy-btn" data-copy="%APPDATA%\EffectCraft\Scripts\ScriptUI Panels\">Copy</button></td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <h4>Loading EffectCraft Extensions:</h4>
-              <ul>
-                <li><strong>WASM/WAT Render Plugins (e.g. DepthCraft, Chromatic Fringe):</strong>
-                  Place in the plugins folder or load on-the-fly via <strong>Effect ▸ Load Effect Plug-in...</strong>. The effect will appear in the Effect Controls inspector.
-                </li>
-                <li><strong>ScriptUI Panels (e.g. EaseCraft, CaptionCraft, QuietCraft):</strong>
-                  Place the <code>.jsx</code> script inside the <code>Scripts/ScriptUI Panels/</code> folder and restart EffectCraft. The tool is available directly in the <strong>Window</strong> menu (e.g. <strong>Window ▸ QuietCraft.jsx</strong>) and can be docked anywhere in your workspace.
-                </li>
-              </ul>
-            </article>
-
-            <!-- 3. VectorCraft -->
-            <article class="app-doc" id="doc-vectorcraft">
-              <div class="app-doc-head">
-                <div class="app-doc-title">
-                  <div class="app-glyph">V</div>
-                  <div>
-                    <h3>VectorCraft</h3>
-                    <span class="badge">WASM Object Filters (ABI v1) &amp; SVG Template Packages</span>
-                  </div>
-                </div>
-              </div>
-              <p>VectorCraft provides procedural path transforms and color appearance filters running in a fuel-metered <code>wasmi</code> engine, preventing infinite loops while manipulating complex Bézier geometries.</p>
-
-              <table class="path-table">
-                <thead>
-                  <tr><th>OS</th><th>Plugin Path (`.wasm`)</th><th>Template Path (`.zip` / `.svg`)</th></tr>
-                </thead>
-                <tbody>
-                  <tr class="os-row" data-os-row="linux">
-                    <td><strong>Linux</strong></td>
-                    <td><code>~/.config/vectorcraft/plugins/</code></td>
-                    <td><code>~/.config/vectorcraft/templates/</code></td>
-                  </tr>
-                  <tr class="os-row" data-os-row="macos">
-                    <td><strong>macOS</strong></td>
-                    <td><code>~/Library/Application Support/VectorCraft/Plugins/</code></td>
-                    <td><code>~/Library/Application Support/VectorCraft/Templates/</code></td>
-                  </tr>
-                  <tr class="os-row" data-os-row="windows">
-                    <td><strong>Windows</strong></td>
-                    <td><code>%APPDATA%\VectorCraft\Plugins\</code></td>
-                    <td><code>%APPDATA%\VectorCraft\Templates\</code></td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <h4>Activation:</h4>
-              <p>For WASM object filters (e.g. <code>vectorcraft_plugin_recolor.wasm</code>), open <strong>Window ▸ Plug-in Manager</strong> or select artwork and click <strong>Object ▸ Live Filters ▸ Recolor &amp; Tone</strong>. For template packs (e.g. <em>Creator Graphics Pack</em>), extract the SVG files into your templates folder and select <strong>File ▸ New From Template...</strong>.</p>
-            </article>
-
-            <!-- 4. FilmCraft -->
-            <article class="app-doc" id="doc-filmcraft">
-              <div class="app-doc-head">
-                <div class="app-doc-title">
-                  <div class="app-glyph">F</div>
-                  <div>
-                    <h3>FilmCraft</h3>
-                    <span class="badge">Native Timeline Effect Presets (JSON v1) &amp; 3D LUTs</span>
-                  </div>
-                </div>
-              </div>
-              <p>FilmCraft supports declarative effect stacks serialized as structured JSON (format <code>filmcraft.effect-presets</code> v1) combining color grading, grain, and motion transforms, alongside industry-standard 17/33/65 <code>.cube</code> files.</p>
-
-              <h4>Installing Presets &amp; LUTs:</h4>
-              <ul>
-                <li><strong>GUI Import:</strong> In FilmCraft's <strong>Effects Panel</strong>, right-click the <strong>Presets</strong> bin and choose <strong>Import Presets...</strong>, then select your downloaded <code>.json</code> or extracted preset package.</li>
-                <li><strong>CLI Batch Import:</strong> Launch FilmCraft headlessly or via automation:
-                  <div class="code-wrap">
-                    <button class="copy-code-btn" data-code="filmcraft-cli --project project.fcproj exec presets.import '{&quot;path&quot;:&quot;./film-emulation-presets.json&quot;}'">Copy</button>
-                    <pre><code>filmcraft-cli --project project.fcproj exec presets.import '{"path":"./film-emulation-presets.json"}'</code></pre>
-                  </div>
-                </li>
-                <li><strong>Creative LUTs:</strong> Save <code>.cube</code> files to <code>~/.config/filmcraft/LUTs/Creative/</code> (Linux) or <code>~/Library/Application Support/FilmCraft/LUTs/Creative/</code> (macOS) to appear automatically in the Lumetri Look dropdown.</li>
-              </ul>
-            </article>
-
-            <!-- 5. SoundCraft -->
-            <article class="app-doc" id="doc-soundcraft">
-              <div class="app-doc-head">
-                <div class="app-doc-title">
-                  <div class="app-glyph">S</div>
-                  <div>
-                    <h3>SoundCraft</h3>
-                    <span class="badge">CLAP (.clap), VST3 (.vst3), Audio Units (.component) &amp; Channel Presets</span>
-                  </div>
-                </div>
-              </div>
-              <p>SoundCraft acts as a modern, host-compliant DAW and mixing environment. It loads open CLAP plugins, VST3 bundles, macOS Audio Units, and custom DSP channel strip presets without wrapping or bridges.</p>
-
-              <table class="path-table">
-                <thead>
-                  <tr><th>Format</th><th>Standard Platform Locations</th><th>Action</th></tr>
-                </thead>
-                <tbody>
-                  <tr class="os-row" data-os-row="linux">
-                    <td><strong>CLAP (Linux)</strong></td>
-                    <td><code>~/.clap/</code> or <code>/usr/lib/clap/</code></td>
-                    <td><button class="copy-btn" data-copy="~/.clap/">Copy</button></td>
-                  </tr>
-                  <tr class="os-row" data-os-row="linux">
-                    <td><strong>VST3 (Linux)</strong></td>
-                    <td><code>~/.vst3/</code> or <code>/usr/lib/vst3/</code></td>
-                    <td><button class="copy-btn" data-copy="~/.vst3/">Copy</button></td>
-                  </tr>
-                  <tr class="os-row" data-os-row="macos">
-                    <td><strong>CLAP (macOS)</strong></td>
-                    <td><code>~/Library/Audio/Plug-Ins/CLAP/</code></td>
-                    <td><button class="copy-btn" data-copy="~/Library/Audio/Plug-Ins/CLAP/">Copy</button></td>
-                  </tr>
-                  <tr class="os-row" data-os-row="macos">
-                    <td><strong>VST3 (macOS)</strong></td>
-                    <td><code>~/Library/Audio/Plug-Ins/VST3/</code></td>
-                    <td><button class="copy-btn" data-copy="~/Library/Audio/Plug-Ins/VST3/">Copy</button></td>
-                  </tr>
-                  <tr class="os-row" data-os-row="macos">
-                    <td><strong>AU (macOS)</strong></td>
-                    <td><code>~/Library/Audio/Plug-Ins/Components/</code></td>
-                    <td><button class="copy-btn" data-copy="~/Library/Audio/Plug-Ins/Components/">Copy</button></td>
-                  </tr>
-                  <tr class="os-row" data-os-row="windows">
-                    <td><strong>CLAP (Win)</strong></td>
-                    <td><code>%COMMONPROGRAMFILES%\CLAP\</code></td>
-                    <td><button class="copy-btn" data-copy="%COMMONPROGRAMFILES%\CLAP\">Copy</button></td>
-                  </tr>
-                  <tr class="os-row" data-os-row="windows">
-                    <td><strong>VST3 (Win)</strong></td>
-                    <td><code>%COMMONPROGRAMFILES%\VST3\</code></td>
-                    <td><button class="copy-btn" data-copy="%COMMONPROGRAMFILES%\VST3\">Copy</button></td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <h4>Scanning and Loading:</h4>
-              <p>In SoundCraft, go to <strong>Preferences ▸ Audio Plug-ins ▸ Rescan All</strong>. To load a channel strip preset package (e.g. <em>SoundCraft Audio Toolkit</em>), click the header menu on any mixer track insert rack and choose <strong>Load Channel Strip Preset...</strong>.</p>
-            </article>
-
-            <!-- 6. PdfCraft -->
-            <article class="app-doc" id="doc-pdfcraft">
-              <div class="app-doc-head">
-                <div class="app-doc-title">
-                  <div class="app-glyph">A</div>
-                  <div>
-                    <h3>PdfCraft</h3>
-                    <span class="badge">Acrobat JavaScript (ISO 32000 in Boa Sandbox)</span>
-                  </div>
-                </div>
-              </div>
-              <p>PdfCraft executes form calculations, field validation, and document automation scripts using an embedded, memory-safe Boa JavaScript engine conforming to ISO 32000-1 specifications.</p>
-
-              <h4>Adding Scripts to PDF Documents:</h4>
-              <ul>
-                <li><strong>Field Calculations (e.g. Invoice Calculator):</strong> Open your PDF in PdfCraft, switch to <strong>Form Edit Mode</strong>, select the target field (e.g. <code>TotalAmount</code>), click <strong>Properties ▸ Calculate ▸ Custom Calculation Script</strong>, and paste the code from <code>pdfcraft-invoice-calculator.js</code>.</li>
-                <li><strong>Document-Level JavaScripts:</strong> Go to <strong>Tools ▸ JavaScript ▸ Document JavaScripts</strong>, enter a script name, and click <strong>Add / Edit</strong> to register global helper functions that run when the document opens.</li>
-              </ul>
-            </article>
-
-            <!-- 7. DesignCraft -->
-            <article class="app-doc" id="doc-designcraft">
-              <div class="app-doc-head">
-                <div class="app-doc-title">
-                  <div class="app-glyph">D</div>
-                  <div>
-                    <h3>DesignCraft</h3>
-                    <span class="badge">IDML Publication Templates &amp; Typographic Styles</span>
-                  </div>
-                </div>
-              </div>
-              <p>DesignCraft accepts InDesign Markup Language (<code>.idml</code>) templates, paragraph style catalogs, and master spread presets. Place downloaded template archives in <code>Documents/DesignCraft/Templates/</code> and open via <strong>File ▸ New From Template...</strong>.</p>
-            </article>
-
-            <!-- 8. LightCraft -->
-            <article class="app-doc" id="doc-lightcraft">
-              <div class="app-doc-head">
-                <div class="app-doc-title">
-                  <div class="app-glyph">L</div>
-                  <div>
-                    <h3>LightCraft</h3>
-                    <span class="badge">RAW Develop Presets &amp; 3D LUT Profiles</span>
-                  </div>
-                </div>
-              </div>
-              <p>Import non-destructive develop presets into LightCraft by opening the <strong>Develop</strong> module, expanding the <strong>Presets</strong> sidebar, and clicking <strong>(+) ▸ Import Presets...</strong>. 3D LUT profiles (<code>.cube</code>) can be loaded directly from the <strong>Color Grading ▸ Profile</strong> panel.</p>
-            </article>
-
-            <!-- 9. CADCraft -->
-            <article class="app-doc" id="doc-cadcraft">
-              <div class="app-doc-head">
-                <div class="app-doc-title">
-                  <div class="app-glyph">C</div>
-                  <div>
-                    <h3>CADCraft</h3>
-                    <span class="badge">Command Automation Scripts &amp; Parametric DXF Macros</span>
-                  </div>
-                </div>
-              </div>
-              <p>CADCraft executes command scripts (<code>.cadscr</code>) and geometric drawing macros. In the CADCraft command line prompt at the bottom of the workspace, type <code>SCRIPT "path/to/script.cadscr"</code>, or load macros via <strong>Tools ▸ Run Macro / Script...</strong>.</p>
-            </article>
-
-          </section>
-
-          <!-- Section 2: Architecture Deep-Dive -->
-          <section class="content-section" id="architectures">
-            <div class="eyebrow">Part 02 / Technical Reference</div>
-            <h2>Extension Architectures &amp; Sandboxing</h2>
-            <p>ArtCraft applications are designed around strict security boundaries, low latency, and zero dependency friction. Here is how each architecture functions under the hood:</p>
-
-            <table class="matrix-table">
-              <thead>
-                <tr>
-                  <th>Host Application</th>
-                  <th>Extension Architecture</th>
-                  <th>Sandbox / Runtime</th>
-                  <th>File Types</th>
-                  <th>Isolation &amp; Permissions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><strong>PhotoCraft</strong></td>
-                  <td>WebAssembly ABI v1</td>
-                  <td>Wasmtime (Linear Memory)</td>
-                  <td><code>.wasm</code>, <code>.cube</code></td>
-                  <td>No FS/Network. Pure pixel buffers.</td>
-                </tr>
-                <tr>
-                  <td><strong>EffectCraft</strong></td>
-                  <td>WASM API v1 + ScriptUI</td>
-                  <td>Wasmtime + ExtendScript Engine</td>
-                  <td><code>.wasm</code>, <code>.wat</code>, <code>.jsx</code></td>
-                  <td>Render sandboxed; UI scoped to Host DOM.</td>
-                </tr>
-                <tr>
-                  <td><strong>VectorCraft</strong></td>
-                  <td>Object Filter ABI v1</td>
-                  <td>wasmi (Fuel-metered)</td>
-                  <td><code>.wasm</code>, <code>.svg</code></td>
-                  <td>Path transform buffer. Gas-limited.</td>
-                </tr>
-                <tr>
-                  <td><strong>FilmCraft</strong></td>
-                  <td>Native Preset Graphs</td>
-                  <td>Native JSON Deserializer</td>
-                  <td><code>.json</code>, <code>.cube</code></td>
-                  <td>Pure declarative state. Zero exec code.</td>
-                </tr>
-                <tr>
-                  <td><strong>SoundCraft</strong></td>
-                  <td>CLAP / VST3 / AU Host</td>
-                  <td>Native Process DSP Threads</td>
-                  <td><code>.clap</code>, <code>.vst3</code>, <code>.component</code></td>
-                  <td>Realtime priority, buffer audio processing.</td>
-                </tr>
-                <tr>
-                  <td><strong>PdfCraft</strong></td>
-                  <td>Acrobat JS (ISO 32000)</td>
-                  <td>Boa JavaScript Engine (Rust)</td>
-                  <td><code>.js</code></td>
-                  <td>Restricted to document field DOM.</td>
-                </tr>
-                <tr>
-                  <td><strong>DesignCraft</strong></td>
-                  <td>Publication Templates</td>
-                  <td>IDML XML Parser</td>
-                  <td><code>.idml</code>, <code>.zip</code></td>
-                  <td>Declarative layout structures.</td>
-                </tr>
-                <tr>
-                  <td><strong>LightCraft</strong></td>
-                  <td>Develop Profiles</td>
-                  <td>Color Pipe Engine</td>
-                  <td><code>.xmp</code>, <code>.cube</code></td>
-                  <td>Parameter curves &amp; 3D LUT matrices.</td>
-                </tr>
-                <tr>
-                  <td><strong>CADCraft</strong></td>
-                  <td>Automation Scripts</td>
-                  <td>Command Interpreter</td>
-                  <td><code>.cadscr</code>, <code>.py</code></td>
-                  <td>Headless drawing command dispatch.</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <div class="callout tip">
-              <span class="callout-icon">💡</span>
-              <div class="callout-content">
-                <strong>Why WebAssembly ABI v1?</strong>
-                <p>By compiling to WebAssembly without OS system calls (<code>wasm32-unknown-unknown</code>), plugins run identically across Linux, macOS, and Windows with near-native speed, zero installation dependencies, and complete protection against unauthorized filesystem or network access.</p>
-              </div>
-            </div>
-          </section>
-
-          <!-- Section 3: Developer Guide -->
-          <section class="content-section" id="developer-guide">
-            <div class="eyebrow">Part 03 / SDK Reference</div>
-            <h2>Developer Guide: Building a Plugin</h2>
-            <p>Creating an ArtCraft plugin takes only a few minutes. Whether you are writing a WebAssembly image filter in Rust or an ExtendScript animation tool in JavaScript, here is the recommended developer setup.</p>
-
-            <h3>1. Building a PhotoCraft or VectorCraft WASM Plugin in Rust</h3>
-            <p>Install the Rust toolchain and add the WebAssembly target:</p>
-            <div class="code-wrap">
-              <button class="copy-code-btn" data-code="rustup target add wasm32-unknown-unknown">Copy</button>
-              <pre><code>rustup target add wasm32-unknown-unknown</code></pre>
-            </div>
-
-            <p>Configure your <code>Cargo.toml</code> as a <code>cdylib</code>:</p>
-            <div class="code-wrap">
-              <button class="copy-code-btn" data-code="[package]&#10;name = &quot;my-photocraft-filter&quot;&#10;version = &quot;1.0.0&quot;&#10;edition = &quot;2021&quot;&#10;&#10;[lib]&#10;crate-type = [&quot;cdylib&quot;]&#10;&#10;[dependencies]">Copy</button>
-              <pre><code>[package]
-name = "my-photocraft-filter"
-version = "1.0.0"
-edition = "2021"
-
-[lib]
-crate-type = ["cdylib"]
-
-[dependencies]</code></pre>
-            </div>
-
-            <p>In <code>src/lib.rs</code>, export the standard ABI v1 memory allocation and processing symbols:</p>
-            <div class="code-wrap">
-              <button class="copy-code-btn" data-code="#[no_mangle]&#10;pub extern &quot;C&quot; fn allocate(size: usize) -> *mut u8 {&#10;    let mut buf = Vec::with_capacity(size);&#10;    let ptr = buf.as_mut_ptr();&#10;    std::mem::forget(buf);&#10;    ptr&#10;}&#10;&#10;#[no_mangle]&#10;pub extern &quot;C&quot; fn deallocate(ptr: *mut u8, size: usize) {&#10;    unsafe { drop(Vec::from_raw_parts(ptr, 0, size)); }&#10;}&#10;&#10;#[no_mangle]&#10;pub extern &quot;C&quot; fn process_frame(ptr: *mut u8, width: u32, height: u32, param: f32) {&#10;    let len = (width * height * 4) as usize;&#10;    let pixels = unsafe { std::slice::from_raw_parts_mut(ptr, len) };&#10;    // Process RGBA pixel buffers in-place...&#10;}">Copy</button>
-              <pre><code>#[no_mangle]
-pub extern "C" fn allocate(size: usize) -> *mut u8 {
-    let mut buf = Vec::with_capacity(size);
-    let ptr = buf.as_mut_ptr();
-    std::mem::forget(buf);
-    ptr
-}
-
-#[no_mangle]
-pub extern "C" fn deallocate(ptr: *mut u8, size: usize) {
-    unsafe { drop(Vec::from_raw_parts(ptr, 0, size)); }
-}
-
-#[no_mangle]
-pub extern "C" fn process_frame(ptr: *mut u8, width: u32, height: u32, param: f32) {
-    let len = (width * height * 4) as usize;
-    let pixels = unsafe { std::slice::from_raw_parts_mut(ptr, len) };
-    // Process RGBA pixel buffer in-place...
-}</code></pre>
-            </div>
-
-            <p>Compile to optimized WebAssembly:</p>
-            <div class="code-wrap">
-              <button class="copy-code-btn" data-code="cargo build --target wasm32-unknown-unknown --release">Copy</button>
-              <pre><code>cargo build --target wasm32-unknown-unknown --release</code></pre>
-            </div>
-
-            <h3>2. Building an EffectCraft ScriptUI Panel (.jsx)</h3>
-            <p>ScriptUI panels are dockable JavaScript scripts using the host ExtendScript environment. Here is a clean boilerplate:</p>
-            <div class="code-wrap">
-              <button class="copy-code-btn" data-code="(function(thisObj) {&#10;  var win = (thisObj instanceof Panel) ? thisObj : new Window('palette', 'MyTool', undefined, {resizeable: true});&#10;  win.orientation = 'column';&#10;  win.alignChildren = ['fill', 'top'];&#10;&#10;  var btn = win.add('button', undefined, 'Apply Effect');&#10;  btn.onClick = function() {&#10;    app.beginUndoGroup('Apply Tool Action');&#10;    // Timeline and layer manipulation code...&#10;    app.endUndoGroup();&#10;  };&#10;&#10;  win.layout.layout(true);&#10;  if (win instanceof Window) win.show();&#10;})(this);">Copy</button>
-              <pre><code>(function(thisObj) {
-  var win = (thisObj instanceof Panel) ? thisObj : new Window('palette', 'MyTool', undefined, {resizeable: true});
-  win.orientation = 'column';
-  win.alignChildren = ['fill', 'top'];
-
-  var btn = win.add('button', undefined, 'Apply Effect');
-  btn.onClick = function() {
-    app.beginUndoGroup('Apply Tool Action');
-    // Timeline and layer manipulation code...
-    app.endUndoGroup();
-  };
-
-  win.layout.layout(true);
-  if (win instanceof Window) win.show();
-})(this);</code></pre>
-            </div>
-          </section>
-
-          <!-- Section 4: Store Submission -->
-          <section class="content-section" id="submission-guide">
-            <div class="eyebrow">Part 04 / Store Catalog</div>
-            <h2>Submitting an Item to the Store</h2>
-            <p>The ArtCraft Store is 100% open-source and catalog-driven. To add your extension to the website and Launcher API, submit a pull request with an entry in <code>catalog.json</code>.</p>
-
-            <h3>Catalog Entry Schema</h3>
-            <p>Add a new JSON object to the <code>plugins</code> array in <code>catalog.json</code>:</p>
-            <div class="code-wrap">
-              <button class="copy-code-btn" data-code="{&#10;  &quot;id&quot;: &quot;org.example.my-filter&quot;,&#10;  &quot;app&quot;: &quot;photocraft&quot;,&#10;  &quot;name&quot;: &quot;My Amazing Filter&quot;,&#10;  &quot;version&quot;: &quot;1.0.0&quot;,&#10;  &quot;author&quot;: &quot;Your Name or Handle&quot;,&#10;  &quot;license&quot;: &quot;MIT&quot;,&#10;  &quot;kind&quot;: &quot;filter&quot;,&#10;  &quot;description&quot;: &quot;Clear, concise summary of what this tool accomplishes.&quot;,&#10;  &quot;tags&quot;: [&quot;creative&quot;, &quot;procedural&quot;, &quot;retouch&quot;],&#10;  &quot;compatibility&quot;: &quot;ABI v1&quot;,&#10;  &quot;sourceUrl&quot;: &quot;https://github.com/yourname/my-filter&quot;,&#10;  &quot;downloadUrl&quot;: &quot;https://github.com/yourname/my-filter/releases/download/v1.0.0/my_filter.wasm&quot;,&#10;  &quot;releaseAsset&quot;: &quot;my_filter.wasm&quot;&#10;}">Copy</button>
-              <pre><code>{
-  "id": "org.example.my-filter",
-  "app": "photocraft",
-  "name": "My Amazing Filter",
-  "version": "1.0.0",
-  "author": "Your Name or Handle",
-  "license": "MIT",
-  "kind": "filter",
-  "description": "Clear, concise summary of what this tool accomplishes.",
-  "tags": ["creative", "procedural", "retouch"],
-  "compatibility": "ABI v1",
-  "sourceUrl": "https://github.com/yourname/my-filter",
-  "downloadUrl": "https://github.com/yourname/my-filter/releases/download/v1.0.0/my_filter.wasm",
-  "releaseAsset": "my_filter.wasm"
-}</code></pre>
-            </div>
-
-            <h3>Validation Checklist &amp; Commands</h3>
-            <p>Before submitting your PR, run the local validation suite to ensure your metadata complies with all schema rules:</p>
-            <div class="code-wrap">
-              <button class="copy-code-btn" data-code="python3 -m unittest tests/test_catalog.py&#10;python3 scripts/validate_catalog.py --check-artifacts">Copy</button>
-              <pre><code>python3 -m unittest tests/test_catalog.py
-python3 scripts/validate_catalog.py --check-artifacts</code></pre>
-            </div>
-
-            <div class="callout tip">
-              <span class="callout-icon">✅</span>
-              <div class="callout-content">
-                <strong>Submission Criteria:</strong>
-                <p>1. Target <code>app</code> must be one of the 9 supported IDs.<br>
-                   2. <code>id</code> must use reverse-DNS notation (e.g. <code>org.author.plugin</code>) and be globally unique.<br>
-                   3. The plugin must be licensed under an open-source or permissive license (e.g. MIT, Apache 2.0, BSD).<br>
-                   4. If including local source in <code>plugins/</code>, add compilation steps to <code>build-all.sh</code>.</p>
-              </div>
-            </div>
-          </section>
-
-          <!-- Section 5: Troubleshooting & FAQ -->
-          <section class="content-section" id="faq">
-            <div class="eyebrow">Part 05 / Support</div>
-            <h2>Troubleshooting &amp; Frequently Asked Questions</h2>
-
-            <details class="faq-item">
-              <summary>Why isn't my WASM plugin showing up in PhotoCraft or EffectCraft?</summary>
-              <div class="faq-body">
-                <p>Check the following common causes:</p>
-                <ol>
-                  <li><strong>Target Directory:</strong> Ensure the file is placed directly in the app's <code>plugins/</code> folder, not in an unextracted ZIP or subfolder.</li>
-                  <li><strong>Rescan:</strong> Use <strong>Filters ▸ Rescan Plug-in Directory</strong> in PhotoCraft, or completely restart the host application.</li>
-                  <li><strong>Architecture Mismatch:</strong> The WebAssembly binary must target <code>wasm32-unknown-unknown</code>. If compiled for <code>wasm32-wasi</code>, the host may reject symbols expecting WASI system calls.</li>
-                </ol>
-              </div>
-            </details>
-
-            <details class="faq-item">
-              <summary>How do I resolve macOS Gatekeeper / Quarantine warnings on downloaded plugins?</summary>
-              <div class="faq-body">
-                <p>When downloading plug-ins (such as <code>.clap</code> or <code>.vst3</code>) via a web browser, macOS may mark the file with a quarantine attribute. You can remove it via Terminal:</p>
-                <div class="code-wrap">
-                  <button class="copy-code-btn" data-code="xattr -d com.apple.quarantine ~/Library/Audio/Plug-Ins/CLAP/plugin.clap">Copy</button>
-                  <pre><code>xattr -d com.apple.quarantine ~/Library/Audio/Plug-Ins/CLAP/plugin.clap</code></pre>
-                </div>
-              </div>
-            </details>
-
-            <details class="faq-item">
-              <summary>My ScriptUI panel (.jsx) does not show up in EffectCraft's Window menu.</summary>
-              <div class="faq-body">
-                <p>Make sure the script is placed inside <code>Scripts/ScriptUI Panels/</code> (the exact subfolder name matters). Files placed in the root <code>Scripts/</code> folder only appear under <strong>File ▸ Scripts ▸ Run Script</strong>, whereas panels placed in <code>ScriptUI Panels/</code> are dockable and register automatically under the <strong>Window</strong> menu upon application startup.</p>
-              </div>
-            </details>
-
-            <details class="faq-item">
-              <summary>Can I use external crates / dependencies in my WebAssembly plugins?</summary>
-              <div class="faq-body">
-                <p>Yes! Any Rust crate that supports <code>no_std</code> or does not invoke operating system syscalls (like thread spawning, filesystem I/O, or raw networking) will compile cleanly and run inside the ArtCraft sandbox. Fast math, color science, easing algorithms, and image processing libraries work out-of-the-box.</p>
-              </div>
-            </details>
-
-            <details class="faq-item">
-              <summary>How does the Launcher API work for custom tools?</summary>
-              <div class="faq-body">
-                <p>The ArtCraft Store provides a public, static, zero-configuration JSON API. Launchers and package managers can consume <a href="./catalog.json"><code>catalog.json</code></a> and <a href="./api/v1/manifest.json"><code>api/v1/manifest.json</code></a> or import the JavaScript client at <a href="./api/v1/client.js"><code>api/v1/client.js</code></a> without requiring API keys or user authentication.</p>
-              </div>
-            </details>
-          </section>
-
-        </div>
+      <div class="nav-tabs" role="tablist">
+        <a class="nav-tab" href="./">Catalog</a>
+        <a class="nav-tab active" href="./docs.html" aria-current="page">Documentation</a>
       </div>
-    </main>
+    </div>
+    <div class="topbar-right">
+      <a href="./catalog.json">Catalog JSON</a>
+      <a href="./lut-studio/">LUT Studio ↗</a>
+      <a href="https://github.com/akkk09/artcraft-store" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+    </div>
+  </nav>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="eyebrow">● USER GUIDES · SDK ARCHITECTURE · ALL 09 APPS</div>
+      <h1>Extension Architecture<br>&amp; Installation Guides.</h1>
+      <p>Step-by-step setup guides, directory paths, and developer architecture references for all ArtCraft creative applications.</p>
+    </section>
+
+    <div class="toast" id="toast" role="alert"></div>
+
+    <div class="filter-section">
+      <div class="filter-label">SELECT APPLICATION:</div>
+      <div class="pill-group" id="app-pills">
+        <button class="pill active" data-app="all">All apps</button>
+        <button class="pill" data-app="photocraft">PhotoCraft</button>
+        <button class="pill" data-app="effectcraft">EffectCraft</button>
+        <button class="pill" data-app="vectorcraft">VectorCraft</button>
+        <button class="pill" data-app="filmcraft">FilmCraft</button>
+        <button class="pill" data-app="soundcraft">SoundCraft</button>
+        <button class="pill" data-app="pdfcraft">PdfCraft</button>
+        <button class="pill" data-app="designcraft">DesignCraft</button>
+        <button class="pill" data-app="lightcraft">LightCraft</button>
+        <button class="pill" data-app="cadcraft">CADCraft</button>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <div class="filter-label">OPERATING SYSTEM:</div>
+      <div class="pill-group" id="os-pills">
+        <button class="pill active" data-os="all">All Systems</button>
+        <button class="pill" data-os="linux">Linux</button>
+        <button class="pill" data-os="macos">macOS</button>
+        <button class="pill" data-os="windows">Windows</button>
+      </div>
+    </div>
+
+    <div class="cards-grid" id="cards-container">
+
+      <!-- PhotoCraft -->
+      <article class="doc-card" data-app="photocraft">
+        <div class="doc-card-head">
+          <div class="doc-glyph">P</div>
+          <div class="doc-title-group">
+            <h2>PhotoCraft</h2>
+            <div class="doc-arch-tag">WASM Filters (ABI v1) &amp; 3D LUTs</div>
+          </div>
+        </div>
+        <p class="doc-desc">Executes sandboxed WebAssembly pixel-manipulation modules (compiled to wasm32-unknown-unknown) with zero OS syscalls, alongside 3D color cubes (.cube).</p>
+        <div class="path-boxes">
+          <div class="path-row" data-os="linux">
+            <strong>Linux:</strong>
+            <code>~/.config/photocraft/plugins/</code>
+            <button class="copy-btn" data-copy="~/.config/photocraft/plugins/">Copy</button>
+          </div>
+          <div class="path-row" data-os="macos">
+            <strong>macOS:</strong>
+            <code>~/Library/Application Support/PhotoCraft/Plugins/</code>
+            <button class="copy-btn" data-copy="~/Library/Application Support/PhotoCraft/Plugins/">Copy</button>
+          </div>
+          <div class="path-row" data-os="windows">
+            <strong>Windows:</strong>
+            <code>%APPDATA%\PhotoCraft\Plugins\</code>
+            <button class="copy-btn" data-copy="%APPDATA%\PhotoCraft\Plugins\">Copy</button>
+          </div>
+        </div>
+        <ol class="steps-list">
+          <li>Download the <code>.wasm</code> filter binary (or <code>.cube</code> 3D LUT file).</li>
+          <li>Copy the file into your platform's plugins directory listed above.</li>
+          <li>Launch PhotoCraft or select <strong>Filter ▸ Rescan Plug-in Directory</strong>.</li>
+          <li>Access the filter under the <strong>Filter</strong> menu in its registered category.</li>
+          <li>For 3D LUTs: Apply via <strong>Image ▸ Adjustments ▸ Apply 3D LUT...</strong> or use <a href="./lut-studio/" style="color:var(--text);font-weight:600">LUT Studio</a>.</li>
+        </ol>
+      </article>
+
+      <!-- EffectCraft -->
+      <article class="doc-card" data-app="effectcraft">
+        <div class="doc-card-head">
+          <div class="doc-glyph">E</div>
+          <div class="doc-title-group">
+            <h2>EffectCraft</h2>
+            <div class="doc-arch-tag">WASM Render Filters (API v1) &amp; ScriptUI Panels (.jsx)</div>
+          </div>
+        </div>
+        <p class="doc-desc">High-performance video render filters in WASM/WAT, paired with dockable ExtendScript panels for keyframing, captions, and audio silence removal.</p>
+        <div class="path-boxes">
+          <div class="path-row" data-os="linux">
+            <strong>Linux:</strong>
+            <code>WASM: ~/.config/effectcraft/plugins/  |  ScriptUI: ~/.config/effectcraft/Scripts/ScriptUI Panels/</code>
+            <button class="copy-btn" data-copy="~/.config/effectcraft/Scripts/ScriptUI Panels/">Copy JSX Path</button>
+          </div>
+          <div class="path-row" data-os="macos">
+            <strong>macOS:</strong>
+            <code>WASM: ~/Library/Application Support/EffectCraft/Plug-ins/  |  ScriptUI: Scripts/ScriptUI Panels/</code>
+            <button class="copy-btn" data-copy="~/Library/Application Support/EffectCraft/Scripts/ScriptUI Panels/">Copy JSX Path</button>
+          </div>
+          <div class="path-row" data-os="windows">
+            <strong>Windows:</strong>
+            <code>WASM: %APPDATA%\EffectCraft\Plug-ins\  |  ScriptUI: Scripts\ScriptUI Panels\</code>
+            <button class="copy-btn" data-copy="%APPDATA%\EffectCraft\Scripts\ScriptUI Panels\">Copy JSX Path</button>
+          </div>
+        </div>
+        <ol class="steps-list">
+          <li><strong>Render Plugins (.wasm, .wat):</strong> Place in plugins folder or load via <strong>Effect ▸ Load Effect Plug-in...</strong>.</li>
+          <li><strong>ScriptUI Panels (.jsx like QuietCraft, EaseCraft):</strong> Copy into <code>Scripts/ScriptUI Panels/</code> and restart EffectCraft.</li>
+          <li>Open your panel from the <strong>Window</strong> menu (e.g. <strong>Window ▸ QuietCraft.jsx</strong>).</li>
+          <li>Dock the panel anywhere in your workspace alongside Effect Controls and Timeline.</li>
+        </ol>
+      </article>
+
+      <!-- VectorCraft -->
+      <article class="doc-card" data-app="vectorcraft">
+        <div class="doc-card-head">
+          <div class="doc-glyph">V</div>
+          <div class="doc-title-group">
+            <h2>VectorCraft</h2>
+            <div class="doc-arch-tag">Object Filters (ABI v1) &amp; SVG Templates (.zip)</div>
+          </div>
+        </div>
+        <p class="doc-desc">Procedural path transforms running in a gas-limited wasmi sandbox, plus editable SVG template packages.</p>
+        <div class="path-boxes">
+          <div class="path-row" data-os="linux">
+            <strong>Linux:</strong>
+            <code>Plugins: ~/.config/vectorcraft/plugins/  |  Templates: ~/.config/vectorcraft/templates/</code>
+            <button class="copy-btn" data-copy="~/.config/vectorcraft/plugins/">Copy</button>
+          </div>
+          <div class="path-row" data-os="macos">
+            <strong>macOS:</strong>
+            <code>Plugins: ~/Library/Application Support/VectorCraft/Plugins/  |  Templates: Templates/</code>
+            <button class="copy-btn" data-copy="~/Library/Application Support/VectorCraft/Plugins/">Copy</button>
+          </div>
+          <div class="path-row" data-os="windows">
+            <strong>Windows:</strong>
+            <code>Plugins: %APPDATA%\VectorCraft\Plugins\  |  Templates: Templates\</code>
+            <button class="copy-btn" data-copy="%APPDATA%\VectorCraft\Plugins\">Copy</button>
+          </div>
+        </div>
+        <ol class="steps-list">
+          <li><strong>WASM Filters:</strong> Copy to plugins folder; open <strong>Window ▸ Plug-in Manager</strong> or <strong>Object ▸ Live Filters</strong>.</li>
+          <li><strong>SVG Templates:</strong> Extract archive into templates directory and select <strong>File ▸ New From Template...</strong>.</li>
+        </ol>
+      </article>
+
+      <!-- FilmCraft -->
+      <article class="doc-card" data-app="filmcraft">
+        <div class="doc-card-head">
+          <div class="doc-glyph">F</div>
+          <div class="doc-title-group">
+            <h2>FilmCraft</h2>
+            <div class="doc-arch-tag">Timeline Effect Presets (JSON v1) &amp; 3D LUTs (.cube)</div>
+          </div>
+        </div>
+        <p class="doc-desc">Declarative parameter and effect chains (filmcraft.effect-presets v1) and 17/33/65-point 3D Look-Up Tables.</p>
+        <div class="path-boxes">
+          <div class="path-row" data-os="linux">
+            <strong>Linux:</strong>
+            <code>LUTs: ~/.config/filmcraft/LUTs/Creative/</code>
+            <button class="copy-btn" data-copy="~/.config/filmcraft/LUTs/Creative/">Copy</button>
+          </div>
+          <div class="path-row" data-os="macos">
+            <strong>macOS:</strong>
+            <code>LUTs: ~/Library/Application Support/FilmCraft/LUTs/Creative/</code>
+            <button class="copy-btn" data-copy="~/Library/Application Support/FilmCraft/LUTs/Creative/">Copy</button>
+          </div>
+          <div class="path-row" data-os="windows">
+            <strong>Windows:</strong>
+            <code>LUTs: %APPDATA%\FilmCraft\LUTs\Creative\</code>
+            <button class="copy-btn" data-copy="%APPDATA%\FilmCraft\LUTs\Creative\">Copy</button>
+          </div>
+        </div>
+        <ol class="steps-list">
+          <li><strong>GUI Import:</strong> Right-click Effects panel Presets bin ▸ <strong>Import Presets...</strong> and select the JSON file.</li>
+          <li><strong>CLI Import:</strong> Run <code>filmcraft-cli --project project.fcproj exec presets.import '{"path":"presets.json"}'</code>.</li>
+          <li><strong>Creative LUTs:</strong> Save <code>.cube</code> files to your LUTs folder or select <strong>Lumetri Color ▸ Creative ▸ Look LUT</strong>.</li>
+        </ol>
+      </article>
+
+      <!-- SoundCraft -->
+      <article class="doc-card" data-app="soundcraft">
+        <div class="doc-card-head">
+          <div class="doc-glyph">S</div>
+          <div class="doc-title-group">
+            <h2>SoundCraft</h2>
+            <div class="doc-arch-tag">CLAP (.clap), VST3 (.vst3), Audio Units &amp; DSP Presets</div>
+          </div>
+        </div>
+        <p class="doc-desc">Host-compliant digital audio workstation loading open CLAP, VST3, and macOS Audio Units with sample-accurate automation.</p>
+        <div class="path-boxes">
+          <div class="path-row" data-os="linux">
+            <strong>Linux:</strong>
+            <code>CLAP: ~/.clap/ or /usr/lib/clap/  |  VST3: ~/.vst3/ or /usr/lib/vst3/</code>
+            <button class="copy-btn" data-copy="~/.clap/">Copy</button>
+          </div>
+          <div class="path-row" data-os="macos">
+            <strong>macOS:</strong>
+            <code>CLAP: ~/Library/Audio/Plug-Ins/CLAP/  |  VST3: Plug-Ins/VST3/  |  AU: Components/</code>
+            <button class="copy-btn" data-copy="~/Library/Audio/Plug-Ins/CLAP/">Copy</button>
+          </div>
+          <div class="path-row" data-os="windows">
+            <strong>Windows:</strong>
+            <code>CLAP: %COMMONPROGRAMFILES%\CLAP\  |  VST3: %COMMONPROGRAMFILES%\VST3\</code>
+            <button class="copy-btn" data-copy="%COMMONPROGRAMFILES%\CLAP\">Copy</button>
+          </div>
+        </div>
+        <ol class="steps-list">
+          <li>Place third-party audio plugins in your platform's standard audio plugin directory.</li>
+          <li>In SoundCraft, open <strong>Preferences ▸ Audio Plug-ins ▸ Rescan All</strong>.</li>
+          <li>Insert the plugin on any channel strip track.</li>
+          <li><strong>Channel Strip Presets:</strong> Load via the track insert header menu (<strong>Load Channel Strip Preset...</strong>).</li>
+        </ol>
+      </article>
+
+      <!-- PdfCraft -->
+      <article class="doc-card" data-app="pdfcraft">
+        <div class="doc-card-head">
+          <div class="doc-glyph">A</div>
+          <div class="doc-title-group">
+            <h2>PdfCraft</h2>
+            <div class="doc-arch-tag">Acrobat JavaScript (ISO 32000 in Boa Sandbox)</div>
+          </div>
+        </div>
+        <p class="doc-desc">Interactive forms, field calculations, and automation scripts running in a sandboxed pure-Rust JavaScript engine.</p>
+        <div class="path-boxes">
+          <div class="path-row" data-os="linux">
+            <strong>Target:</strong>
+            <code>Tools ▸ JavaScript ▸ Document JavaScripts</code>
+          </div>
+        </div>
+        <ol class="steps-list">
+          <li><strong>Form Calculations:</strong> Open PDF in PdfCraft, switch to Form Edit Mode.</li>
+          <li>Right-click field ▸ <strong>Properties ▸ Calculate ▸ Custom Script</strong> and paste calculation logic (e.g. from <code>pdfcraft-invoice-calculator.js</code>).</li>
+          <li><strong>Document Scripts:</strong> Register global scripts via <strong>Tools ▸ JavaScript ▸ Document JavaScripts</strong>.</li>
+        </ol>
+      </article>
+
+      <!-- DesignCraft -->
+      <article class="doc-card" data-app="designcraft">
+        <div class="doc-card-head">
+          <div class="doc-glyph">D</div>
+          <div class="doc-title-group">
+            <h2>DesignCraft</h2>
+            <div class="doc-arch-tag">IDML Publication Templates &amp; Typographic Styles</div>
+          </div>
+        </div>
+        <p class="doc-desc">Multi-page layout templates, master spreads, and typography style packages.</p>
+        <div class="path-boxes">
+          <div class="path-row" data-os="linux">
+            <strong>Path:</strong>
+            <code>Documents/DesignCraft/Templates/</code>
+            <button class="copy-btn" data-copy="Documents/DesignCraft/Templates/">Copy</button>
+          </div>
+        </div>
+        <ol class="steps-list">
+          <li>Save downloaded template archives to <code>Documents/DesignCraft/Templates/</code>.</li>
+          <li>Open directly with <strong>File ▸ New From Template...</strong> or <strong>File ▸ Open...</strong>.</li>
+          <li>Load paragraph &amp; character styles from the Paragraph Styles panel flyout menu.</li>
+        </ol>
+      </article>
+
+      <!-- LightCraft -->
+      <article class="doc-card" data-app="lightcraft">
+        <div class="doc-card-head">
+          <div class="doc-glyph">L</div>
+          <div class="doc-title-group">
+            <h2>LightCraft</h2>
+            <div class="doc-arch-tag">RAW Develop Presets (.xmp) &amp; 3D LUT Profiles (.cube)</div>
+          </div>
+        </div>
+        <p class="doc-desc">Non-destructive RAW photo development parameter curves and color grading profiles.</p>
+        <div class="path-boxes">
+          <div class="path-row" data-os="linux">
+            <strong>Linux:</strong>
+            <code>~/.config/lightcraft/presets/</code>
+            <button class="copy-btn" data-copy="~/.config/lightcraft/presets/">Copy</button>
+          </div>
+          <div class="path-row" data-os="macos">
+            <strong>macOS:</strong>
+            <code>~/Library/Application Support/LightCraft/Presets/</code>
+            <button class="copy-btn" data-copy="~/Library/Application Support/LightCraft/Presets/">Copy</button>
+          </div>
+          <div class="path-row" data-os="windows">
+            <strong>Windows:</strong>
+            <code>%APPDATA%\LightCraft\Presets\</code>
+            <button class="copy-btn" data-copy="%APPDATA%\LightCraft\Presets\">Copy</button>
+          </div>
+        </div>
+        <ol class="steps-list">
+          <li>Open LightCraft's Develop module.</li>
+          <li>Click Presets panel <strong>(+) ▸ Import Presets...</strong> and select <code>.xmp</code> or preset bundle.</li>
+          <li>Load 3D LUT profiles in <strong>Color Grading ▸ Profiles</strong> dropdown.</li>
+        </ol>
+      </article>
+
+      <!-- CADCraft -->
+      <article class="doc-card" data-app="cadcraft">
+        <div class="doc-card-head">
+          <div class="doc-glyph">C</div>
+          <div class="doc-title-group">
+            <h2>CADCraft</h2>
+            <div class="doc-arch-tag">Command Scripts (.cadscr) &amp; Geometric Macros</div>
+          </div>
+        </div>
+        <p class="doc-desc">Parametric drafting automation, batch coordinate drawing, and procedural geometry macros.</p>
+        <div class="path-boxes">
+          <div class="path-row" data-os="linux">
+            <strong>Linux:</strong>
+            <code>~/.config/cadcraft/scripts/</code>
+            <button class="copy-btn" data-copy="~/.config/cadcraft/scripts/">Copy</button>
+          </div>
+          <div class="path-row" data-os="macos">
+            <strong>macOS:</strong>
+            <code>~/Library/Application Support/CADCraft/Scripts/</code>
+            <button class="copy-btn" data-copy="~/Library/Application Support/CADCraft/Scripts/">Copy</button>
+          </div>
+          <div class="path-row" data-os="windows">
+            <strong>Windows:</strong>
+            <code>%APPDATA%\CADCraft\Scripts\</code>
+            <button class="copy-btn" data-copy="%APPDATA%\CADCraft\Scripts\">Copy</button>
+          </div>
+        </div>
+        <ol class="steps-list">
+          <li>In CADCraft command line prompt, run: <code>SCRIPT "path/to/script.cadscr"</code>.</li>
+          <li>Run interactive macros via <strong>Tools ▸ Run Macro / Script...</strong>.</li>
+          <li>Bind macros to workspace shortcut keys or custom toolbar buttons.</li>
+        </ol>
+      </article>
+
+    </div>
+
+    <!-- Developer Reference -->
+    <section class="dev-card">
+      <h3>Developer &amp; SDK Architecture</h3>
+      <p>Build native WebAssembly filters in Rust using <code>wasm32-unknown-unknown</code>:</p>
+      <pre><code>cargo build --target wasm32-unknown-unknown --release</code></pre>
+      <p>Run the local store catalog audit and unit test suite:</p>
+      <pre><code>python3 -m unittest tests/test_catalog.py
+python3 scripts/validate_catalog.py --check-artifacts</code></pre>
+    </section>
 
     <footer>
-      <span>Community project · Not affiliated with ArtCraft app maintainers.</span>
+      <span>ARTCRAFT STORE · COMMUNITY PROJECT</span>
       <span>
         <a href="./">Catalog</a> ·
         <a href="./lut-studio/">LUT Studio</a> ·
-        <a href="catalog.json">Catalog JSON</a> ·
-        <a href="https://github.com/akkk09/artcraft-store">Source Code</a> ·
-        MIT License
+        <a href="./catalog.json">Catalog JSON</a> ·
+        <a href="https://github.com/akkk09/artcraft-store" target="_blank" rel="noopener noreferrer">Source code</a> ·
+        MIT
       </span>
     </footer>
-  </div>
+  </main>
 
   <script>
-    // OS Switcher filtering logic
-    const osButtons = document.querySelectorAll('.os-btn');
-    const osRows = document.querySelectorAll('.os-row');
+    let activeApp = "all";
+    let activeOs = "all";
 
-    osButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const os = btn.dataset.os;
-        osButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+    const toast = document.getElementById("toast");
+    function showToast(text) {
+      toast.textContent = "✓ " + text;
+      toast.style.display = "block";
+      setTimeout(() => { toast.style.display = "none"; }, 2400);
+    }
 
-        osRows.forEach(row => {
-          if (os === 'all' || row.dataset.osRow === os) {
-            row.style.display = '';
-          } else {
-            row.style.display = 'none';
-          }
-        });
+    const appPills = document.querySelectorAll("#app-pills .pill");
+    const osPills = document.querySelectorAll("#os-pills .pill");
+    const cards = document.querySelectorAll(".doc-card");
+    const pathRows = document.querySelectorAll(".path-row");
+
+    function updateView() {
+      cards.forEach(card => {
+        const app = card.dataset.app;
+        const matchesApp = (activeApp === "all" || app === activeApp);
+        card.style.display = matchesApp ? "block" : "none";
+      });
+
+      pathRows.forEach(row => {
+        const os = row.dataset.os;
+        const matchesOs = (!os || activeOs === "all" || os === activeOs);
+        row.style.display = matchesOs ? "flex" : "none";
+      });
+    }
+
+    appPills.forEach(btn => {
+      btn.addEventListener("click", () => {
+        appPills.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeApp = btn.dataset.app;
+        updateView();
       });
     });
 
-    // Copy button feedback logic
-    document.querySelectorAll('.copy-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+    osPills.forEach(btn => {
+      btn.addEventListener("click", () => {
+        osPills.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeOs = btn.dataset.os;
+        updateView();
+      });
+    });
+
+    document.querySelectorAll(".copy-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
         const text = btn.dataset.copy;
         if (!text) return;
         navigator.clipboard.writeText(text).then(() => {
-          const original = btn.textContent;
-          btn.textContent = 'Copied!';
-          btn.classList.add('copied');
-          setTimeout(() => {
-            btn.textContent = original;
-            btn.classList.remove('copied');
-          }, 1800);
+          showToast("Copied " + text + " to clipboard");
         });
       });
     });
 
-    document.querySelectorAll('.copy-code-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const text = btn.dataset.code || btn.nextElementSibling.textContent;
-        if (!text) return;
-        navigator.clipboard.writeText(text).then(() => {
-          const original = btn.textContent;
-          btn.textContent = 'Copied!';
-          btn.classList.add('copied');
-          setTimeout(() => {
-            btn.textContent = original;
-            btn.classList.remove('copied');
-          }, 1800);
-        });
-      });
-    });
+    // Check URL parameters (e.g. docs.html?app=effectcraft)
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramApp = urlParams.get("app");
+    if (paramApp) {
+      const match = document.querySelector(`#app-pills .pill[data-app="${paramApp}"]`);
+      if (match) match.click();
+    }
   </script>
 </body>
 </html>
