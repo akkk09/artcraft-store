@@ -4,7 +4,7 @@
 // Built against EffectCraft's public scripting API:
 // comp.layers.addText, TextDocument, layer.timing, layer.inPoint, layer.outPoint,
 // app.project.activeItem, app.settings, and ScriptUI.
-// Original work by EffectCraft contributors under MIT OR Apache-2.0.
+// Original work by EffectCraft contributors under the MIT License.
 
 (function captionCraft(thisObj) {
   var SECTION = "CaptionCraft";

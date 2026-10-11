@@ -3,7 +3,7 @@ name = "vectorcraft-vectorfirstaid"
 version = "1.0.0"
 edition = "2021"
 description = "VectorFirstAid document and vector cleanup tool for VectorCraft"
-license = "MIT OR Apache-2.0"
+license = "MIT"
 
 [lib]
 crate-type = ["cdylib", "rlib"]

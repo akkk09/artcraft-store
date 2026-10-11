@@ -47,7 +47,7 @@ pub const MODELS: &[ModelSpec] = &[
         name: "Classical Gradient & Focus Proxy",
         description: "Pure-Rust multi-scale edge gradient and focus depth estimator. Zero external weights, deterministic, runs in sandboxed wasm and CPU.",
         authors: "EffectCraft contributors",
-        license: "MIT OR Apache-2.0",
+        license: "MIT",
         license_url: "https://github.com/storytold/effectcraft/blob/main/LICENSE-MIT",
         homepage: "https://github.com/storytold/effectcraft",
         default_resolution: (256, 256),

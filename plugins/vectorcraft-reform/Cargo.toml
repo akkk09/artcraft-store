@@ -3,7 +3,7 @@ name = "vectorcraft-reform"
 version = "1.0.0"
 edition = "2021"
 description = "Vector Reform path sculpting and reshaping plugin for VectorCraft"
-license = "MIT OR Apache-2.0"
+license = "MIT"
 
 [lib]
 crate-type = ["cdylib", "rlib"]

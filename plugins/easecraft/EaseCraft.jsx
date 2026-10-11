@@ -4,7 +4,7 @@
 // Built against EffectCraft's public scripting API:
 // comp.selectedProperties, Property.selectedKeys, keyInTemporalEase, keyOutTemporalEase,
 // setTemporalEaseAtKey, KeyframeEase, setInterpolationTypeAtKey, app.settings, and ScriptUI.
-// Original work by EffectCraft contributors under MIT OR Apache-2.0.
+// Original work by EffectCraft contributors under the MIT License.
 
 (function easeCraft(thisObj) {
   var SECTION = "EaseCraft";

@@ -1,6 +1,6 @@
 # DepthCraft Attribution & Licensing
 
-DepthCraft is an original EffectCraft plugin developed under the project license (MIT OR Apache-2.0).
+DepthCraft is an original EffectCraft plugin developed under the project license (MIT).
 
 ## Open Model References & Specifications
 
@@ -24,5 +24,5 @@ DepthCraft is an original EffectCraft plugin developed under the project license
    - **Reference**: https://gist.github.com/mikhailov-work/ee72ba419ac4274247068a81a13600f6
 
 ## Original Implementation
-All plugin code, bilateral cross-edge refinement, adaptive temporal smoothing filters, and pipeline caching are original works licensed under **MIT OR Apache-2.0**.
+All plugin code, bilateral cross-edge refinement, adaptive temporal smoothing filters, and pipeline caching are original works licensed under **MIT**.
 No proprietary code, binaries, or assets from third-party plugins were accessed, decompiled, or copied.

@@ -4,7 +4,7 @@
 // Built against EffectCraft's public scripting API:
 // comp.selectedLayers, layer.transform, layer.sourceRectAtTime, dimensionsSeparated,
 // threeDLayer, app.beginUndoGroup, app.settings, and ScriptUI.
-// Original work by EffectCraft contributors under MIT OR Apache-2.0.
+// Original work by EffectCraft contributors under the MIT License.
 
 (function pivotCraft(thisObj) {
   var SECTION = "PivotCraft";

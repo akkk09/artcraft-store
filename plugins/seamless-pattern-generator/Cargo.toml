@@ -2,6 +2,7 @@
 name = "photocraft-plugin-seamless-pattern-generator"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
 
 [lib]
 name = "photocraft_plugin_seamless_pattern_generator"

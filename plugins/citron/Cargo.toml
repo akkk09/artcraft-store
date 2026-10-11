@@ -3,7 +3,7 @@ name = "citron"
 version = "1.0.0"
 edition = "2024"
 description = "Citron: Maya/Blender-inspired multi-channel graph editor, FFD lattice cage tool, and curve engine for EffectCraft"
-license = "MIT OR Apache-2.0"
+license = "MIT"
 authors = ["EffectCraft Contributors"]
 
 [dependencies]

@@ -3,7 +3,7 @@ name = "pastecraft"
 version = "0.1.0"
 edition = "2024"
 description = "Universal clipboard asset importer, vector converter, and layer replacer for EffectCraft"
-license = "MIT OR Apache-2.0"
+license = "MIT"
 authors = ["EffectCraft Contributors"]
 
 [dependencies]

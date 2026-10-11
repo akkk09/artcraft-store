@@ -3,7 +3,7 @@ name = "glassify"
 description = "Glassify: Advanced optical glass rendering effect with refraction, chromatic dispersion, frosted blur, and procedural distortion for EffectCraft"
 version = "1.0.0"
 edition = "2024"
-license = "MIT OR Apache-2.0"
+license = "MIT"
 publish = false
 
 # Standalone workspace so it can target both wasm32-unknown-unknown cdylib and native host cli.

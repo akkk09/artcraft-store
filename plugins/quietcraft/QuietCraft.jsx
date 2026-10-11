@@ -4,7 +4,7 @@
 // Built against EffectCraft's public scripting API:
 // app.project.activeItem, comp.selectedLayers, layer.inPoint, layer.outPoint, layer.startTime,
 // layer.duplicate(), layer.marker, app.beginUndoGroup, app.settings, and ScriptUI.
-// Original work by EffectCraft contributors under MIT OR Apache-2.0.
+// Original work by EffectCraft contributors under the MIT License.
 
 (function quietCraft(thisObj) {
   var SECTION = "QuietCraft";

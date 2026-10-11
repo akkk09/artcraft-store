@@ -3,7 +3,7 @@ name = "vectorcraft-plugin-recolor"
 version = "0.1.0"
 edition = "2021"
 description = "VectorCraft object filter plugin for adjusting vector colors and saturation"
-license = "MIT OR Apache-2.0"
+license = "MIT"
 
 [lib]
 crate-type = ["cdylib"]

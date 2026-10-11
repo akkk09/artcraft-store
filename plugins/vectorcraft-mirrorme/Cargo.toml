@@ -3,7 +3,7 @@ name = "vectorcraft-plugin-mirrorme"
 version = "0.1.0"
 edition = "2021"
 description = "VectorCraft MirrorMe plugin: Real-time symmetry, axis reflection, and kaleidoscopic vector replication"
-license = "MIT OR Apache-2.0"
+license = "MIT"
 
 [lib]
 crate-type = ["cdylib", "rlib"]

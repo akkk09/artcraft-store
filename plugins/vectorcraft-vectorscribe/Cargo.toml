@@ -3,7 +3,7 @@ name = "vectorcraft-vectorscribe"
 version = "1.0.0"
 edition = "2021"
 description = "VectorScribe path, node and handle editing toolkit for VectorCraft"
-license = "MIT OR Apache-2.0"
+license = "MIT"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
