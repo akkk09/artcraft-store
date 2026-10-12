@@ -312,6 +312,33 @@ static mut RENDER_BUF: [u8; 1024 * 1024 * 16] = [0; 1024 * 1024 * 16];
 pub extern "C" fn ec_alloc(bytes: i32) -> i32 {
     unsafe { RENDER_BUF.as_mut_ptr() as usize as i32 }
 }
+
+#[no_mangle]
+pub unsafe extern "C" fn ec_render(
+    pixels: i32,
+    width: i32,
+    height: i32,
+    params: i32,
+    nparams: i32,
+    time: f64,
+    scale: f64,
+) -> i32 {
+    if width <= 0 || height <= 0 || nparams < 1 {
+        return 1;
+    }
+    let p = std::slice::from_raw_parts(params as usize as *const f64, nparams as usize);
+    let gain = p[0] as f32;
+    let total_pixels = (width as usize) * (height as usize);
+    let px = std::slice::from_raw_parts_mut(pixels as usize as *mut [f32; 4], total_pixels);
+
+    for pixel in px.iter_mut() {
+        pixel[0] = (pixel[0] * gain).min(1.0); // R
+        pixel[1] = (pixel[1] * gain).min(1.0); // G
+        pixel[2] = (pixel[2] * gain).min(1.0); // B
+        // Alpha (pixel[3]) preserved
+    }
+    0
+}
 "##;
 
 const SCRIPTUI_PANEL_SNIPPET: &str = r#"// EffectCraft ScriptUI Dockable Panel (.jsx ExtendScript)
