@@ -576,6 +576,27 @@
       "compatibility": "EffectCraft ScriptUI / ExtendScript"
     },
     {
+      "id": "org.effectcraft.community.effectcraft-link",
+      "name": "EffectCraft Link",
+      "version": "1.0.0",
+      "author": "doolecg",
+      "description": "Blender add-on that sends models, cameras, lights and camera animation into EffectCraft, and updates them when you export again.",
+      "kind": "tool",
+      "abi": 1,
+      "sourceUrl": "https://github.com/doolecg/ec-blender-link",
+      "downloadUrl": "https://github.com/doolecg/ec-blender-link/releases/download/1.0.0/effectcraft_link-1.0.0.zip",
+      "tags": [
+        "blender",
+        "gltf",
+        "import",
+        "camera",
+        "lights",
+        "pipeline"
+      ],
+      "app": "effectcraft",
+      "compatibility": "EffectCraft 0.6+ with Blender 4.0+ (external Blender add-on; talks to EffectCraft's local control channel)"
+    },
+    {
       "id": "org.filmcraft.community.film-emulation",
       "name": "Film Emulation Presets & LUTs",
       "version": "0.1.0",

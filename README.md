@@ -132,6 +132,7 @@ The browser-based LUT Studio is available at `https://akkk09.github.io/artcraft-
 | **PivotCraft** | Tool (ScriptUI / ExtendScript) | Fast, predictable anchor-point placement, layer alignment, and transform-compensated pivot tool (`PivotCraft.jsx`). |
 | **Citron** | Tool (ScriptUI / ExtendScript) | Maya/Blender-inspired multi-channel curve workspace, FFD lattice cage tool, and graph editor (`Citron.jsx`). |
 | **PasteCraft** | Tool (ScriptUI / ExtendScript) | Universal clipboard asset importer, vector SVG converter, and in-place layer replacer with transform & effect preservation (`PasteCraft.jsx`). |
+| **EffectCraft Link** | Tool (Blender add-on) | Sends Blender models, cameras, lights and camera animation into EffectCraft, and re-syncs on export (`effectcraft_link-1.0.0.zip`, hosted in [doolecg/ec-blender-link](https://github.com/doolecg/ec-blender-link)). |
 
 In EffectCraft:
 - Native / WASM effect plug-ins (**Glassify**, **LumaSweep**, **DepthCraft**, **Chromatic Fringe**) can be loaded via **Effect → Load Effect Plug-in** or placed in `~/.config/effectcraft/plugins/`.
