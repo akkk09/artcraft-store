@@ -1,4 +1,4 @@
-# ArtCraft Store
+# ArtCraft Store (DEPRECATED.)
 
 [![Storefront](https://img.shields.io/badge/Storefront-Live-2ea043?style=for-the-badge)](https://akkk09.github.io/artcraft-store/)
 [![Documentation](https://img.shields.io/badge/Documentation-Installation_%26_Developer_Guide-0969da?style=for-the-badge)](https://akkk09.github.io/artcraft-store/docs.html)
